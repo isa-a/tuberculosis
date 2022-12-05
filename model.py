@@ -38,8 +38,9 @@ def deriv(y, t, N, beta, gamma):
     dU = b - ((lamda + mu) * U)
     dLf = (lamda*U) + ((c*lamda)*(Ls + R)) - ((u + v + mu) * Lf)
     dLs = (u * Lf) - ((w + c*lamda + mu) * Ls)
-    dJ = ((beta * S * I) / N)
-    return dS, dI, dR, dJ
+    dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I)
+    dR = ((gamma + sigma) * I) - ((rho - c*lamda + mu) * R)
+    return dU, dLf, dLs, dI, dR, Prevalence
 
 
 # Total population, N.
