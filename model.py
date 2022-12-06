@@ -20,20 +20,28 @@ Prevalence = I0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
 beta, gamma = 1.47617188, 1/7
 lamda = beta * I0
-clambda = lamda
+clamda = lamda
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.083, 0.88, 0.0006
+t = np.linspace(0, 600, 600+1)
 
 # The SIR model differential equations.
 def deriv(y, t, N, beta, gamma, lamda, clamda, mu, muTB, sigma, rho, u, v, w):
     U, Lf, Ls, I, R, Prevalence = y
     b = mu(U + Lf + Ls + R) + muTB
     dU = b - ((lamda + mu) * U)
-    dLf = (lamda*U) + ((c*lamda)*(Ls + R)) - ((u + v + mu) * Lf)
-    dLs = (u * Lf) - ((w + c*lamda + mu) * Ls)
+    dLf = (lamda*U) + ((clamda)*(Ls + R)) - ((u + v + mu) * Lf)
+    dLs = (u * Lf) - ((w + clamda + mu) * Ls)
     dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I)
-    dR = ((gamma + sigma) * I) - ((rho - c*lamda + mu) * R)
+    dR = ((gamma + sigma) * I) - ((rho - clamda + mu) * R)
     return dU, dLf, dLs, dI, dR, Prevalence
+
+
+# Initial conditions are S0, I0, R0
+# Integrate the SIR equations over the time grid, t.
+solve = odeint(deriv, (U0, I0, R0, Prevalence), t, args=(N, beta, gamma, lamda, clamda, mu, muTB, sigma, rho, u, v, w))
+U, Lf, Ls, I, R, Prevalence = solve.T
+
 
 
 # Total population, N.
