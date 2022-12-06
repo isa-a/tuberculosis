@@ -25,7 +25,7 @@ mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.083, 0.88, 0.0006
 
 # The SIR model differential equations.
-def deriv(y, t, N, beta, gamma):
+def deriv(y, t, N, beta, gamma, lamda, clamda, mu, muTB, sigma, rho, u, v, w):
     U, Lf, Ls, I, R, Prevalence = y
     b = mu(U + Lf + Ls + R) + muTB
     dU = b - ((lamda + mu) * U)
