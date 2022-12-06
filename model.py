@@ -9,14 +9,6 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 
-#three compartments, Susceptible S, infected I, recovered R
-#dS/dt, dI/dt, dR/dt
-#susceptible sees birth rate coming in, deaths leaving and force of infection leaving
-#infected sees FOI coming in, deaths leaving and recovery rates
-#recovered sees recovery rate coming in, deaths leaving
-#beta is tranmission coefficient, FOI is beta * (I/N) where N is total pop
-#initially consider a model not accounting for births and deaths
-
 
 # Total population, N.
 N = 100000
@@ -28,6 +20,7 @@ Prevalence = I0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
 beta, gamma = 1.47617188, 1/7
 lamda = beta * I0
+clambda = lamda
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.083, 0.88, 0.0006
 
