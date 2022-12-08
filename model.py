@@ -27,7 +27,7 @@ t = np.linspace(0, 600, 600+1)
 def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
     U, Lf, Ls, I, R = y
     b = (mu * (U + Lf + Ls + R)) + muTB
-    lamda = beta * I0
+    lamda = beta * (I0/N)
     clamda = 0.2 * lamda
     dU = b - ((lamda + mu) * U)
     dLf = (lamda*U) + ((clamda)*(Ls + R)) - ((u + v + mu) * Lf)
