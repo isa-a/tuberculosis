@@ -13,20 +13,20 @@ import matplotlib.pyplot as plt
 # Total population, N.
 N = 1
 # Initial number of infected and recovered individuals, I0 and R0.
-I0, R0 = 0.0001, 0
+I0, R0 = 0.01, 0
 # Everyone else, S0, is susceptible to infection initially.
 U0 = N - I0 - R0
-Lf0, Ls0 = 0, 0
+Lf0, Ls0 = 0.0001, 0.001
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 0.2, 1/7
+beta, gamma = 0.2, 1/11
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.083, 0.88, 0.0006
-t = np.linspace(0, 20, 20+1)
+t = np.linspace(0, 600, 600+1)
 
 # The SIR model differential equations.
 def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
     U, Lf, Ls, I, R = y
-    b = (mu * (U + Lf + Ls + R)) + muTB
+    b = (mu * (U + Lf + Ls + R)) + (muTB * I0)
     lamda = beta * (I0)
     clamda = 0.2 * lamda
     dU = b - ((lamda + mu) * U)
