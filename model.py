@@ -25,7 +25,7 @@ t = np.linspace(0, 600, 600+1)
 
 # The SIR model differential equations.
 def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, tau, u, v, w):
-    U, Lf, Ls, I, R = y
+    U, Lf, Ls, I, R, Prevalence = y
     b = (mu * (U + Lf + Ls + R)) + (muTB * I0)
     lamda = beta * (I0)
     clamda = 0.2 * lamda
@@ -34,7 +34,8 @@ def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, tau, u, v, w):
     dLs = (u * Lf) - ((w + clamda + mu) * Ls)
     dI = w*Ls + v*Lf - ((gamma + muTB + sigma + tau) * I) + (rho * R)
     dR = ((gamma + sigma + tau) * I) - ((rho + clamda + mu) * R)
-    return dU, dLf, dLs, dI, dR
+    Prev = w*Ls + v*Lf + (rho * R)
+    return dU, dLf, dLs, dI, dR, Prev
 
 
 # Integrate the SIR equations over the time grid, t.
@@ -136,3 +137,4 @@ legend.get_frame().set_alpha(0.5)
 #for spine in ('top', 'right', 'bottom', 'left'):
 #    ax.spines[spine].set_visible(False)
 plt.show()
+
