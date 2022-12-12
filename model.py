@@ -37,14 +37,10 @@ def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
     return dU, dLf, dLs, dI, dR
 
 
-# Initial conditions are S0, I0, R0
 # Integrate the SIR equations over the time grid, t.
 solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
 U, Lf, Ls, I, R = solve.T
 
-# J_diff = Prevalence[1:] - Prevalence[:-1]
-# J_diff = np.diff(Prevalence)
-# Plot the data on three separate curves for S(t), I(t) and R(t)
 fig = plt.figure(facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 ax.plot(t, U/100000, 'b', alpha=1, lw=2, label='uninfected')
@@ -52,18 +48,11 @@ ax.plot(t, Lf/100000, 'r', alpha=1, lw=2, label='latent fast')
 ax.plot(t, Ls/100000, 'black', alpha=1, lw=2, label='latent slow')
 ax.plot(t, I/100000, 'green', alpha=1, lw=2, label='infected')
 ax.plot(t, R/100000, 'red', alpha=1, lw=2, label='recovered')
-#ax.plot(t, Prevalence/100000, 'red', alpha=1, lw=2, label='prevalence')
-#ax.plot(t[1:], J_diff, 'blue', alpha=1, lw=2, label='Daily incidence')
 ax.set_xlabel('Time in days')
 ax.set_ylabel('Number')
-#ax.set_ylim(0,1.1)
-#ax.yaxis.set_tick_params(length=0)
-#ax.xaxis.set_tick_params(length=0)
 ax.grid(b=True, which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
-#for spine in ('top', 'right', 'bottom', 'left'):
-#    ax.spines[spine].set_visible(False)
 plt.show()
 
 
