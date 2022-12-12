@@ -19,7 +19,7 @@ U0 = N - I0 - R0
 Lf0, Ls0 = 0.0001, 0.001
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
 beta, gamma = 0.2, 1/11
-mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
+mu, muTB, sigma, rho, tau = 1/80, 1/6, 1/6, 0.03, 0.2
 u, v, w = 0.083, 0.88, 0.0006
 t = np.linspace(0, 600, 600+1)
 
@@ -32,8 +32,8 @@ def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
     dU = b - ((lamda + mu) * U)
     dLf = (lamda*U) + ((clamda)*(Ls + R)) - ((u + v + mu) * Lf)
     dLs = (u * Lf) - ((w + clamda + mu) * Ls)
-    dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I) + (rho * R)
-    dR = ((gamma + sigma) * I) - ((rho + clamda + mu) * R)
+    dI = w*Ls + v*Lf - ((gamma + muTB + sigma + tau) * I) + (rho * R)
+    dR = ((gamma + sigma + tau) * I) - ((rho + clamda + mu) * R)
     return dU, dLf, dLs, dI, dR
 
 
