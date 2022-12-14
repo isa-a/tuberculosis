@@ -26,7 +26,7 @@ t = np.linspace(0, 20, 20+1)
 
 # The SIR model differential equations.
 def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
-    U, Lf, Ls, I, R, Prevalence = y
+    U, Lf, Ls, I, R, cInc = y
     b = (mu * (U + Lf + Ls + R)) + (muTB * I)
     lamda = beta * I
     clamda = 0.2 * lamda
@@ -54,7 +54,7 @@ ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
 #ax.plot(t, R/100000, 'red', alpha=1, lw=2, label='recovered')
 ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='Daily incidence')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
-ax.set_xlabel('Time in days')
+ax.set_xlabel('Time in years')
 ax.set_ylabel('Number')
 ax.grid(b=True, which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
