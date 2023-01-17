@@ -104,7 +104,7 @@ for i, j in zip(beta_samples, gamma_samples):
     accepted = []
     
     if 320 < I[-1]*100000 < 480 and 240 < (cInc[1:] - cInc[:-1])[-1]*100000 < 360:
-        print('pprevalence is ', I[-1]*100000, 'incidence is ', (cInc[1:] - cInc[:-1])[-1]*100000)
+        print('for beta of', beta, 'and gamma of', gamma, 'pprevalence is ', I[-1]*100000, 'incidence is ', (cInc[1:] - cInc[:-1])[-1]*100000)
     else:
         print('values rejected')
 
