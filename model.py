@@ -66,7 +66,7 @@ plt.show()
 beta_samples = np.random.uniform(0, 30, 10)
 gamma_samples = np.random.uniform(0, 2, 10)
 
-for i in beta_samples:
+for i, j in zip(beta_samples, gamma_samples):
     # Total population, N.
     N = 1
     # Initial number of infected and recovered individuals, I0 and R0.
@@ -76,7 +76,7 @@ for i in beta_samples:
     J0 = I0
     Lf0, Ls0 = 0, 0
     # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-    beta, gamma = i, 0.4
+    beta, gamma = i, j
     mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
     u, v, w = 0.88, 0.083, 0.0006
     t = np.linspace(0, 500, 500+1)
@@ -107,6 +107,7 @@ for i in beta_samples:
         print('pprevalence is ', I[-1]*100000, 'incidence is ', (cInc[1:] - cInc[:-1])[-1]*100000)
     else:
         print('values rejected')
+
 
     
     J_diff = cInc[1:] - cInc[:-1]
