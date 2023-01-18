@@ -63,9 +63,12 @@ legend.get_frame().set_alpha(0.5)
 plt.show()
 
 
-beta_samples = np.random.uniform(0, 30, 10)
-gamma_samples = np.random.uniform(0, 2, 10)
 
+
+beta_samples = np.random.uniform(0, 30, 500)
+gamma_samples = np.random.uniform(0, 2, 500)
+accepted = []
+rejected = []
 for i, j in zip(beta_samples, gamma_samples):
     # Total population, N.
     N = 1
@@ -99,36 +102,15 @@ for i, j in zip(beta_samples, gamma_samples):
     # Integrate the SIR equations over the time grid, t.
     solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
     U, Lf, Ls, I, R, cInc = solve.T
-    
-    rejected = []
-    accepted = []
-    
+
     if 320 < I[-1]*100000 < 480 and 240 < (cInc[1:] - cInc[:-1])[-1]*100000 < 360:
+        acc = [320 < I[-1]*100000 < 480]
+        accepted.append(acc)
         print('for beta of', beta, 'and gamma of', gamma, 'pprevalence is ', I[-1]*100000, 'incidence is ', (cInc[1:] - cInc[:-1])[-1]*100000)
     else:
-        print('values rejected')
-
-
-    
-    J_diff = cInc[1:] - cInc[:-1]
-    #J_diff = np.diff(cInc)
-    fig = plt.figure(facecolor='w')
-    ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
-    #ax.plot(t, U/100000, 'b', alpha=1, lw=2, label='uninfected')
-    #ax.plot(t, Lf/100000, 'r', alpha=1, lw=2, label='latent fast')
-    #ax.plot(t, Ls/100000, 'black', alpha=1, lw=2, label='latent slow')
-    ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
-    #ax.plot(t, R/100000, 'red', alpha=1, lw=2, label='recovered')
-    ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='Daily incidence')
-    #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
-    ax.set_xlabel('Time in years')
-    ax.set_ylabel('Number')
-    ax.grid(b=True, which='major', c='w', lw=2, ls='-')
-    legend = ax.legend()
-    legend.get_frame().set_alpha(0.5)
-    plt.show()
-
-
+        rejected.append(beta_samples)
+        print('values of', beta, 'and gamma of', gamma, 'rejected')
+print(len(accepted), 'vals accepted')
 
 
 
@@ -193,3 +175,15 @@ x0 = [6, 0.4] #beta, i0, gamma
 res = minimize(residual, x0, method="Nelder-Mead", options={'fatol':1e-04}).x
 print(res)
 
+
+mylist = []
+rej = []
+q =(0,2,2)
+w= range(1,8,2)
+for y,x in zip(q,w):
+    if x+y > 4:
+        mylist.append(str(x+y))
+    else:
+        rej.append(str(x+y))
+print(mylist)
+print(rej)
