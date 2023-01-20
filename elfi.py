@@ -51,8 +51,8 @@ def derivative(beta, gamma, batch_size = 1, random_state = None):
 
     return resultz
 
-def SSE(x, y):
-    return np.atleast_1d(np.sum((x-y) ** 2, axis=1))
+# def SSE(x, y):
+#     return np.atleast_1d(np.sum((x-y) ** 2, axis=1))
 
 def select_var(X, variable=3):
     """
@@ -66,11 +66,11 @@ def select_var(X, variable=3):
     """
     return X[:,:,variable]
 
-def autocov(x, lag=1):
-    x = np.atleast_2d(x)
-    # In R this is normalized with x.shape[1]
-    C = np.mean(x[:, lag:] * x[:, :-lag], axis=1)
-    return C
+# def autocov(x, lag=1):
+#     x = np.atleast_2d(x)
+#     # In R this is normalized with x.shape[1]
+#     C = np.mean(x[:, lag:] * x[:, :-lag], axis=1)
+#     return C
 
 vectorized_derivative = elfi.tools.vectorize(derivative)
 
@@ -82,13 +82,17 @@ beta_prior = elfi.Prior('uniform', 0, 30, model=model)
 gamma_prior = elfi.Prior('uniform', 0, 2, model=model)
 
 sim_results = elfi.Simulator(vectorized_derivative, model['beta_prior'], model['gamma_prior'], observed = y_obs_I)
+elfi.draw(sim_results)
+sim_results.generate()
 
-var = elfi.Summary(select_var, model['Y_lv'], 3)
+var = elfi.Summary(select_var, model['sim_results'], 3)
+var.generate()
 
 #summ = elfi.Summary(autocov, model['I'], 1)
 
 #elfi.Distance(SSE, model['S1'], name='dist')
 elfi.Distance('euclidean', var, name='dista')
+
 
 rej = elfi.Rejection(model['dista'], batch_size = 1, seed = 1)
 result = rej.sample(1000, quantile = 0.01)
@@ -103,3 +107,6 @@ plt.close()
 
 
 rej.extract_result()
+
+
+
