@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jan 19 12:29:50 2023
+Created on Fri Jan 20 14:16:08 2023
 
 @author: ISA
 """
 
 import elfi
-import time
 import numpy as np
-import scipy.stats
 import matplotlib.pyplot as plt
-import logging
 from scipy.integrate import odeint
-from scipy.optimize import minimize
-elfi.set_client('multiprocessing')
 
 seed = 20170530  # this will be separately given to ELFI
 np.random.seed(seed)
@@ -27,7 +22,7 @@ U0 = N - I0 - R0
 J0 = I0
 Lf0, Ls0 = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 8, 0.4
+beta0, gamma0 = 8, 0.4
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
 t = np.linspace(0, 500, 500+1)
@@ -46,17 +41,6 @@ def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
     cI = w*Ls + v*Lf + (rho * R)
     return dU, dLf, dLs, dI, dR, cI
 
-
-# Integrate the SIR equations over the time grid, t.
-solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
-U, Lf, Ls, I, R, cInc = solve.T
-
-
-#try using I as observed data
-y_obs_I = np.array(I)
-y_obs_I = y_obs_I.flatten()
-
-
 def derivative(beta, gamma, batch_size = 1, random_state = None):
     
     y0 = [U0, Lf0, Ls0, I0, R0, J0]
@@ -64,39 +48,58 @@ def derivative(beta, gamma, batch_size = 1, random_state = None):
     times = np.linspace(0, 500, 500+1)
     
     resultz = odeint(deriv, y0, times, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
-    
-    return resultz.flatten()
 
+    return resultz
 
-beta_prior = elfi.Prior('uniform', 6, 9, name = 'beta')
-gamma_prior = elfi.Prior('uniform', 0, 1, name = 'gamma')
-
-Y_lv = elfi.Simulator(derivative, beta_prior, gamma_prior, observed = y_obs_I)
-Y_lv.generate()
-
-# Define sum of squared errors as the distance function
 def SSE(x, y):
-   return np.atleast_1d(np.sum((x-y)**2))
-d_lv = elfi.Distance(SSE, Y_lv)
-d_lv.generate()
-elfi.draw(d_lv)
-rej = elfi.Rejection(d_lv, batch_size = 1, seed = seed)
-result = rej.sample(50, quantile = 0.01)
+    return np.atleast_1d(np.sum((x-y) ** 2, axis=1))
+
+def select_var(X, variable=3):
+    """
+    variable name
+       0       U0
+       1      Lf0
+       2      Ls0
+       3       I0
+       4       R0
+       5       J0
+    """
+    return X[:,:,variable]
+
+def autocov(x, lag=1):
+    x = np.atleast_2d(x)
+    # In R this is normalized with x.shape[1]
+    C = np.mean(x[:, lag:] * x[:, :-lag], axis=1)
+    return C
+
+vectorized_derivative = elfi.tools.vectorize(derivative)
+
+y_obs_I = vectorized_derivative(beta0, gamma0)
+
+model = elfi.new_model()
+
+beta_prior = elfi.Prior('uniform', 0, 30, model=model)
+gamma_prior = elfi.Prior('uniform', 0, 2, model=model)
+
+sim_results = elfi.Simulator(vectorized_derivative, model['beta_prior'], model['gamma_prior'], observed = y_obs_I)
+
+var = elfi.Summary(select_var, model['Y_lv'], 3)
+
+#summ = elfi.Summary(autocov, model['I'], 1)
+
+#elfi.Distance(SSE, model['S1'], name='dist')
+elfi.Distance('euclidean', var, name='dista')
+
+rej = elfi.Rejection(model['dista'], batch_size = 1, seed = 1)
+result = rej.sample(1000, quantile = 0.01)
 
 
 fig, ax = plt.subplots()
 rej.plot_state(ax = ax)
-ax.set_xlim([0, 11])
+ax.set_xlim([0, 20])
 ax.set_ylim([0, 1])
 plt.savefig("parameter_space.png")
 plt.close()
 
 
-
 rej.extract_result()
-
-
-result.summary()
-import matplotlib.pyplot as plt
-result.plot_pairs();
-plt.show()
