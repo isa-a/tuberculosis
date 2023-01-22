@@ -4,7 +4,7 @@ Created on Fri Jan 20 14:16:08 2023
 
 @author: ISA
 """
-
+import sys
 import elfi
 import numpy as np
 import matplotlib.pyplot as plt
@@ -78,20 +78,20 @@ y_obs_I = vectorized_derivative(beta0, gamma0)
 
 model = elfi.new_model()
 
-beta_prior = elfi.Prior('uniform', 0, 30, model=model)
-gamma_prior = elfi.Prior('uniform', 0, 2, model=model)
+beta_prior = elfi.Prior('uniform', 7, 9, model=model)
+gamma_prior = elfi.Prior('uniform', 0, 1, model=model)
 
 sim_results = elfi.Simulator(vectorized_derivative, model['beta_prior'], model['gamma_prior'], observed = y_obs_I)
 elfi.draw(sim_results)
 sim_results.generate()
 
 var = elfi.Summary(select_var, model['sim_results'], 3)
-var.generate()
 
 #summ = elfi.Summary(autocov, model['I'], 1)
 
 #elfi.Distance(SSE, model['S1'], name='dist')
 elfi.Distance('euclidean', var, name='dista')
+d = elfi.Distance('euclidean', var)
 
 
 rej = elfi.Rejection(model['dista'], batch_size = 1, seed = 1)
@@ -100,13 +100,36 @@ result = rej.sample(1000, quantile = 0.01)
 
 fig, ax = plt.subplots()
 rej.plot_state(ax = ax)
-ax.set_xlim([0, 20])
-ax.set_ylim([0, 1])
+ax.set_xlim([0, 15])
+ax.set_ylim([0, 2])
 plt.savefig("parameter_space.png")
+plt.close()
+
+
+fig, ax = plt.subplots()
+rej.plot_traces(ax = ax)
+ax.set_xlim([0, 15])
+ax.set_ylim([0, 2])
+plt.savefig("tra.png")
 plt.close()
 
 
 rej.extract_result()
 
+bolfi = elfi.BOLFI(d, batch_size=1, initial_evidence=100, update_interval=10, bounds={'beta_prior':(6, 9), 'gamma_prior':(0, 1)}, seed=1)
+post = bolfi.fit(n_evidence=500)
 
 
+bolfi.plot_discrepancy()
+plt.savefig("bolfi_discrepancy.pdf")
+plt.close()
+
+sys.stderr.write("Sampling from BOLFI posterior\n")
+result_BOLFI = bolfi.sample(10000, algorithm="metropolis")
+
+result_BOLFI.plot_traces()
+plt.savefig("posterior_traces.pdf")
+plt.close()
+
+post2 = bolfi.extract_posterior(-1.)
+post.plot(logpdf=True)
