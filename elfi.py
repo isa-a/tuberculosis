@@ -8,6 +8,7 @@ import sys
 import elfi
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import stats
 from scipy.integrate import odeint
 
 seed = 20170530  # this will be separately given to ELFI
@@ -40,6 +41,9 @@ def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
     dR = ((gamma + sigma) * I) - ((rho + clamda + mu) * R)
     cI = w*Ls + v*Lf + (rho * R)
     return dU, dLf, dLs, dI, dR, cI
+
+# solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta0, gamma0, mu, muTB, sigma, rho, u, v, w))
+# U, Lf, Ls, I, R, cInc = solve.T
 
 def derivative(beta, gamma, batch_size = 1, random_state = None):
     
@@ -78,8 +82,8 @@ y_obs_I = vectorized_derivative(beta0, gamma0)
 
 model = elfi.new_model()
 
-beta_prior = elfi.Prior('uniform', 7, 9, model=model)
-gamma_prior = elfi.Prior('uniform', 0, 1, model=model)
+beta_prior = elfi.Prior('uniform', 0, 20, model=model)
+gamma_prior = elfi.Prior('uniform', 0, 10, model=model)
 
 sim_results = elfi.Simulator(vectorized_derivative, model['beta_prior'], model['gamma_prior'], observed = y_obs_I)
 elfi.draw(sim_results)
