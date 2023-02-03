@@ -42,12 +42,12 @@ import numpy as np
 import scipy.stats as sps
 import matplotlib.pyplot as plt
 
-mu, sd = 400, 40
+mu, sd = 300, 30
 n = 100_000
 
 # draw samples from distributions
 a = np.random.normal(mu, sd, n)
-b = np.random.lognormal(np.log(mu), sd / mu, n)
+b = np.random.lognormal(np.log((mu**2) / (mu**2 + sd**2)**0.5), (np.log(1 + (sd**2 / mu**2)))**0.5, n)
 
 # use Scipy for analytical PDFs
 d1 = sps.norm(mu, sd)
@@ -77,10 +77,10 @@ ax2.plot(x, d2.pdf(x), label="Log-Normal PDF")
 ax2.legend()
 fig.supylabel("Density")
 
-x=0
-mu=5.99
-sd=0.1
-func = -0.5*((np.log(x) - mu) / sd)**2 - np.log(x * sd * (2*math.pi)**0.5)
+x=1
+mu=5.698807309229617
+sd=0.0997513451195927
+func = -0.5*((np.log(300) - mu) / sd)**2 - np.log(300 * sd * (2*math.pi)**0.5)
 
 scipy.stats.norm.pdf(6,2.0,1.0)
 print( np.log(scipy.stats.norm.pdf(a,2.5,97.5)).sum() )
