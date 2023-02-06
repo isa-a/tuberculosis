@@ -8,6 +8,53 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats
 import math
+import scipy.stats as sps
+from scipy.integrate import odeint
+import model
+
+# Total population, N.
+N = 1
+# Initial number of infected and recovered individuals, I0 and R0.
+I0, R0 = 0.001, 0
+# Everyone else, S0, is susceptible to infection initially.
+U0 = N - I0 - R0
+J0 = I0
+Lf0, Ls0 = 0, 0
+# Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
+beta, gamma = 8, 0.4
+mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
+u, v, w = 0.88, 0.083, 0.0006
+t = np.linspace(0, 500, 500+1)
+
+solve = odeint(model.deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
+U, Lf, Ls, I, R, cInc = solve.T
+#print(cInc[1:] - cInc[:-1])
+
+muPrev, sigmaPrev = 400, 40 #I
+muInc, sigmaInc = 300, 30 #cInc
+n = 10000
+
+logPrev = np.random.lognormal(np.log((muPrev**2) / (muPrev**2 + sigmaPrev**2)**0.5), (np.log(1 + (sigmaPrev**2 / muPrev**2)))**0.5, n) #lognormal
+logInc = np.random.lognormal(np.log((muInc**2) / (muInc**2 + sigmaInc**2)**0.5), (np.log(1 + (sigmaInc**2 / muInc**2)))**0.5, n) #lognormal
+
+xPrev = I[-1]*100000
+xInc = (cInc[1:] - cInc[:-1])[-1]*100000
+
+logmuPrev = np.log((muPrev**2) / (muPrev**2 + sigmaPrev**2)**0.5)
+logsdPrev = (np.log(1 + (sigmaPrev**2 / muPrev**2)))**0.5
+
+logmuInc = np.log((muInc**2) / (muInc**2 + sigmaInc**2)**0.5)
+logsdInc = (np.log(1 + (sigmaInc**2 / muInc**2)))**0.5
+
+L_prev = -0.5*((np.log(xPrev) - logmuPrev) / logsdPrev)**2 - np.log(xPrev * logsdPrev * (2*math.pi)**0.5)
+L_inc = -0.5*((np.log(xInc) - logmuInc) / logsdInc)**2 - np.log(xInc * logsdInc * (2*math.pi)**0.5)
+
+logsum = L_prev + L_inc
+np.exp(logsum)
+
+
+
+
 
 
 
@@ -24,7 +71,6 @@ print(y)
 log_norm = np.exp(a)
 
 
-#dist = np.sqrt( (x - (2.5/100))**2 + (y - (97.5/100))**2 + (z - (50/100))**2)
 
 
 
@@ -38,9 +84,6 @@ q = np.percentile(s, 97.5) # return 50th percentile, e.g median.
 print(p)
 print(q)
 
-import numpy as np
-import scipy.stats as sps
-import matplotlib.pyplot as plt
 
 mu, sd = 300, 30
 n = 100_000
@@ -110,7 +153,7 @@ def llnorm(mu, sigma, data):
     ll = np.sum(math.log(2*math.pi*(sigma**2))/2 + ((data-mu)**2)/(2 * (sigma**2)))
     return ll
 data = a
-result = optimize.minimize(llnorm, [2,1], args = (a))
+result = optimize.minimize(llnorm, [2,1], args = (data))
 mu, sigma = 300, 30
 llnorm(300, 30, s)
 math.log(482098)
