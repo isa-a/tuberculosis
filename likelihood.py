@@ -10,7 +10,8 @@ import scipy.stats
 import math
 import scipy.stats as sps
 from scipy.integrate import odeint
-import model
+#import model
+from pymcmcstat.MCMC import MCMC
 
 # Total population, N.
 N = 1
@@ -26,36 +27,112 @@ mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
 t = np.linspace(0, 500, 500+1)
 
-solve = odeint(model.deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
-U, Lf, Ls, I, R, cInc = solve.T
-#print(cInc[1:] - cInc[:-1])
-
-muPrev, sigmaPrev = 400, 40 #I
-muInc, sigmaInc = 300, 30 #cInc
-n = 10000
-
-logPrev = np.random.lognormal(np.log((muPrev**2) / (muPrev**2 + sigmaPrev**2)**0.5), (np.log(1 + (sigmaPrev**2 / muPrev**2)))**0.5, n) #lognormal
-logInc = np.random.lognormal(np.log((muInc**2) / (muInc**2 + sigmaInc**2)**0.5), (np.log(1 + (sigmaInc**2 / muInc**2)))**0.5, n) #lognormal
-
-xPrev = I[-1]*100000
-xInc = (cInc[1:] - cInc[:-1])[-1]*100000
-
-logmuPrev = np.log((muPrev**2) / (muPrev**2 + sigmaPrev**2)**0.5)
-logsdPrev = (np.log(1 + (sigmaPrev**2 / muPrev**2)))**0.5
-
-logmuInc = np.log((muInc**2) / (muInc**2 + sigmaInc**2)**0.5)
-logsdInc = (np.log(1 + (sigmaInc**2 / muInc**2)))**0.5
-
-L_prev = -0.5*((np.log(xPrev) - logmuPrev) / logsdPrev)**2 - np.log(xPrev * logsdPrev * (2*math.pi)**0.5)
-L_inc = -0.5*((np.log(xInc) - logmuInc) / logsdInc)**2 - np.log(xInc * logsdInc * (2*math.pi)**0.5)
-
-logsum = L_prev + L_inc
-np.exp(logsum)
+# The SIR model differential equations.
+def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
+    U, Lf, Ls, I, R, cInc = y
+    b = (mu * (U + Lf + Ls + R)) + (muTB * I)
+    lamda = beta * I
+    clamda = 0.2 * lamda
+    dU = b - ((lamda + mu) * U)
+    dLf = (lamda*U) + ((clamda)*(Ls + R)) - ((u + v + mu) * Lf)
+    dLs = (u * Lf) - ((w + clamda + mu) * Ls)
+    dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I) + (rho * R)
+    dR = ((gamma + sigma) * I) - ((rho + clamda + mu) * R)
+    cI = w*Ls + v*Lf + (rho * R)
+    return dU, dLf, dLs, dI, dR, cI
 
 
+solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
+U, Lf, Ls, I, R, cInc = solve.T #get trajectories
+
+
+def loglik(beta, gamma):
+    
+    solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
+    U, Lf, Ls, I, R, cInc = solve.T #get trajectories
+
+    muPrev, sigmaPrev = I[-1]*100000, 40 #I (prevalence)
+    muInc, sigmaInc = (cInc[1:] - cInc[:-1])[-1]*100000, 30 #cInc (incidence)
+    n = 10000
+    
+    # logPrev = np.random.lognormal(np.log((muPrev**2) / (muPrev**2 + sigmaPrev**2)**0.5), (np.log(1 + (sigmaPrev**2 / muPrev**2)))**0.5, n) #lognormal
+    # logInc = np.random.lognormal(np.log((muInc**2) / (muInc**2 + sigmaInc**2)**0.5), (np.log(1 + (sigmaInc**2 / muInc**2)))**0.5, n) #lognormal
+    
+    xPrev = I[-1]*100000 #value of x in formula for log of pdf
+    xInc = (cInc[1:] - cInc[:-1])[-1]*100000 #value of x in formula for log of pdf
+    
+    logmuPrev = np.log((muPrev**2) / (muPrev**2 + sigmaPrev**2)**0.5) #lognormal params
+    logsdPrev = (np.log(1 + (sigmaPrev**2 / muPrev**2)))**0.5
+    
+    logmuInc = np.log((muInc**2) / (muInc**2 + sigmaInc**2)**0.5)#lognormal params
+    logsdInc = (np.log(1 + (sigmaInc**2 / muInc**2)))**0.5
+    
+    L_prev = -0.5*((np.log(xPrev) - logmuPrev) / logsdPrev)**2 - np.log(xPrev * logsdPrev * (2*math.pi)**0.5) #log of pdf for prev and inc
+    L_inc = -0.5*((np.log(xInc) - logmuInc) / logsdInc)**2 - np.log(xInc * logsdInc * (2*math.pi)**0.5)
+    
+    logsum = L_prev + L_inc #summing logs
+    np.exp(logsum) #exp for likelihood
+    return np.exp(logsum)
 
 
 
+mcstat = MCMC()  #initialise mcmc
+x = t
+y = I*100000
+mcstat.data.add_data_set(x,y) #create data using prevalence
+
+
+
+mcstat.model_settings.define_model_settings(sos_function=loglik)  # put function into model
+mcstat.simulation_options.define_simulation_options(nsimu=10.0e3) #number of sims to run
+mcstat.parameters.add_model_parameter(name='beta', theta0=8, minimum = 0, maximum = 20) #priors
+mcstat.parameters.add_model_parameter(name='gamma',theta0=0.4, minimum = 0, maximum=2) #priors
+mcstat.run_simulation() #run mcmc
+
+results = mcstat.simulation_results.results #get results
+chain = results['chain'] #get results
+burnin = int(chain.shape[0]/2) #define burnin period as first 50% of chain
+# display chain statistics
+mcstat.chainstats(chain[burnin:, :], results)
+
+names = results['names']
+chain = results['chain']
+s2chain = results['s2chain']
+names = results['names'] # parameter names
+
+mcpl = mcstat.mcmcplot # initialize plotting methods
+mcpl.plot_chain_panel(chain, names)
+
+mcpl.plot_chain_panel(chain[burnin:,:], names)
+
+nds = 100
+x = np . linspace (2 , 3 , num = nds )
+x = x . reshape ( nds ,1)
+m = 2 # slope
+b = -3 # offset
+noise = 0.1* np . random . standard_normal ( x . shape )
+y = m * x + b + noise
+mcstat = MCMC ()
+mcstat.data.add_data_set(x, y)
+mcstat.parameters.add_model_parameter(name = 'm', theta0 = 1. , minimum = -10 , maximum = 10)
+mcstat.parameters.add_model_parameter ( name = 'b', theta0 = -5. , minimum =-10 , maximum = 100)
+mcstat.simulation_options.define_simulation_options(nsimu=10.0e3) #number of sims to run
+def test_modelfun ( xdata , theta ) :
+    m = theta [0]
+    b = theta [1]
+    nrow , ncol = xdata . shape
+    y = np . zeros ([ nrow ,1])
+    y [: ,0] = m * xdata . reshape ( nrow ,) + b
+    return y
+def test_ssfun ( theta , data ) :
+    xdata = data . xdata [0]
+    ydata = data . ydata [0]
+    # eval model
+    ymodel = test_modelfun ( xdata , theta )
+    # calc sos
+    ss = sum (( ymodel [: ,0] - ydata [: ,0]) **2)
+    return ss
+####################### NIM: IGNORE BELOW ###########################################
 
 
 muPrev, sigmaPrev = 400, 40.
