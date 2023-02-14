@@ -25,7 +25,7 @@ beta, gamma = 8, 0.4
 int_gamma = 0.8
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
-t = np.linspace(0, 500, 500+1)
+t = np.linspace(0, 1000, 1000+1)
 
 # The SIR model differential equations.
 def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
@@ -49,6 +49,7 @@ U, Lf, Ls, I, R, cInc = solve.T
 # The SIR model differential equations.
 def derivint(y, t, N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w):
     U, Lf, Ls, I, R, cInc = y
+    #int_gamma = t/2500+0.4
     b = (mu * (U + Lf + Ls + R)) + (muTB * I)
     lamda = beta * I
     clamda = 0.2 * lamda
@@ -62,7 +63,7 @@ def derivint(y, t, N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w):
 
 
 # Integrate the SIR equations over the time grid, t.
-solveint = odeint(derivint, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w))
+solveint = odeint(derivint, (U[-1], Lf[-1], Ls[-1], I[-1], R[-1], J0), t, args=(N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w))
 Uint, Lfint, Lsint, Iint, Rint, cIncint = solveint.T
 
 
@@ -77,13 +78,14 @@ ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
 #ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
 ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
-ax.plot(t[1:], J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
+ax.plot(t[1:]+500, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
 ax.set_xlabel('Time in years')
 ax.set_ylabel('Number')
 ax.grid(b=True, which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
+plt.title("Intervention")
 plt.show()
 
 
@@ -257,14 +259,3 @@ res = minimize(residual, x0, method="Nelder-Mead", options={'fatol':1e-04}).x
 print(res)
 
 
-mylist = []
-rej = []
-q =(0,2,2)
-w= range(1,8,2)
-for y,x in zip(q,w):
-    if x+y > 4:
-        mylist.append(str(x+y))
-    else:
-        rej.append(str(x+y))
-print(mylist)
-print(rej)
