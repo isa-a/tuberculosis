@@ -22,7 +22,7 @@ U0 = N - I0 - R0
 J0 = I0
 Lf0, Ls0 = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 8, 0.4
+beta, gamma = 2.99985371, 0.55000031
 int_gamma = 0.8
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
@@ -76,7 +76,7 @@ solveint = odeint(derivint, (U[-1], Lf[-1], Ls[-1], I[-1], R[-1], J0), t, args=(
 Uint, Lfint, Lsint, Iint, Rint, cIncint = solveint.T
 
 
-def peak_infections(beta, df):
+def peak_infections(x, df):
  
     N = 1*100000
     # Initial number of infected and recovered individuals, I0 and R0.
@@ -86,11 +86,10 @@ def peak_infections(beta, df):
     J0 = I0
     Lf0, Ls0 = 0, 0
     # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-    gamma = 4
-    int_gamma = 0.8
+    beta = x[0]
+    gamma = x[1] 
     mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
     u, v, w = 0.88, 0.083, 0.0006
-    t = np.linspace(0, 500, 500+1) 
     t7 = np.arange(7,84,7)
 
     def deriv(y, t7, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
@@ -119,13 +118,38 @@ def residual(x, df):
     incidence = df.incidence.to_numpy()/N
     return np.sum((peak_infections(x, df) - incidence) ** 2)
 
-x0 = 1
+x0 = [3, 0.55]
 res = minimize(residual, x0, args=(df)).x
 print(res)
 
+def error_function(params):
+    gamma = params[0]
+    beta = params[1]
+    def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
+            U, Lf, Ls, I, R, cInc = y
+            b = (mu * (U + Lf + Ls + R)) + (muTB * I)
+            lamda = beta * I
+            clamda = 0.2 * lamda
+            dU = b - ((lamda + mu) * U)
+            dLf = (lamda*U) + ((clamda)*(Ls + R)) - ((u + v + mu) * Lf)
+            dLs = (u * Lf) - ((w + clamda + mu) * Ls)
+            dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I) + (rho * R)
+            dR = ((gamma + sigma) * I) - ((rho + clamda + mu) * R)
+            cI = w*Ls + v*Lf + (rho * R)
+            return dU, dLf, dLs, dI, dR, cI
+
+    # Integrate the SIR equations over the time grid, t.
+    solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
+    U, Lf, Ls, I, R, cInc = solve.T
+    return (7/100000 - np.max(I)/N)**2
+
+initial_guess = [0.55, 3]
+result = minimize(error_function, initial_guess)
+fit_params = result.x
+
 
 J_diff = cInc[1:] - cInc[:-1]
-J_diffint = cIncint[1:] - cIncint[:-1]
+#J_diffint = cIncint[1:] - cIncint[:-1]
 #J_diff = np.diff(cInc)
 fig = plt.figure(facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
@@ -135,15 +159,15 @@ ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
 #ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
 ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
-ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
+#ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
 ax.set_xlabel('Time in years')
 ax.set_ylabel('Number')
-ax.set_xlim(2019, 2030)
+#ax.set_xlim(2019, 2030)
 ax.grid(b=True, which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
-plt.title("Intervention")
+#plt.title("Intervention")
 plt.show()
 
 
