@@ -252,10 +252,6 @@ import scipy.stats
 import matplotlib as mpl   
 import matplotlib.pyplot as plt
 
-mod1=lambda t:np.random.normal(10,3,t)
-
-#Form a population of 30,000 individual, with average=10 and scale=3
-population = mod1(30000)
 #Assume we are only able to observe 1,000 of these individuals.
 observation = np.random.normal(400, 40, 1000)
  
