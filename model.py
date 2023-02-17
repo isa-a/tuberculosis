@@ -22,17 +22,11 @@ U0 = N - I0 - R0
 J0 = I0
 Lf0, Ls0 = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 2.99985371, 0.55000031
+beta, gamma = 2,5
 int_gamma = 0.8
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
 t = np.linspace(0, 500, 500+1)
-
-#d = np.full(501, 7)
-#ad = {'Week': [t], 'incidence': [d]}
-t = np.linspace(0, 77, 77+1)
-d = {'Week': [t[7],t[14],t[21],t[28],t[35],t[42],t[49],t[56],t[63],t[70],t[77]], 'incidence': [7,7,7,7,7,7,7,7,7,7,7]}
-df = pd.DataFrame(data=d)
 
 
 
@@ -55,6 +49,29 @@ def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
 solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
 U, Lf, Ls, I, R, cInc = solve.T
 
+J_diff = cInc[1:] - cInc[:-1]
+#J_diffint = cIncint[1:] - cIncint[:-1]
+#J_diff = np.diff(cInc)
+fig = plt.figure(facecolor='w')
+ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
+#ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
+#ax.plot(t, Lf/100000, 'r', alpha=1, lw=2, label='latent fast')
+#ax.plot(t, Ls/100000, 'black', alpha=1, lw=2, label='latent slow')
+#ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
+#ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
+ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
+#ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
+#ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
+ax.set_xlabel('Time in years')
+ax.set_ylabel('Number')
+#ax.set_xlim(2019, 2030)
+ax.grid(b=True, which='major', c='w', lw=2, ls='-')
+legend = ax.legend()
+legend.get_frame().set_alpha(0.5)
+#plt.title("Intervention")
+plt.show()
+
+
 # The SIR model differential equations.
 def derivint(y, t, N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w):
     U, Lf, Ls, I, R, cInc = y
@@ -76,21 +93,20 @@ solveint = odeint(derivint, (U[-1], Lf[-1], Ls[-1], I[-1], R[-1], J0), t, args=(
 Uint, Lfint, Lsint, Iint, Rint, cIncint = solveint.T
 
 
-def peak_infections(x, df):
+def peak_infections(beta):
  
-    N = 1*100000
+    N = 1
     # Initial number of infected and recovered individuals, I0 and R0.
-    I0, R0 = 0.001*100000, 0
+    I0, R0 = 0.001, 0
     # Everyone else, S0, is susceptible to infection initially.
     U0 = N - I0 - R0
     J0 = I0
     Lf0, Ls0 = 0, 0
     # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-    beta = x[0]
-    gamma = x[1] 
+    gamma = 365/75
     mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
     u, v, w = 0.88, 0.083, 0.0006
-    t7 = np.arange(7,84,7)
+    t7 = np.linspace(0,500,500+1)
 
     def deriv(y, t7, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
         U, Lf, Ls, I, R, cInc = y
@@ -109,18 +125,17 @@ def peak_infections(x, df):
     solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t7, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
     U, Lf, Ls, I, R, cInc = solve.T
 
-    return np.max(I)/N
+    return (cInc[1:] - cInc[:-1])[-1]
 
-def residual(x, df):
+def residual(x):
 
     # Total population,  N.
-    N = 100000
-    incidence = df.incidence.to_numpy()/N
-    return np.sum((peak_infections(x, df) - incidence) ** 2)
+    return np.sum((peak_infections(x) - 7/100000) ** 2)
 
-x0 = [3, 0.55]
-res = minimize(residual, x0, args=(df)).x
+x0 = 9.5
+res = minimize(residual, x0).x
 print(res)
+
 
 def error_function(params):
     gamma = params[0]
