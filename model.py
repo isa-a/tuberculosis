@@ -21,11 +21,11 @@ U0 = N - I0 - R0
 J0 = I0
 Lf0, Ls0 = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 14.21, 365/75
-int_gamma = 0.8
+beta, gamma = 13.21245908, 365/75
+int_gamma = gamma * 2
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
-t = np.linspace(0, 500, 500+1)
+t = np.linspace(0, 50000, 50000+1)
 
 
 
@@ -90,6 +90,29 @@ def derivint(y, t, N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w):
 # Integrate the SIR equations over the time grid, t.
 solveint = odeint(derivint, (U[-1], Lf[-1], Ls[-1], I[-1], R[-1], J0), t, args=(N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w))
 Uint, Lfint, Lsint, Iint, Rint, cIncint = solveint.T
+
+
+J_diff = cInc[1:] - cInc[:-1]
+J_diffint = cIncint[1:] - cIncint[:-1]
+#J_diff = np.diff(cInc)
+fig = plt.figure(facecolor='w')
+ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
+#ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
+#ax.plot(t, Lf/100000, 'r', alpha=1, lw=2, label='latent fast')
+#ax.plot(t, Ls/100000, 'black', alpha=1, lw=2, label='latent slow')
+#ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
+#ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
+ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
+ax.plot(t[1:]+(20000-1), J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
+#ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
+ax.set_xlabel('Time in years')
+ax.set_ylabel('Number')
+ax.set_xlim(19990, 20750)
+ax.grid(b=True, which='major', c='w', lw=2, ls='-')
+legend = ax.legend()
+legend.get_frame().set_alpha(0.5)
+#plt.title("Intervention")
+plt.show()
 
 
 def peak_infections(beta):
@@ -163,7 +186,7 @@ fit_params = result.x
 
 
 J_diff = cInc[1:] - cInc[:-1]
-#J_diffint = cIncint[1:] - cIncint[:-1]
+J_diffint = cIncint[1:] - cIncint[:-1]
 #J_diff = np.diff(cInc)
 fig = plt.figure(facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
@@ -173,7 +196,7 @@ ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
 #ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
 ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
-#ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
+ax.plot(t[1:], J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
 ax.set_xlabel('Time in years')
 ax.set_ylabel('Number')

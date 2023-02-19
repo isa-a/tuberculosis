@@ -8,6 +8,8 @@ Created on Fri Feb 17 22:13:20 2023
 import numpy as np
 from scipy.integrate import odeint
 from scipy.optimize import minimize
+from scipy.optimize import leastsq
+
 import scipy.optimize
 
 def peak_infections(beta): #contains initial values, but need to estimate beta
@@ -20,10 +22,10 @@ def peak_infections(beta): #contains initial values, but need to estimate beta
     J0 = I0
     Lf0, Ls0 = 0, 0
     # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-    gamma = 1/75
+    gamma = 365/75
     mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
     u, v, w = 0.88, 0.083, 0.0006
-    t7 = np.linspace(0,500,500+1)
+    t7 = np.linspace(0,50000,50000+1)
 
     def deriv(y, t7, N, beta, gamma, mu, muTB, sigma, rho, u, v, w): #solves ode system
         U, Lf, Ls, I, R, cInc = y
@@ -52,7 +54,8 @@ def residual(x):
 
 x0 = 13 #init guess
 res = minimize(residual, x0).x
-print(res) #just returns initial guess :(
+res2 = leastsq(residual, x0)
+print(res2) #just returns initial guess :(
 
 #############################################################################################
 
