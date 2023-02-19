@@ -10,7 +10,6 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 import math
-import pandas as pd
 
 
 # Total population, N.
@@ -22,7 +21,7 @@ U0 = N - I0 - R0
 J0 = I0
 Lf0, Ls0 = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 2,5
+beta, gamma = 14.21, 365/75
 int_gamma = 0.8
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006

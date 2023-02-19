@@ -20,7 +20,7 @@ def peak_infections(beta): #contains initial values, but need to estimate beta
     J0 = I0
     Lf0, Ls0 = 0, 0
     # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-    gamma = 365/75
+    gamma = 1/75
     mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
     u, v, w = 0.88, 0.083, 0.0006
     t7 = np.linspace(0,500,500+1)
@@ -43,13 +43,78 @@ def peak_infections(beta): #contains initial values, but need to estimate beta
     U, Lf, Ls, I, R, cInc = solve.T #output trajectories
 
     return (cInc[1:] - cInc[:-1])[-1] #this is the array for which i want the last value to be 7, and find the best beta for that, so this function returns the last value in that array
+    
 
 def residual(x):
 
     # Total population,  N.
     return np.sum((peak_infections(x) - 7/100000) ** 2) #here i implemented what you said
 
-x0 = 9.5 #init guess
-res = minimize
+x0 = 13 #init guess
+res = minimize(residual, x0).x
 print(res) #just returns initial guess :(
+
+#############################################################################################
+
+import numpy as np
+import pandas as pd
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+import math
+
+import plotly.express as px
+
+# The SIR model differential equations.
+def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
+    U, Lf, Ls, I, R, cInc = y
+    b = (mu * (U + Lf + Ls + R)) + (muTB * I)
+    lamda = beta * I
+    clamda = 0.2 * lamda
+    dU = b - ((lamda + mu) * U)
+    dLf = (lamda*U) + ((clamda)*(Ls + R)) - ((u + v + mu) * Lf)
+    dLs = (u * Lf) - ((w + clamda + mu) * Ls)
+    dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I) + (rho * R)
+    dR = ((gamma + sigma) * I) - ((rho + clamda + mu) * R)
+    cI = w*Ls + v*Lf + (rho * R)
+    return dU, dLf, dLs, dI, dR, cI
+
+def optimise_beta(beta):
+  N = 1 # Total population, N
+  I0, R0 = 0.001, 0 # Initial number of infected and recovered individuals, I0 and R0.
+  U0 = N - I0 - R0 # Everyone else, U0, is susceptible to infection initially.
+  J0 = I0 
+  Lf0, Ls0 = 0, 0
+
+  # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
+  gamma = 365/75
+  int_gamma = 0.8
+  mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
+  u, v, w = 0.88, 0.083, 0.0006
+  t = np.linspace(0, 500, 500+1)
+
+  # Integrate the SIR equations over the time grid, t.
+  solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
+  U, Lf, Ls, I, R, cInc = solve.T
+  J_diff = cInc[1:] - cInc[:-1]
+
+  equilibrium_value = list(J_diff*100000)[-1]
+
+  return equilibrium_value
+
+
+
+beta_range = np.linspace(0,100,1000)
+equilibrium_values = pd.DataFrame(columns=['beta','equilibrium_value'])
+
+
+for idx, beta in enumerate(beta_range):
+  equilibrium_values.at[idx,'beta'] = beta
+  equilibrium_values.at[idx,'equilibrium_value'] = optimise_beta(beta)
+  
+  
+equilibrium_values[(equilibrium_values['equilibrium_value']>=7) & (equilibrium_values['equilibrium_value']<=8)]  
+  
+fig = px.line(equilibrium_values, x="beta", y="equilibrium_value")
+fig.show()
 
