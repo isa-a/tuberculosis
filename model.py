@@ -22,11 +22,11 @@ J0 = I0
 Lf0, Ls0 = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
 beta, gamma = 13.21245908, 365/75
-int_gamma = gamma * 2
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
 t = np.linspace(0, 50000, 50000+1)
-
+arr = np.geomspace(365/75, 365/56, num = 10 )
+int_gamma = 365/56
 
 
 # The SIR model differential equations.
@@ -61,20 +61,20 @@ ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
 #ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
-ax.set_xlabel('Time in years')
+ax.set_xlabel('Time')
 ax.set_ylabel('Number')
 #ax.set_xlim(2019, 2030)
 ax.grid(b=True, which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
-#plt.title("Intervention")
+#plt.title("Incidence")
 plt.show()
 
 
 # The SIR model differential equations.
 def derivint(y, t, N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w):
     U, Lf, Ls, I, R, cInc = y
-    #int_gamma = t/2500+0.4
+    int_gamma = (t + 147368.42105277)/30281.182408084 
     b = (mu * (U + Lf + Ls + R)) + (muTB * I)
     lamda = beta * I
     clamda = 0.2 * lamda
@@ -102,16 +102,16 @@ ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, Ls/100000, 'black', alpha=1, lw=2, label='latent slow')
 #ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
 #ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
-ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
-ax.plot(t[1:]+(20000-1), J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
+ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='Baseline')
+ax.plot(t[1:]+(40000-1), J_diffint*100000, 'red', alpha=1, lw=2, label='Reduced delay in diagnosis')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
-ax.set_xlabel('Time in years')
+ax.set_xlabel('Time')
 ax.set_ylabel('Number')
-ax.set_xlim(19990, 20750)
+ax.set_xlim(39990, 50000)
 ax.grid(b=True, which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
-#plt.title("Intervention")
+plt.title("Incidence")
 plt.show()
 
 
