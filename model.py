@@ -14,23 +14,30 @@ import math
 
 # Total population, N.
 N = 1
+N_m = 1
 # Initial number of infected and recovered individuals, I0 and R0.
 I0, R0 = 0.001, 0
+I0_m, R0_m = 0.001, 0
 # Everyone else, S0, is susceptible to infection initially.
 U0 = N - I0 - R0
+U0_m = N_m - I0_m - R0_m
 J0 = I0
+J0_m = I0_m
 Lf0, Ls0 = 0, 0
+Lf0_m, Ls0_m = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 13.21245908, 365/75
+beta, gamma = 8,0.4
+beta_m, gamma_m = 13.21245908, 365/75
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
+mu_m, muTB_m, sigma_m, rho_m = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
-t = np.linspace(0, 50000, 50000+1)
-arr = np.geomspace(365/75, 365/56, num = 10 )
+u_m, v_m, w_m = 0.88, 0.083, 0.0006
+t = np.linspace(0, 500, 500+1)
 int_gamma = 365/56
 
 
 # The SIR model differential equations.
-def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
+def genpop(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
     U, Lf, Ls, I, R, cInc = y
     b = (mu * (U + Lf + Ls + R)) + (muTB * I)
     lamda = beta * I
@@ -45,7 +52,7 @@ def deriv(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
 
 
 # Integrate the SIR equations over the time grid, t.
-solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
+solve = odeint(genpop, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
 U, Lf, Ls, I, R, cInc = solve.T
 
 J_diff = cInc[1:] - cInc[:-1]
@@ -54,9 +61,9 @@ J_diff = cInc[1:] - cInc[:-1]
 fig = plt.figure(facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
-#ax.plot(t, Lf/100000, 'r', alpha=1, lw=2, label='latent fast')
-#ax.plot(t, Ls/100000, 'black', alpha=1, lw=2, label='latent slow')
-#ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
+ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
+ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
+ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
 #ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
 ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
 #ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
@@ -69,6 +76,26 @@ legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
 #plt.title("Incidence")
 plt.show()
+
+# The SIR model differential equations.
+def migrantpop(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
+    U, Lf, Ls, I, R, cInc = y
+    b = (mu * (U + Lf + Ls + R)) + (muTB * I)
+    lamda = beta * I
+    clamda = 0.2 * lamda
+    dU = b - ((lamda + mu) * U)
+    dLf = (lamda*U) + ((clamda)*(Ls + R)) - ((u + v + mu) * Lf)
+    dLs = (u * Lf) - ((w + clamda + mu) * Ls)
+    dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I) + (rho * R)
+    dR = ((gamma + sigma) * I) - ((rho + clamda + mu) * R)
+    cI = w*Ls + v*Lf + (rho * R)
+    return dU, dLf, dLs, dI, dR, cI
+
+
+# Integrate the SIR equations over the time grid, t.
+solve = odeint(migrantpop, (U0_m, Lf0_m, Ls0_m, I0_m, R0_m, J0_m), t, args=(N_m, beta_m, gamma_m, mu_m, muTB_m, sigma_m, rho_m, u_m, v_m, w_m))
+U_m, Lf_m, Ls_m, I_m, R_m, cInc = solve.T
+
 
 
 # The SIR model differential equations.
@@ -99,7 +126,7 @@ fig = plt.figure(facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
 #ax.plot(t, Lf/100000, 'r', alpha=1, lw=2, label='latent fast')
-#ax.plot(t, Ls/100000, 'black', alpha=1, lw=2, label='latent slow')
+#ax.plot(t, (Ls+Lf)*100000, 'black', alpha=1, lw=2, label='latent slow')
 #ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
 #ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
 ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='Baseline')
@@ -112,6 +139,7 @@ ax.grid(b=True, which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
 plt.title("Incidence")
+#plt.savefig('filename.png')
 plt.show()
 
 
