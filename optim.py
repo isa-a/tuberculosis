@@ -12,7 +12,7 @@ from scipy.optimize import leastsq
 
 import scipy.optimize
 
-def peak_infections(x): #contains initial values, but need to estimate beta
+def peak_infections(x): #contains initial values, but need to estimate beta #mU=0.00128254
  
     N = 0.168
     # Initial number of infected and recovered individuals, I0 and R0.
@@ -24,42 +24,49 @@ def peak_infections(x): #contains initial values, but need to estimate beta
     # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
     beta = 8
     gamma = 0.4
-    mU = x[0]
-    mLf = x[1]
-    mLs = x[2]
-    mR = x[3]
+    mLf = x[0]
+    mLs = x[1]
     mI = 0    
     mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
     u, v, w = 0.88, 0.083, 0.0006
     t7 = np.linspace(0,500,500+1)
 
-    def deriv(y, t7, N, beta, gamma,mU,mLf,mLs,mR,mI, mu, muTB, sigma, rho, u, v, w): #solves ode system
+    def deriv(y, t7, N, beta, gamma,mLf, mLs,mI,mu, muTB, sigma, rho, u, v, w): #solves ode system
         U, Lf, Ls, I, R, cInc = y
         b = (mu * (U + Lf + Ls + R)) + (muTB * I)
         lamda = beta * I
         clamda = 0.2 * lamda
-        dU = b - ((lamda + mu) * U) + mU
+        dU = b - ((lamda + mu) * U) 
         dLf = (lamda*U) + ((clamda)*(Ls + R)) - ((u + v + mu) * Lf) + mLf
-        dLs = (u * Lf) - ((w + clamda + mu) * Ls)+mLs
-        dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I) + (rho * R)+mI
-        dR = ((gamma + sigma) * I) - ((rho + clamda + mu) * R)+mR
+        dLs = (u * Lf) - ((w + clamda + mu) * Ls) +mLs
+        dI = w*Ls + v*Lf - ((gamma + muTB + sigma) * I) + (rho * R) + mI
+        dR = ((gamma + sigma) * I) - ((rho + clamda + mu) * R)
         cI = w*Ls + v*Lf + (rho * R)
         return dU, dLf, dLs, dI, dR, cI
 
     # Integrate the SIR equations over the time grid, t.
-    solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t7, args=(N, beta, gamma,mU,mLf,mLs,mR,mI, mu, muTB, sigma, rho, u, v, w))
+    solve = odeint(deriv, (U0, Lf0, Ls0, I0, R0, J0), t7, args=(N, beta, gamma, mLf,mLs,mI,mu, muTB, sigma, rho, u, v, w))
     U, Lf, Ls, I, R, cInc = solve.T #output trajectories
 
-    return (cInc[1:] - cInc[:-1])[-1]*100000 #this is the array for which i want the last value to be 7, and find the best beta for that, so this function returns the last value in that array
+    return ((cInc[1:] - cInc[:-1])[-1]*100000, (Lf+Ls)[-1]*100000) #this is the array for which i want the last value to be 7, and find the best beta for that, so this function returns the last value in that array
     
 
 def residual(x):
 
     # Total population,  N.
-    return np.sum((peak_infections(x) - 300) ** 2) #here i implemented what you said
+    return np.sum((peak_infections(x)[1] - 0.25*16800) ** 2) #here i implemented what you said
 
-x0 = [1,1,1,1] #init guess
-res2 = leastsq(residual, x0)
+def residual(x):
+    tol = 0.2  # 20% tolerance
+    thres = 300  # Threshold value
+    min_val = (thres * tol) ** 2
+    target = (peak_infections(x) - thres) ** 2
+    target[target < min_val] = 0
+    return np.sum(target)
+
+
+x0 = [1,1] #init guess
+res2 = minimize(residual, x0)
 print(res2) 
 
  
