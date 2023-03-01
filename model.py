@@ -26,13 +26,13 @@ J0_m = I0_m
 Lf0, Ls0 = 0, 0
 Lf0_m, Ls0_m = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 8,0.4
+beta, gamma = 13.21245908, 365/75
 beta_m, gamma_m = 13.21245908, 365/75
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 mu_m, muTB_m, sigma_m, rho_m = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
 u_m, v_m, w_m = 0.88, 0.083, 0.0006
-t = np.linspace(0, 500, 500+1)
+t = np.linspace(0, 50000, 50000+1)
 int_gamma = 365/56
 
 
@@ -118,11 +118,12 @@ def derivint(y, t, N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w):
 solveint = odeint(derivint, (U[-1], Lf[-1], Ls[-1], I[-1], R[-1], J0), t, args=(N, beta, int_gamma, mu, muTB, sigma, rho, u, v, w))
 Uint, Lfint, Lsint, Iint, Rint, cIncint = solveint.T
 
+labels =["2023","2024","2025","2026","2027","2028"]
 
 J_diff = cInc[1:] - cInc[:-1]
 J_diffint = cIncint[1:] - cIncint[:-1]
 #J_diff = np.diff(cInc)
-fig = plt.figure(facecolor='w')
+fig = plt.figure(dpi=1200, facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
 #ax.plot(t, Lf/100000, 'r', alpha=1, lw=2, label='latent fast')
@@ -132,14 +133,15 @@ ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='Baseline')
 ax.plot(t[1:]+(40000-1), J_diffint*100000, 'red', alpha=1, lw=2, label='Reduced delay in diagnosis')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
-ax.set_xlabel('Time')
-ax.set_ylabel('Number')
+ax.set_xlabel('Year')
+ax.set_ylabel('Rate per 100,000')
 ax.set_xlim(39990, 50000)
 ax.grid(b=True, which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
 plt.title("Incidence")
-#plt.savefig('filename.png')
+plt.xticks(np.linspace(39990, 50000, len(labels)), labels)
+plt.savefig('filename.png')
 plt.show()
 
 
