@@ -86,7 +86,7 @@ r.ACF2         = [0 0];
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
-names = {'beta','betadec','gamma','p_birth','p_kLf'};
+names = {'beta','betadec','gamma','p_birth','p_kLf'};                       % THESE ARE PARAMS - GAMMA IS HEALTH SYSTEM
 lgths =      [1,        1,      1,        1,      1];
 
 lim = 0; xi = [];
