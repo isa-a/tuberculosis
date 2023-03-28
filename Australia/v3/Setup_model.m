@@ -86,8 +86,8 @@ r.ACF2         = [0 0];
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
-names = {'beta','betadec','gamma','p_birth','p_kLf'};                       % THESE ARE PARAMS - GAMMA IS HEALTH SYSTEM
-lgths =      [1,        1,      1,        1,      1];
+names = {'beta','betadec','gamma', 'p_birth','p_kLf'};                       % THESE ARE PARAMS - GAMMA IS HEALTH SYSTEM
+lgths =      [1,        1,1,        1,      1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -110,13 +110,13 @@ ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 % -------------------------------------------------------------------------
-% --- Specify data --------------------------------------------------------
+% --- Specify --------------------------------------------------------
 
 data.incd2010   = [6.5 7 7.5];
 data.incd2020   = [6.5 7 7.5];
 data.mort       = [0.28 0.3 0.32];
-data.p_migrTB   = [0.87 0.89 0.91];
-data.p_migrpopn = [0.27 0.30 0.33];
+data.p_migrTB   = [0.708 0.728 0.748];
+data.p_migrpopn = [0.138 0.168 0.198];
 data.p_LTBI     = [0.15 0.2 0.25];
 
 show = 1;
