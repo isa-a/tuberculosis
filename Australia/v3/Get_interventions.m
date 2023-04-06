@@ -63,7 +63,7 @@ for ii = 1:size(xs,1)
     
     for mi = 1:length(models)
         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, p1, [2022 2025], agg, sel, r);
-        [t,soln] = ode15s(geq, [2022:2031], init);
+        [t,soln] = ode15s(geq, [2022:2036], init);
         
         sdiff = diff(soln,[],1);
         incsto(:,ii,mi) = sdiff(:,i.aux.inc(1))*1e5;
@@ -85,30 +85,28 @@ mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
 cols = linspecer(size(incmat,3));
 figure; lw = 1.5; fs = 14;
 
-xx = [2022:2030];
+xx = [2022:2035];
 for ii = 1:size(incmat,3)
    plt = incmat(:,:,ii);
    lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
    jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
+   yline(1.05,'k--');
 end
 yl = ylim; yl(1) = 0; ylim(yl);
+xlim([2022 2035])
 set(gca,'fontsize',fs);
 
 %legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','location','SouthWest');
-legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','+ Monthly followup post TPT or Tx','location','SouthWest');
-ylabel('Incidence per 100,000 population');
-
-% Show the proportions from different sources
-tmp1 = prctile(props,[2.5,50,97.5],1);
-tmp2 = squeeze(tmp1(2,:,end));
-[sum(tmp2([1,3])), sum(tmp2([2,4])), tmp2(5)]
+legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','+ Monthly followup post TPT or Tx', 'Elimination target','location','SouthWest');
+ylabel('Rate per 100,000 population');
+title('Incidence')
 
 
 %mortality-----------------------------------------------------------------
 cols = linspecer(size(mrtmat,3));
 figure; lw = 1.5; fs = 14;
 
-xx = [2022:2030];
+xx = [2022:2035];
 for ii = 1:size(mrtmat,3)
    plt = mrtmat(:,:,ii);
    lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
@@ -118,8 +116,9 @@ yl = ylim; yl(1) = 0; ylim(yl);
 set(gca,'fontsize',fs);
 
 %legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','location','SouthWest');
-legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','+ Monthly followup post TPT or Tx','location','SouthWest');
-ylabel('Mortality per 100,000 population');
+%legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','+ Monthly followup post TPT or Tx','location','SouthWest');
+ylabel('Rate per 100,000 population');
+title('Mortality')
 
 % Show the proportions from different sources
 tmp1 = prctile(props,[2.5,50,97.5],1);
@@ -128,5 +127,6 @@ mm = [sum(tmp2([1,3])), sum(tmp2([2,4])), tmp2(5)];
 
 
 figure; pie(mm);
-labels = {'People developing TB without history of TPT or active TB treatment', 'People developing TB after TPT', 'People developing relapse TB after active TB treatment'};
+labels = {'People developing TB without history of TPT or active TB treatment', 'People developing TB after TPT', 'Relapse after active TB treatment'};
 legend(labels,'Location','NorthWest','Orientation','vertical');
+title('Sources of incidence in 2035 with all interventions combined')
