@@ -31,3 +31,14 @@ TPTeff       = 0.6
 TPT          = [0, 0]
 ACF          = [0, 0]
 ACF2         = [0, 0]
+
+#free params
+params = ['beta', 'gamma']
+
+#set param bounds for distribution
+beta_bounds = [0, 50]
+gamma_bounds = [0, 40]
+
+
+
+
