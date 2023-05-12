@@ -8,6 +8,9 @@ Created on Wed Apr 26 00:44:17 2023
 #SIR model implemented through linear algebra
 
 import numpy as np
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+
 
 
 # -- Natural history parameters -------------------------------------------
@@ -32,72 +35,96 @@ params = ['beta', 'gamma']
 beta_bounds = [0, 50]
 gamma_bounds = [0, 40]
 
-
-####create matrix
-
-u = LTBI_stabil
-v = progression
-w = reactivation
-gamma = self_cure
-beta = 0.4
+    
 # Total population, N.
 N = 1
 # Initial number of infected and recovered individuals, I0 and R0.
 I0, R0 = 0.001, 0
 # Everyone else, S0, is susceptible to infection initially.
 U0 = N - I0 - R0
-J0 = I0
+#J0 = I0
 Lf0, Ls0 = 0, 0
-
+u = LTBI_stabil
+v = progression
+w = reactivation
+gamma = self_cure
+beta = 0.4
 U = U0
 Lf = Lf0
 Ls=Ls0
 I=I0
 R=R0
+t= np.linspace(0,500,1)
 
-#create state vector
-state_vec = np.array([U, Lf, Ls, I, R])
+def model_spec(t, N, beta, gamma, u, v, w):
+    ####create matrix
+     
+    #create state vector
+    state_vec = np.array([U, Lf, Ls, I, R])
+    
+    #def matrices():
+    zero_mat = np.zeros((5,5))
+    
+    # addressU = zero_mat[0,]
+    # addressLf = zero_mat[1,]
+    # addressLs = zero_mat[2,]
+    # addressI = zero_mat[3,]
+    # addressR = zero_mat[4,]
+    
+    # colU = zero_mat[:,0]
+    # colLf = zero_mat[:,1]
+    # colLs = zero_mat[:,2]
+    # colI = zero_mat[:,3]
+    # colR = zero_mat[:,4]
+        
+    zero_mat.put([6], -u-v)
+    zero_mat.put([11], u)
+    zero_mat.put([12], -w)
+    zero_mat.put([16], v)
+    zero_mat.put([17], w)
+    zero_mat.put([18], -gamma)
+    zero_mat.put([23], gamma)
+    
+    linearmatrix = zero_mat
+        
+    lam_zeros_mat = np.zeros((5,5))
+    lam_zeros_mat.put([0], -1)
+    lam_zeros_mat.put([5], 1)
+    
+    lam_vector = np.zeros((5))
+    lam_vector.put([3], beta)
+    lamda = np.dot(lam_vector, state_vec)
+    
+    nonlinearmatrix = lamda * lam_zeros_mat
+    
+    combinedmatrices = nonlinearmatrix + linearmatrix
+    
+    solver_feed = np.dot(combinedmatrices, state_vec)
+    
+    return solver_feed
 
-#def matrices():
-zero_mat = np.zeros((5,5))
 
-# addressU = zero_mat[0,]
-# addressLf = zero_mat[1,]
-# addressLs = zero_mat[2,]
-# addressI = zero_mat[3,]
-# addressR = zero_mat[4,]
+solve = odeint(model_spec, (U0, Lf0, Ls0, I0, R0), t, args=(U0, Lf0, Ls0, I0, R0, t, N, beta, gamma, u, v, w))
+U, Lf, Ls, I, R = solve.T
 
-# colU = zero_mat[:,0]
-# colLf = zero_mat[:,1]
-# colLs = zero_mat[:,2]
-# colI = zero_mat[:,3]
-# colR = zero_mat[:,4]
-
-
-zero_mat.put([6], -u-v)
-zero_mat.put([11], u)
-zero_mat.put([12], -w)
-zero_mat.put([16], v)
-zero_mat.put([17], w)
-zero_mat.put([18], -gamma)
-zero_mat.put([23], gamma)
-
-linearmatrix = zero_mat
-
-
-lam_zeros_mat = np.zeros((5,5))
-lam_zeros_mat.put([0], -1)
-lam_zeros_mat.put([5], 1)
-
-lam_vector = np.zeros((5))
-lam_vector.put([3], beta)
-lamda = np.dot(lam_vector, state_vec)
-
-nonlinearmatrix = lamda * lam_zeros_mat
-
-combinedmatrices = nonlinearmatrix + linearmatrix
-
-np.dot(combinedmatrices, state_vec)
+fig = plt.figure(facecolor='w')
+ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
+#ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
+ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
+ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
+ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
+ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
+#ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
+#ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
+#ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
+ax.set_xlabel('Time')
+ax.set_ylabel('Number')
+#ax.set_xlim(2019, 2030)
+ax.grid(b=True, which='major', c='w', lw=2, ls='-')
+legend = ax.legend()
+legend.get_frame().set_alpha(0.5)
+#plt.title("Incidence")
+plt.show()
 
 
 
