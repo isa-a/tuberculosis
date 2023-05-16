@@ -56,6 +56,8 @@ def model_spec(state_vec, t, N, beta, gamma, u, v, w):
     #create matrix full of zeros
     zero_mat = np.zeros((5,5))
     
+    
+    #get_addresses replication...will realign later
     # addressU = zero_mat[0,]
     # addressLf = zero_mat[1,]
     # addressLs = zero_mat[2,]
