@@ -18,22 +18,12 @@ progression  = 0.0826
 LTBI_stabil  = 0.872
 reactivation = 0.0006
 Tx            = 2
-default       = 0.01
 self_cure    = 1/6
-relapse      = [0.032, 0.14, 0.0015]
 muTB         = 1/6
 prop_imm     = 0.8
 # Interventions 
 migrTPT      = 0
 TPTeff       = 0.6                                                     
-TPT          = [0, 0]
-ACF          = [0, 0]
-ACF2         = [0, 0]
-#free params
-params = ['beta', 'gamma']
-#set param bounds for distribution
-beta_bounds = [0, 50]
-gamma_bounds = [0, 40]
 
     
 # Total population, N.
@@ -54,13 +44,14 @@ Lf = Lf0
 Ls=Ls0
 I=I0
 R=R0
-t= np.linspace(0,500,500+1)
+t= np.linspace(0,100,100+1)
+
 
 def model_spec(state_vec, t, N, beta, gamma, u, v, w):
     ####create matrix
      
     #create state vector
-    state_vec = np.array([U, Lf, Ls, I, R])
+    state_vec = np.array([U0, Lf0, Ls0, I0, R0])
     
     #create matrix full of zeros
     zero_mat = np.zeros((5,5))
@@ -125,10 +116,10 @@ U, Lf, Ls, I, R = solve.T
 fig = plt.figure(facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
-ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
-ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
+#ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
+#ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
 ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
-ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
+#ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
 #ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
 #ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
