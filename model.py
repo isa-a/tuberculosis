@@ -32,7 +32,7 @@ mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 mu_m, muTB_m, sigma_m, rho_m = 1/80, 1/6, 1/6, 0.03
 u, v, w = 0.88, 0.083, 0.0006
 u_m, v_m, w_m = 0.88, 0.083, 0.0006
-t = np.linspace(0, 50000, 50000+1)
+t = np.linspace(0, 100, 100+1)
 int_gamma = 365/56
 
 
@@ -55,17 +55,18 @@ def genpop(y, t, N, beta, gamma, mu, muTB, sigma, rho, u, v, w):
 solve = odeint(genpop, (U0, Lf0, Ls0, I0, R0, J0), t, args=(N, beta, gamma, mu, muTB, sigma, rho, u, v, w))
 U, Lf, Ls, I, R, cInc = solve.T
 
+
 J_diff = cInc[1:] - cInc[:-1]
 #J_diffint = cIncint[1:] - cIncint[:-1]
 #J_diff = np.diff(cInc)
 fig = plt.figure(facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
-ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
+#ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
 #ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
 ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
-#ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
-ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
+ax.plot(t, R*100000, 'blue', alpha=1, lw=2, label='recovered')
+ax.plot(t[1:], J_diff*100000, 'purple', alpha=1, lw=2, label='incidence')
 #ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
 ax.set_xlabel('Time')

@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 progression  = 0.0826
 LTBI_stabil  = 0.872
 reactivation = 0.0006
-Tx            = 2
+Tx           = 2
 self_cure    = 1/6
 muTB         = 1/6
 prop_imm     = 0.8
@@ -38,7 +38,7 @@ u = LTBI_stabil
 v = progression
 w = reactivation
 gamma = self_cure
-beta = 0.4
+beta = 13
 U = U0
 Lf = Lf0
 Ls=Ls0
@@ -47,70 +47,84 @@ R=R0
 t= np.linspace(0,100,100+1)
 
 
-def model_spec(state_vec, t, N, beta, gamma, u, v, w):
-    ####create matrix
-     
-    #create state vector
-    state_vec = np.array([U0, Lf0, Ls0, I0, R0])
-    
-    #create matrix full of zeros
-    zero_mat = np.zeros((5,5))
-    
-    
-    #get_addresses replication...will realign later
-    # addressU = zero_mat[0,]
-    # addressLf = zero_mat[1,]
-    # addressLs = zero_mat[2,]
-    # addressI = zero_mat[3,]
-    # addressR = zero_mat[4,]
-    
-    # colU = zero_mat[:,0]
-    # colLf = zero_mat[:,1]
-    # colLs = zero_mat[:,2]
-    # colI = zero_mat[:,3]
-    # colR = zero_mat[:,4]
-        
-    #put the rates in correct positions
-    #positions are based on a flattend matrix
-    zero_mat.put([6], -u-v)
-    zero_mat.put([11], u)
-    zero_mat.put([12], -w)
-    zero_mat.put([16], v)
-    zero_mat.put([17], w)
-    zero_mat.put([18], -gamma)
-    zero_mat.put([23], gamma)
-    
-    #rename to linear component
-    linearmatrix = zero_mat
-    
-    #create matrix of zeros for nonlinear
-    #put 1s in places where lambda will be
-    lam_zeros_mat = np.zeros((5,5))
-    lam_zeros_mat.put([0], -1)
-    lam_zeros_mat.put([5], 1)
-    
-    #create lambda vector, 1x5 shape
-    #place beta in positions that will match up with infectious states
-    lam_vector = np.zeros((5))
-    lam_vector.put([3], beta)
-    #get scalar lambda value by multiplying with state vector
-    lamda = np.dot(lam_vector, state_vec)
-    
-    #add lambda to nonlinear matrix
-    nonlinearmatrix = lamda * lam_zeros_mat
-    
-    #both nonlinear and linear components combined
-    combinedmatrices = nonlinearmatrix + linearmatrix
-    
-    #combined matrix multiplied by state vector to give 5x1 vector
-    solver_feed = np.dot(combinedmatrices, state_vec)
-    
-    #convert to tuple
-    solver_feed = solver_feed.tolist()    
-    solver_feed = tuple(solver_feed)
-    
-    return solver_feed
 
+#def model_spec(y, t, N, beta, gamma, u, v, w):
+####create matrix
+U,Lf,Ls,I,R = y
+#create state vector
+state_vec = np.array([U, Lf, Ls, I, R])
+
+#create matrix full of zeros
+zero_mat = np.zeros((5,5))
+
+
+#get_addresses replication...will realign later
+# addressU = zero_mat[0,]
+# addressLf = zero_mat[1,]
+# addressLs = zero_mat[2,]
+# addressI = zero_mat[3,]
+# addressR = zero_mat[4,]
+
+# colU = zero_mat[:,0]
+# colLf = zero_mat[:,1]
+# colLs = zero_mat[:,2]
+# colI = zero_mat[:,3]
+# colR = zero_mat[:,4]
+    
+#put the rates in correct positions
+#positions are based on a flattend matrix
+zero_mat.put([6], -u-v)
+zero_mat.put([11], u)
+zero_mat.put([12], -w)
+zero_mat.put([16], v)
+zero_mat.put([17], w)
+zero_mat.put([18], -gamma)
+zero_mat.put([23], gamma)
+
+#rename to linear component
+linearmatrix = zero_mat
+
+#create matrix of zeros for nonlinear
+#put 1s in places where lambda will be
+lam_zeros_mat = np.zeros((5,5))
+lam_zeros_mat.put([0], -1)
+lam_zeros_mat.put([5], 1)
+
+#create lambda vector, 1x5 shape
+#place beta in positions that will match up with infectious states
+lam_vector = np.zeros((5))
+lam_vector.put([3], beta)
+#get scalar lambda value by multiplying with state vector
+lamda = np.dot(lam_vector, state_vec)
+
+#add lambda to nonlinear matrix
+nonlinearmatrix = lamda * lam_zeros_mat
+
+#both nonlinear and linear components combined
+combinedmatrices = nonlinearmatrix + linearmatrix
+
+#combined matrix multiplied by state vector to give 5x1 vector
+solver_feed = np.dot(combinedmatrices, state_vec)
+
+#convert to tuple
+solver_feed = solver_feed.tolist()    
+solver_feed = tuple(solver_feed)
+
+
+#incidence auxillary
+#create seleector matrix for incidence
+# dJ/dt = lambda*U
+#for infectious state put 1s except on diag
+inc_selector = np.zeros((5,5))
+inc_selector.put([10], 1)
+inc_selector.put([11], 1)
+inc_selector.put([13], 1)
+inc_selector.put([14], 1)
+
+inc_aux = np.multiply(inc_selector,combinedmatrices)
+
+    
+    #return solver_feed
 
 solve = odeint(model_spec, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
 U, Lf, Ls, I, R = solve.T
@@ -121,7 +135,7 @@ ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
 #ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
 ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
-#ax.plot(t, R*100000, 'red', alpha=1, lw=2, label='recovered')
+ax.plot(t, R*100000, 'blue', alpha=1, lw=2, label='recovered')
 #ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
 #ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
 #ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
@@ -133,6 +147,8 @@ legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
 #plt.title("Incidence")
 plt.show()
+
+
 
 
 
