@@ -55,13 +55,17 @@ def get_addresses():
     col_labels = ['U', 'Lf', 'Ls', 'I', 'R']
     
     # Create a dictionary to map labels to indices
+    #the keys are tuples of row and column labels
+    #the values are tuples of row and column indices
+    #first element of the tuple represents the row index
+    #second element represents the column index
     index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(5) for j in range(5)}
     
     return index_map
 
 
 def make_model(y, t, N, beta, gamma, u, v, w):
-        ####create matrix
+    ####create matrix
     U,Lf,Ls,I,R = y
     #create state vector
     state_vec = np.array([U, Lf, Ls, I, R])
@@ -69,13 +73,17 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     #create matrix full of zeros
     zero_mat = np.zeros((5,5))
     
-    zero_mat[index_map[('U', 'Lf')]] = 1
-    zero_mat[index_map[('Ls', 'I')]] = 2
-    zero_mat[index_map[('R', 'R')]] = 3
-
+    zero_mat[index_map[('Ls', 'Lf')]] = u
+    zero_mat[index_map[('I', 'Lf')]] = v
+    zero_mat[index_map[('I', 'Ls')]] = w
+    zero_mat[index_map[('R', 'I')]] = gamma
     
+    #sort out diagonal
     
-
+    def sum_diags():
+        return np.sum(zero_mat, axis=0)
+    
+    np.apply_along_axis(sum_diags, arr=zero_mat)
     return
 
 #create all matrices in here 
@@ -232,3 +240,5 @@ matrix[index_map[('R', 'R')]] = 3
 
 # Print the matrix
 print(matrix)
+
+
