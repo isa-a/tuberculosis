@@ -46,9 +46,40 @@ I=I0
 R=R0
 t= np.linspace(0,100,100+1)
 
+def get_addresses():
+    # Create the matrix
+    matrix = np.zeros((5, 5))
+    
+    # Define the row and column labels
+    row_labels = ['U', 'Lf', 'Ls', 'I', 'R']
+    col_labels = ['U', 'Lf', 'Ls', 'I', 'R']
+    
+    # Create a dictionary to map labels to indices
+    index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(5) for j in range(5)}
+    
+    return index_map
 
 
-def model_spec(y, t, N, beta, gamma, u, v, w):
+def make_model(y, t, N, beta, gamma, u, v, w):
+        ####create matrix
+    U,Lf,Ls,I,R = y
+    #create state vector
+    state_vec = np.array([U, Lf, Ls, I, R])
+    
+    #create matrix full of zeros
+    zero_mat = np.zeros((5,5))
+    
+    zero_mat[index_map[('U', 'Lf')]] = 1
+    zero_mat[index_map[('Ls', 'I')]] = 2
+    zero_mat[index_map[('R', 'R')]] = 3
+
+    
+    
+
+    return
+
+#create all matrices in here 
+def make(y, t, N, beta, gamma, u, v, w):
     ####create matrix
     U,Lf,Ls,I,R = y
     #create state vector
@@ -57,6 +88,57 @@ def model_spec(y, t, N, beta, gamma, u, v, w):
     #create matrix full of zeros
     zero_mat = np.zeros((5,5))
     
+    #put the rates in correct positions
+    #positions are based on a flattend matrix
+    zero_mat.put([6], -u-v)
+    zero_mat.put([11], u)
+    zero_mat.put([12], -w)
+    zero_mat.put([16], v)
+    zero_mat.put([17], w)
+    zero_mat.put([18], -gamma)
+    zero_mat.put([23], gamma)
+    
+    #rename to linear component
+    linearmatrix = zero_mat
+    
+    #create matrix of zeros for nonlinear
+    #put 1s in places where lambda will be
+    lam_zeros_mat = np.zeros((5,5))
+    lam_zeros_mat.put([0], -1)
+    lam_zeros_mat.put([5], 1)
+    
+    #create lambda vector, 1x5 shape
+    #place beta in positions that will match up with infectious states
+    lam_vector = np.zeros((5))
+    lam_vector.put([3], beta)
+    #get scalar lambda value by multiplying with state vector
+    lamda = np.dot(lam_vector, state_vec)
+    
+    #add lambda to nonlinear matrix
+    nonlinearmatrix = lamda * lam_zeros_mat
+    
+    #both nonlinear and linear components combined
+    #combinedmatrices = nonlinearmatrix + linearmatrix
+    
+    #combined matrix multiplied by state vector to give 5x1 vector
+    #solver_feed = np.dot(combinedmatrices, state_vec)
+    
+    #convert to tuple
+    #solver_feed = solver_feed.tolist()    
+    #solver_feed = tuple(solver_feed)
+    
+    return linearmatrix, nonlinearmatrix
+
+    
+
+def model_spec(y, t, N, beta, gamma, u, v, w):
+    ####create matrix
+    U,Lf,Ls,I,R = y
+    #create state vector
+    state_vec = np.array([U, Lf, Ls, I, R])
+    
+    #create matrix full of zeros
+    zero_mat = np.zeros((5,5))    
     
     
     #get_addresses replication...will realign later
@@ -71,7 +153,7 @@ def model_spec(y, t, N, beta, gamma, u, v, w):
     # colLs = zero_mat[:,2]
     # colI = zero_mat[:,3]
     # colR = zero_mat[:,4]
-        
+    
     #put the rates in correct positions
     #positions are based on a flattend matrix
     zero_mat.put([6], -u-v)
@@ -110,21 +192,7 @@ def model_spec(y, t, N, beta, gamma, u, v, w):
     #convert to tuple
     solver_feed = solver_feed.tolist()    
     solver_feed = tuple(solver_feed)
-    
-    
-    #incidence auxillary
-    #create seleector matrix for incidence
-    # dJ/dt = lambda*U
-    #for infectious state put 1s except on diag
-    inc_selector = np.zeros((5,5))
-    inc_selector.put([10], 1)
-    inc_selector.put([11], 1)
-    inc_selector.put([13], 1)
-    inc_selector.put([14], 1)
-    
-    inc_aux = np.multiply(inc_selector,combinedmatrices)
-    inc_aux = np.dot(inc_aux, state_vec)
-    
+
     return solver_feed
 
 solve = odeint(model_spec, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
@@ -137,9 +205,6 @@ ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
 #ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
 ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
 ax.plot(t, R*100000, 'blue', alpha=1, lw=2, label='recovered')
-#ax.plot(t[1:], J_diff*100000, 'blue', alpha=1, lw=2, label='incidence')
-#ax.plot(t[1:]+2019, J_diffint*100000, 'red', alpha=1, lw=2, label='intervention incidence')
-#ax.plot(t, cInc, 'red', alpha=1, lw=2, label='Prevalence')
 ax.set_xlabel('Time')
 ax.set_ylabel('Number')
 #ax.set_xlim(2019, 2030)
@@ -150,109 +215,20 @@ legend.get_frame().set_alpha(0.5)
 plt.show()
 
 
+# Create the matrix
+matrix = np.zeros((5, 5))
 
+# Define the row and column labels
+row_labels = ['U', 'Lf', 'Ls', 'I', 'R']
+col_labels = ['U', 'Lf', 'Ls', 'I', 'R']
 
+# Create a dictionary to map labels to indices
+index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(5) for j in range(5)}
 
+# Assign values to the matrix
+matrix[index_map[('U', 'Lf')]] = 1
+matrix[index_map[('Ls', 'I')]] = 2
+matrix[index_map[('R', 'R')]] = 3
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def zeroes(lamda, u, v, w, gamma):
-    
-    zero_mat = np.array([[-lamda, 0., 0., 0., 0.],
-                         [lamda, -(u+v), 0., 0., 0.],
-                         [0.,   u,      -w, 0., 0.],
-                         [0.,   v,   w,     -gamma, 0.],
-                         [0., 0.,   0.,      gamma, 0.]])
-    
-    state_vec = np.array(['U', 'Lf', 'Ls', 'I', 'R']) #needs to be changed
-    
-    dU = zero_mat[0,0] * state_vec[0]
-    dlf = zero_mat[1,0] * state_vec[0] + zero_mat[1,1] * state_vec[1]
-    dls = zero_mat[2,1] * state_vec[1] + zero_mat[2,2] * state_vec[2]
-    dI = zero_mat[3,1] * state_vec[1] + zero_mat[3,2] * state_vec[2] + zero_mat[3,3] * state_vec[3]
-    dR = zero_mat[4,3] * state_vec[3]
-    
-    #state_vec = np.array([[U, Lf, Ls, I, R]])
-    return(zero_mat)
-
-state_vec = np.array(['U', 'Lf', 'Ls', 'I', 'R'])
-
-zeros = np.zeros((5,5))
-params = ['-lambda', 'lambda', '-u-v', 'u', '-w', 'v', 'w','-gamma', 'gamma']
-pos = [(0,0),(1,0),(1,1),(2,1),(2,2),(3,1),(3,2),(3,3),(4,3)]
-rows, cols = zip(*pos)
-zeros[rows, cols] = params
-
-
-zeros = np.zeros((5, 5)).astype(str)
-params = ['-lambda', 'lambda', '-u-v', 'u', '-w', 'v', 'w','-gamma', 'gamma']
-posx = [0, 1, 1, 2, 2, 3, 3, 3, 4]
-posy = [0, 0, 1, 1, 2, 1, 2, 3, 3]
-zeros[posx, posy] = params
-
-zeros[0,0]
-#rates_matrix = np.array([[0,0,0,0,0], [0,0,0,0,0]])
-
-print(np.dot(zeros,state_vec))
-
-
-
-
-def zeroes(lamda, u, v, w, gamma):
-    
-    zero_mat = np.array([[-lamda, 0., 0., 0., 0.],
-                         [lamda, -(u+v), 0., 0., 0.],
-                         [0.,   u,      -w, 0., 0.],
-                         [0.,   v,   w,     -gamma, 0.],
-                         [0., 0.,   0.,      gamma, 0.]])
-    
-    state_vec = np.array(['U', 'Lf', 'Ls', 'I', 'R']) #needs to be changed
-    
-    dU = zero_mat[0,0] * state_vec[0]
-    dlf = zero_mat[1,0] * state_vec[0] + zero_mat[1,1] * state_vec[1]
-    dls = zero_mat[2,1] * state_vec[1] + zero_mat[2,2] * state_vec[2]
-    dI = zero_mat[3,1] * state_vec[1] + zero_mat[3,2] * state_vec[2] + zero_mat[3,3] * state_vec[3]
-    dR = zero_mat[4,3] * state_vec[3]
-    
-    #state_vec = np.array([[U, Lf, Ls, I, R]])
-    return(zero_mat)
-
-I0, R0 = 0.001, 0
-lamda = beta/I0
-
-zero_mat =     np.array([[lamda, 0., 0., 0., 0.],
-                         [lamda, -(u+v), 0., 0., 0.],
-                         [0., u, -w, 0., 0.],
-                         [0., v, w, -gamma, 0.],
-                         [0., 0., 0., gamma, 0.]])
-    
-state_vec = np.array(['U', 'Lf', 'Ls', 'I', 'R'])
-
-
-lamdamat = np.array([0, 0, 0, beta, 0])
-
-
-lamdazeros =   np.array([[-1, 0., 0., 0., 0.],
-                         [1, 0, 0., 0., 0.],
-                         [0., 0, 0, 0., 0.],
-                         [0., 0, 0, 0, 0.],
-                         [0., 0., 0., 0, 0.]])
-    
-dU = zero_mat[0,0] * state_vec[0]
-dlf = zero_mat[1,0] * state_vec[0] + zero_mat[1,1] * state_vec[1]
-dls = zero_mat[2,1] * state_vec[1] + zero_mat[2,2] * state_vec[2]
-dI = zero_mat[3,1] * state_vec[1] + zero_mat[3,2] * state_vec[2] + zero_mat[3,3] * state_vec[3]
-dR = zero_mat[4,3] * state_vec[3]
-
+# Print the matrix
+print(matrix)
