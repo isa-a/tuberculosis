@@ -83,7 +83,10 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     def sum_diags():
         return np.sum(zero_mat, axis=0)
     
-    np.apply_along_axis(sum_diags, arr=zero_mat)
+    for index_map in zero_mat:
+        np.fill_diagonal(zero_mat, sum_diags())
+    
+    np.apply_along_axis(sum_diags, axis=0,arr=zero_mat)
     return
 
 #create all matrices in here 
