@@ -54,6 +54,16 @@ def get_addresses(i,j):
     row_labels = ['U', 'Lf', 'Ls', 'I', 'R']
     col_labels = ['U', 'Lf', 'Ls', 'I', 'R']
     
+    def make_rl(n):
+        row_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
+        row_labels = row_labels_base[:]
+        col_labels = row_labels_base[:]
+        for i in range((n-1)):
+            row_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
+            col_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
+        return row_labels, col_labels
+
+    
     # Create a dictionary to map labels to indices
     #the keys are tuples of row and column labels
     #the values are tuples of row and column indices
@@ -85,9 +95,11 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     
     for index_map in zero_mat:
         np.fill_diagonal(zero_mat, -sum_diags())
+        
+    linearmatrix = zero_mat
     
-    np.apply_along_axis(sum_diags, axis=0,arr=zero_mat)
-    return
+    
+    return linearmatrix
 
 #create all matrices in here 
 def make(y, t, N, beta, gamma, u, v, w):
@@ -225,23 +237,14 @@ legend.get_frame().set_alpha(0.5)
 #plt.title("Incidence")
 plt.show()
 
-
-# Create the matrix
-matrix = np.zeros((5, 5))
-
-# Define the row and column labels
-row_labels = ['U', 'Lf', 'Ls', 'I', 'R']
-col_labels = ['U', 'Lf', 'Ls', 'I', 'R']
-
-# Create a dictionary to map labels to indices
-#index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(5) for j in range(5)}
-
-# Assign values to the matrix
-matrix[index_map[('U', 'Lf')]] = 1
-matrix[index_map[('Ls', 'I')]] = 2
-matrix[index_map[('R', 'R')]] = 3
-
-# Print the matrix
-print(matrix)
+def make_rl(n):
+    row_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
+    row_labels = row_labels_base[:]
+    col_labels = row_labels_base[:]
+    for i in range((n-1)):
+        row_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
+        col_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
+    return row_labels, col_labels
 
 
+make_rl(2)
