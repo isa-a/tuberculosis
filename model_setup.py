@@ -51,18 +51,16 @@ def get_addresses(i,j):
     matrix = np.zeros((i,j))
     
     # Define the row and column labels
-    row_labels = ['U', 'Lf', 'Ls', 'I', 'R']
-    col_labels = ['U', 'Lf', 'Ls', 'I', 'R']
-    
-    #nested function
-    def make_rl(n):
-        row_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
-        row_labels = row_labels_base[:]
-        col_labels = row_labels_base[:]
-        for i in range((n-1)):
-            row_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
-            col_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
-        return row_labels, col_labels
+    #n is multiplier for subpopulations
+    #assuming each population has 5 states
+    #U, Lf, Ls, I, R
+    n=1
+    row_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
+    row_labels = row_labels_base[:]
+    col_labels = row_labels_base[:]
+    for i,j in range((n-1)):
+        row_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
+        col_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
 
     
     # Create a dictionary to map labels to indices
