@@ -54,6 +54,7 @@ def get_addresses(i,j):
     row_labels = ['U', 'Lf', 'Ls', 'I', 'R']
     col_labels = ['U', 'Lf', 'Ls', 'I', 'R']
     
+    #nested function
     def make_rl(n):
         row_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
         row_labels = row_labels_base[:]
