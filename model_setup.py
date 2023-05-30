@@ -11,8 +11,6 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 
-
-
 # -- Natural history parameters -------------------------------------------
 progression  = 0.0826
 LTBI_stabil  = 0.872
@@ -24,7 +22,6 @@ prop_imm     = 0.8
 # Interventions 
 migrTPT      = 0
 TPTeff       = 0.6                                                     
-
     
 # Total population, N.
 N = 1
@@ -46,35 +43,44 @@ I=I0
 R=R0
 t= np.linspace(0,100,100+1)
 
-def get_addresses(i,j):
+
+#----------------------- FUNCTION 1---------------------------------------
+def get_addresses():
     # Create the matrix
-    matrix = np.zeros((i,j))
-    
-    # Define the row and column labels
     #n is multiplier for subpopulations
+    n=1
+    matrix = np.zeros((5*n,5*n))
+      
     #assuming each population has 5 states
     #U, Lf, Ls, I, R
-    n=1
-    row_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
-    row_labels = row_labels_base[:]
-    col_labels = row_labels_base[:]
-    for i,j in range((n-1)):
-        row_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
-        col_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
-
+    #row_labels and col_labels represent labels for
+    #rows and columns, respectively
+    labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
+    row_labels = labels_base[:]
+    col_labels = labels_base[:]
     
-    # Create a dictionary to map labels to indices
-    #the keys are tuples of row and column labels
-    #the values are tuples of row and column indices
-    #first element of the tuple represents the row index
-    #second element represents the column index
+    #this will concatenate additional labels to the rows and cols
+    #based on the number of subpops there are
+    #e.g. if we have n=2, domestic and foreign born, then this will
+    #create rows as U, Lf, Ls, I, R and then U_1, Lf_1, Ls_1, I_1, R_1
+    for i in range((n-1)):
+        row_labels += ["%s%d" % (lbl,i+1) for lbl in labels_base]
+        col_labels += ["%s%d" % (lbl,i+1) for lbl in labels_base]
+  
+    #here I create a dictionary called index_map 
+    #this iterates over all possible combinations of 
+    #row and column indices using the range of whatever the matrix size is. 
+    #every key in the dict is a tuple containing a pair of 
+    #labels from row_labels and col_labels, while the value is a tuple of 
+    #corresponding row and column indices. the dict maps the 
+    #labels to their respective indices.
     index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(matrix.shape[0]) for j in range(matrix.shape[1])}
     
     return index_map
 
 
+#----------------------- FUNCTION 2---------------------------------------
 def make_model(y, t, N, beta, gamma, u, v, w):
-####create matrix
     U,Lf,Ls,I,R = y
     #create state vector
     state_vec = np.array([U, Lf, Ls, I, R])
@@ -82,23 +88,33 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     #create matrix full of zeros
     zero_mat = np.zeros((5,5))
     
-    zero_mat[get_addresses(5,5)[('Ls', 'Lf')]] = u
-    zero_mat[get_addresses(5,5)[('I', 'Lf')]] = v
-    zero_mat[get_addresses(5,5)[('I', 'Ls')]] = w
-    zero_mat[get_addresses(5,5)[('R', 'I')]] = gamma
-
-#sort out diagonal
     
+    #use get_addresses to add rates into matrix
+    #the order for the mapping is destination, source
+    zero_mat[get_addresses()[('Ls', 'Lf')]] = u
+    zero_mat[get_addresses()[('I', 'Lf')]] = v
+    zero_mat[get_addresses()[('I', 'Ls')]] = w
+    zero_mat[get_addresses()[('R', 'I')]] = gamma
+
+    #sort out diagonal
+    #function sums up columns of matrix
     def sum_diags():
         return np.sum(zero_mat, axis=0)
     
+    #negative of the sum of the columns goes on the diagonal
     for index_map in zero_mat:
         np.fill_diagonal(zero_mat, -sum_diags())
-        
+    
+    #call it the linear component
     linearmatrix = zero_mat
+    
+    #construct non linear component for lambda
     
     
     return linearmatrix
+
+
+
 
 #create all matrices in here 
 def make(y, t, N, beta, gamma, u, v, w):
@@ -236,14 +252,3 @@ legend.get_frame().set_alpha(0.5)
 #plt.title("Incidence")
 plt.show()
 
-def make_rl(n):
-    row_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
-    row_labels = row_labels_base[:]
-    col_labels = row_labels_base[:]
-    for i in range((n-1)):
-        row_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
-        col_labels += ["%s%d" % (lbl,i+1) for lbl in row_labels_base]
-    return row_labels, col_labels
-
-
-make_rl(2)
