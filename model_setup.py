@@ -46,9 +46,9 @@ I=I0
 R=R0
 t= np.linspace(0,100,100+1)
 
-def get_addresses():
+def get_addresses(i,j):
     # Create the matrix
-    matrix = np.zeros((5, 5))
+    matrix = np.zeros((i,j))
     
     # Define the row and column labels
     row_labels = ['U', 'Lf', 'Ls', 'I', 'R']
@@ -59,13 +59,13 @@ def get_addresses():
     #the values are tuples of row and column indices
     #first element of the tuple represents the row index
     #second element represents the column index
-    index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(5) for j in range(5)}
+    index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(matrix.shape[0]) for j in range(matrix.shape[1])}
     
     return index_map
 
 
 def make_model(y, t, N, beta, gamma, u, v, w):
-    ####create matrix
+####create matrix
     U,Lf,Ls,I,R = y
     #create state vector
     state_vec = np.array([U, Lf, Ls, I, R])
@@ -73,18 +73,18 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     #create matrix full of zeros
     zero_mat = np.zeros((5,5))
     
-    zero_mat[index_map[('Ls', 'Lf')]] = u
-    zero_mat[index_map[('I', 'Lf')]] = v
-    zero_mat[index_map[('I', 'Ls')]] = w
-    zero_mat[index_map[('R', 'I')]] = gamma
-    
-    #sort out diagonal
+    zero_mat[get_addresses(5,5)[('Ls', 'Lf')]] = u
+    zero_mat[get_addresses(5,5)[('I', 'Lf')]] = v
+    zero_mat[get_addresses(5,5)[('I', 'Ls')]] = w
+    zero_mat[get_addresses(5,5)[('R', 'I')]] = gamma
+
+#sort out diagonal
     
     def sum_diags():
         return np.sum(zero_mat, axis=0)
     
     for index_map in zero_mat:
-        np.fill_diagonal(zero_mat, sum_diags())
+        np.fill_diagonal(zero_mat, -sum_diags())
     
     np.apply_along_axis(sum_diags, axis=0,arr=zero_mat)
     return
@@ -234,7 +234,7 @@ row_labels = ['U', 'Lf', 'Ls', 'I', 'R']
 col_labels = ['U', 'Lf', 'Ls', 'I', 'R']
 
 # Create a dictionary to map labels to indices
-index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(5) for j in range(5)}
+#index_map = {(row_labels[i], col_labels[j]): (i, j) for i in range(5) for j in range(5)}
 
 # Assign values to the matrix
 matrix[index_map[('U', 'Lf')]] = 1
