@@ -56,6 +56,7 @@ def get_addresses():
     #row_labels and col_labels represent labels for
     #rows and columns, respectively
     labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
+    #slice entire list
     row_labels = labels_base[:]
     col_labels = labels_base[:]
     
@@ -96,14 +97,9 @@ def get_lambda_addresses():
 
 
 #----------------------- FUNCTION 3---------------------------------------
-def make_model(y, t, N, beta, gamma, u, v, w):
-    U,Lf,Ls,I,R = y
-    #create state vector
-    state_vec = np.array([U, Lf, Ls, I, R])
-    
+def make_model():
     #create matrix full of zeros
-    zero_mat = np.zeros((5,5))
-    
+    zero_mat = np.zeros((5,5))   
     
     #use get_addresses to add rates into matrix
     #the order for the mapping is destination, source
@@ -146,6 +142,40 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     
         
     return linearmatrix, nonlinearmatrix, lambda_matrix
+
+#----------------------- FUNCTION 4---------------------------------------
+
+def gov_eqs(y, t, N, beta, gamma, u, v, w):
+    
+    U,Lf,Ls,I,R = y
+    #create state vector
+    state_vec = np.array([U, Lf, Ls, I, R])
+    
+    #calculate product of lambda and nonlinear matrix
+    #multiply lam vector by state to get scalar lambda
+    lambda_value = np.dot(make_model()[2], state_vec)
+    
+    #multiply lambda by the nonlinear component
+    #and add this to the linear matrix
+    #this creates the full model specification
+    
+    all_mat = make_model()[0] + lambda_value * make_model()[1]
+    
+    
+    return all_mat
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
