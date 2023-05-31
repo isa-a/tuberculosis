@@ -44,7 +44,7 @@ R=R0
 t= np.linspace(0,100,100+1)
 
 
-#----------------------- FUNCTION 1---------------------------------------
+#----------------------- FUNCTIONS 1 & 2---------------------------------------
 def get_addresses():
     # Create the matrix
     #n is multiplier for subpopulations
@@ -79,7 +79,23 @@ def get_addresses():
     return index_map
 
 
-#----------------------- FUNCTION 2---------------------------------------
+def get_lambda_addresses():
+    m = 1
+    vector = np.zeros((5 * m))
+    vector_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
+    vector_row_labels = vector_labels_base[:]
+    vector_col_labels = vector_labels_base[:]
+    
+    for i in range((m-1)):
+        vector_row_labels += ["%s%d" % (lbl,i+1) for lbl in vector_labels_base]
+        vector_col_labels += ["%s%d" % (lbl,i+1) for lbl in vector_labels_base]
+        
+    lambda_index_map = {(vector_row_labels[i]): (i) for i in range(vector.shape[0])}
+    
+    return lambda_index_map
+
+
+#----------------------- FUNCTION 3---------------------------------------
 def make_model(y, t, N, beta, gamma, u, v, w):
     U,Lf,Ls,I,R = y
     #create state vector
@@ -108,13 +124,15 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     #call it the linear component
     linearmatrix = zero_mat
     
-    #construct non linear component for lambda
+    #construct nonlinear component for lambda
     lam_zeros_mat = np.zeros((5,5))  
     
     #apply get addresses to add to elements where
     #the lambda values will be - add 1s 
+    #call it nonlinear component
     #destination first, then source
     lam_zeros_mat[get_addresses()[('Lf', 'U')]] = 1
+    nonlinearmatrix = lam_zeros_mat
     
     #sort out diagonal for nonlinear matrix
     def sum_diags_nonlin():
@@ -123,8 +141,11 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     for index_map in lam_zeros_mat:
         np.fill_diagonal(lam_zeros_mat, -sum_diags_nonlin())
     
+    lambda_matrix = np.zeros((5))
+    lambda_matrix[get_lambda_addresses()[('I')]] = beta
     
-    return linearmatrix
+        
+    return linearmatrix, nonlinearmatrix, lambda_matrix
 
 
 
