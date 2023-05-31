@@ -161,21 +161,17 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     
     all_mat = make_model()[0] + lambda_value * make_model()[1]
     
+    #multiply this by the state vector and convert to tuple
+    solver_feed = np.dot(all_mat, state_vec)
+    solver_feed = solver_feed.tolist()    
+    solver_feed = tuple(solver_feed)
     
-    return all_mat
+    
+    return solver_feed
 
 
-
-
-
-
-
-
-
-
-
-
-
+solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
+U, Lf, Ls, I, R = solve.T
 
 
 
