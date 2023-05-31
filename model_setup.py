@@ -109,6 +109,19 @@ def make_model(y, t, N, beta, gamma, u, v, w):
     linearmatrix = zero_mat
     
     #construct non linear component for lambda
+    lam_zeros_mat = np.zeros((5,5))  
+    
+    #apply get addresses to add to elements where
+    #the lambda values will be - add 1s 
+    #destination first, then source
+    lam_zeros_mat[get_addresses()[('Lf', 'U')]] = 1
+    
+    #sort out diagonal for nonlinear matrix
+    def sum_diags_nonlin():
+        return np.sum(lam_zeros_mat, axis=0)
+    
+    for index_map in lam_zeros_mat:
+        np.fill_diagonal(lam_zeros_mat, -sum_diags_nonlin())
     
     
     return linearmatrix
