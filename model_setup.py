@@ -27,7 +27,7 @@ TPTeff       = 0.6
 N = 1
 # Initial number of infected and recovered individuals, I0 and R0.
 I0, R0 = 0.001, 0
-# Everyone else, S0, is susceptible to infection initially.
+# Everyone else, U0, is susceptible to infection initially.
 U0 = N - I0 - R0
 #J0 = I0
 Lf0, Ls0 = 0, 0
