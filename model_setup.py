@@ -168,6 +168,16 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     #create state vector
     state_vec = np.array([U, Lf, Ls, I, R])
     
+    mort_mat = np.zeros((5,2))
+    mort_mat[:,0] = mu
+    mort_mat[3:4,1] = muTB
+    
+    new = np.dot(state_vec, mort_mat)
+    
+    all_morts = np.sum(new)
+    births = 1/all_morts
+
+    
     #calculate product of lambda and nonlinear matrix
     #multiply lam vector by state to get scalar lambda
     lambda_value = np.dot(make_model()[2], state_vec)
@@ -177,6 +187,7 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     #this creates the full model specification
     
     all_mat = make_model()[0] + lambda_value * make_model()[1]
+    
     
     #multiply this by the state vector and convert to tuple
     solver_feed = np.dot(all_mat, state_vec)
@@ -217,6 +228,7 @@ mort_mat = np.zeros((5,2))
 mort_mat[:,0] = mu
 mort_mat[3:4,1] = muTB
 
-new = state_vec * mort_mat
+new = np.dot(state_vec, mort_mat)
 
-
+all_morts = np.sum(new)
+births = 1/all_morts
