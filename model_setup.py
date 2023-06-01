@@ -7,6 +7,22 @@ Created on Wed Apr 26 00:44:17 2023
 
 #SIR model implemented through linear algebra
 
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @////////////////////////////@
+# @////////////////////////////@
+# @/////@@@@@/////////@@@@@////@
+# @///@@@@@@@@///////@@@@@@@@//@
+# @@@@@@@@@@@@///////@@@@@@@@@@@
+# @@@@@@@@@@@@///////@@@@@@@@@@@
+# @@@@@@@@@@@@///////@@@@@@@@@@@
+# @@@@@@@@@@@@///////@@@@@@@@@@@
+# @@@@@@@@@@@@///////@@@@@@@@@@@
+# @@@@@@@@@@@/////////@@@@@@@@@@
+# @@@@@@@@///////////////@@@@@@@
+
+
+
+
 import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
@@ -17,6 +33,7 @@ LTBI_stabil  = 0.872
 reactivation = 0.0006
 Tx           = 2
 self_cure    = 1/6
+mu = 1/80
 muTB         = 1/6
 prop_imm     = 0.8
 # Interventions 
@@ -189,4 +206,17 @@ legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
 #plt.title("Incidence")
 plt.show()
+
+
+
+#'#mortality
+#mu and muTB side by side
+state_vec = np.array([[U, Lf, Ls, I, R]])
+
+mort_mat = np.zeros((5,2))
+mort_mat[:,0] = mu
+mort_mat[3:4,1] = muTB
+
+new = state_vec * mort_mat
+
 
