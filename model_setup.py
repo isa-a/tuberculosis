@@ -20,9 +20,6 @@ Created on Wed Apr 26 00:44:17 2023
 # @@@@@@@@@@@/////////@@@@@@@@@@
 # @@@@@@@@///////////////@@@@@@@
 
-
-
-
 import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
@@ -177,7 +174,7 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     all_morts = np.sum(new)
     births = 1/all_morts
 
-    
+
     #calculate product of lambda and nonlinear matrix
     #multiply lam vector by state to get scalar lambda
     lambda_value = np.dot(make_model()[2], state_vec)
@@ -191,6 +188,8 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     
     #multiply this by the state vector and convert to tuple
     solver_feed = np.dot(all_mat, state_vec)
+    solver_feed = solver_feed - new[0]
+    
     solver_feed = solver_feed.tolist()    
     solver_feed = tuple(solver_feed)
     
