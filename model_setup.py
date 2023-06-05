@@ -30,7 +30,7 @@ LTBI_stabil  = 0.872
 reactivation = 0.0006
 Tx           = 2
 self_cure    = 1/6
-mu = 1/80
+mu           = 1/80
 muTB         = 1/6
 prop_imm     = 0.8
 # Interventions 
@@ -165,8 +165,14 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     #create state vector
     state_vec = np.array([U, Lf, Ls, I, R])
     
-    mort_mat = np.zeros((5,2))
-    mort_mat[:,0] = mu
+    mort_mat = np.zeros((5, 2))
+    row_to_skip = 3
+    
+    for i in range(mort_mat.shape[0]):
+        if i != row_to_skip:
+            mort_mat[i, 0] = mu
+
+    mort_mat[:-2,0] = mu
     mort_mat[3:4,1] = muTB
     
     new = np.dot(state_vec, mort_mat)
@@ -188,7 +194,7 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     
     #multiply this by the state vector and convert to tuple
     solver_feed = np.dot(all_mat, state_vec)
-    solver_feed = solver_feed - new[0]
+    #solver_feed = solver_feed - new[0]
     
     solver_feed = solver_feed.tolist()    
     solver_feed = tuple(solver_feed)
@@ -231,3 +237,5 @@ new = np.dot(state_vec, mort_mat)
 
 all_morts = np.sum(new)
 births = 1/all_morts
+
+
