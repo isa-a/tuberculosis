@@ -211,9 +211,7 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     solver_feed = np.dot(all_mat, state_vec)
     #solver_feed = solver_feed - new[0]
     
-    matrix1_transposed = mort_mat.T
-    
-    result = matrix1_transposed - solver_feed
+    solver_feed = solver_feed - (np.sum(mort_mat, 1))
     
     solver_feed = solver_feed.tolist()    
     solver_feed = tuple(solver_feed)
