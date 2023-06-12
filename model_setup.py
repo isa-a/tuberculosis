@@ -29,7 +29,7 @@ progression  = 0.0826
 LTBI_stabil  = 0.872
 reactivation = 0.0006
 Tx           = 2
-self_cure    = 1/6
+self_cure    = 0.4
 mu           = 1/80
 muTB         = 1/6
 prop_imm     = 0.8
@@ -49,13 +49,13 @@ u = LTBI_stabil
 v = progression
 w = reactivation
 gamma = self_cure
-beta = 13
+beta = 8
 U = U0
 Lf = Lf0
 Ls=Ls0
 I=I0
 R=R0
-t= np.linspace(0,100,100+1)
+t= np.linspace(0,500,500+1)
 
 
 #----------------------- FUNCTIONS 1 & 2---------------------------------------
@@ -159,66 +159,38 @@ def make_model():
 
 #----------------------- FUNCTION 4---------------------------------------
 
+
 def gov_eqs(y, t, N, beta, gamma, u, v, w):
-    
-    U,Lf,Ls,I,R = y
-    #create state vector
+    U, Lf, Ls, I, R = y
     state_vec = np.array([U, Lf, Ls, I, R])
-    
+
     mort_mat = np.zeros((5, 2))
     row_to_skip = 3
-    
+
     for i in range(mort_mat.shape[0]):
         if i != row_to_skip:
             mort_mat[i, 0] = mu
 
-    mort_mat[3,1] = muTB
-    
-    #calculate total deaths, to inform the birth rate
-    #take a sum across columns; end up with a 5x1 column vector 
-    #element-wise multiplication with the state vector, and sum
-    all_morts = np.sum(mort_mat, axis=1)
-    all_morts = all_morts.reshape((-1, 1))
-    
-    totals = all_morts * state_vec
-    
-    #calculate TB deaths 
-    #take the second column, do an element-wise 
-    #multiplication with the state vector, and sum. 
-    tbdeaths = state_vec * mort_mat[:,1]
+    mort_mat[3, 1] = muTB
+
+    tbdeaths = state_vec * mort_mat[:, 1]
     tbdeaths = np.sum(tbdeaths)
-    
-    
-    
-    new = np.dot(state_vec, mort_mat)
-    
-    
-    births = 1/all_morts
 
-
-    #calculate product of lambda and nonlinear matrix
-    #multiply lam vector by state to get scalar lambda
+    births = tbdeaths / mu
     lambda_value = np.dot(make_model()[2], state_vec)
-    
-    #multiply lambda by the nonlinear component
-    #and add this to the linear matrix
-    #this creates the full model specification
-    
-    all_mat = make_model()[0] + lambda_value * make_model()[1]
-    
-    
-    #multiply this by the state vector and convert to tuple
-    solver_feed = np.dot(all_mat, state_vec)
-    #solver_feed = solver_feed - new[0]
-    
-    solver_feed = solver_feed - (np.sum(mort_mat, 1))
-    
-    solver_feed = solver_feed.tolist()    
-    solver_feed = tuple(solver_feed)
-    
-    
-    return solver_feed
 
+    all_mat = make_model()[0] + lambda_value * make_model()[1]
+
+    solver_feed = np.dot(all_mat, state_vec)
+
+    # Subtract mortality rates from the solver_feed
+    solver_feed -= np.sum(mort_mat, axis=1) * state_vec
+    solver_feed = np.array(solver_feed)
+
+    # Add births to the U state
+    #solver_feed[0] += births
+
+    return solver_feed
 
 solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
 U, Lf, Ls, I, R = solve.T
@@ -233,124 +205,8 @@ ax.plot(t, R*100000, 'blue', alpha=1, lw=2, label='recovered')
 ax.set_xlabel('Time')
 ax.set_ylabel('Number')
 #ax.set_xlim(2019, 2030)
-ax.grid(b=True, which='major', c='w', lw=2, ls='-')
+ax.grid(which='major', c='w', lw=2, ls='-')
 legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
 #plt.title("Incidence")
 plt.show()
-
-
-
-#'#mortality
-#mu and muTB side by side
-state_vec = np.array([[U, Lf, Ls, I, R]])
-
-mort_mat = np.zeros((5,2))
-mort_mat[:,0] = mu
-mort_mat[3:4,1] = muTB
-
-new = np.dot(state_vec, mort_mat)
-
-all_morts = np.sum(new)
-births = 1/all_morts
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Generate synthetic SIR data
-np.random.seed(0)
-gamma_true = 0.2
-N = 1000
-I0 = 1
-R0 = 0
-S0 = N - I0 - R0
-t = np.arange(0, 100, 1)
-data = np.zeros((len(t), 3))
-data[0] = [S0, I0, R0]
-
-for i in range(1, len(t)):
-    dS = -beta * data[i-1, 0] * data[i-1, 1] / N
-    dI = beta * data[i-1, 0] * data[i-1, 1] / N - gamma_true * data[i-1, 1]
-    dR = gamma_true * data[i-1, 1]
-    data[i] = data[i-1] + [dS, dI, dR]
-
-# Plot the synthetic data
-plt.plot(t, data[:, 0], label='Susceptible')
-plt.plot(t, data[:, 1], label='Infected')
-plt.plot(t, data[:, 2], label='Recovered')
-plt.xlabel('Time')
-plt.ylabel('Population')
-plt.legend()
-plt.title('Synthetic SIR Data')
-plt.show()
-
-# MCMC Sampler to infer beta
-num_samples = 10000
-burn_in = 1000
-proposal_std = 0.05
-beta_samples = np.zeros(num_samples)
-
-# Define the log-likelihood function
-def log_likelihood(beta):
-    # Run the SIR model with given beta
-    S = S0
-    I = I0
-    R = R0
-    model_data = np.zeros((len(t), 3))
-    model_data[0] = [S, I, R]
-
-    for i in range(1, len(t)):
-        dS = -beta * model_data[i-1, 0] * model_data[i-1, 1] / N
-        dI = beta * model_data[i-1, 0] * model_data[i-1, 1] / N - gamma_true * model_data[i-1, 1]
-        dR = gamma_true * model_data[i-1, 1]
-        model_data[i] = model_data[i-1] + [dS, dI, dR]
-
-    # Compute the log-likelihood
-    log_likelihood = -0.5 * np.sum((data[:, 1] - model_data[:, 1]) ** 2)
-    return log_likelihood
-
-# Run the MCMC sampler
-current_beta = 0.4
-accepted_samples = 0
-
-for i in range(num_samples):
-    # Propose a new beta value
-    proposed_beta = np.random.normal(current_beta, proposal_std)
-    
-    # Compute the acceptance probability
-    log_alpha = log_likelihood(proposed_beta) - log_likelihood(current_beta)
-    log_alpha += np.log(np.random.uniform())
-    
-    # Accept or reject the proposal
-    if log_alpha >= 0:
-        current_beta = proposed_beta
-        accepted_samples += 1
-    else:
-        accept_prob = np.exp(log_alpha)
-        if np.random.uniform() < accept_prob:
-            current_beta = proposed_beta
-            accepted_samples += 1
-    
-    # Save the current beta value
-    beta_samples[i] = current_beta
-
-# Discard burn-in samples
-beta_samples = beta_samples[burn_in:]
-
-# Plot the posterior distribution of beta
-plt.hist(beta_samples, bins=30, density=True)
-plt.xlabel('Beta')
-plt.ylabel('Density')
-plt.title('Posterior Distribution of Beta')
-plt.show()
-
-# Calculate the mean and credible interval
-mean_beta = np.mean(beta_samples)
-lower_ci = np.percentile(beta_samples, 2.5)
-upper_ci = np.percentile(beta_samples, 97.5)
-
-print("Mean Beta:", mean_beta)
-print("Credible Interval (95%):", lower_ci, upper_ci)
-
-
-
