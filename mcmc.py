@@ -20,34 +20,37 @@ observed_data = I  # uses observed data for the number for I
 # Define the prior distributions for beta and gamma
 beta_prior_mean = 8  # mean beta
 beta_prior_std = 2  # sd beta
-
 gamma_prior_mean = 0.4  #  mean  gamma
 gamma_prior_std = 0.1  #  sd gamma
 
-# Define the proposal distributions for beta and gamma
+
+#sds for the proposal distributions of beta and gamma
+#dist generates new values for beta and gamma during mcmc
 beta_proposal_std = 0.5  # Standard deviation for the proposal distribution of beta
 gamma_proposal_std = 0.05  # Standard deviation for the proposal distribution of gamma
 
-# Define the number of iterations for the MCMC sampler
+#num of iterations for mcmc
 num_iterations = 100
 
-# Initialize the MCMC sampler
+#lists to store param samples
 beta_samples = []
 gamma_samples = []
+#initialize the current values of beta and gamma as random samples from 
+#the dists
 current_beta = np.random.normal(beta_prior_mean, beta_prior_std)
 current_gamma = np.random.normal(gamma_prior_mean, gamma_prior_std)
 
-# Initialize the likelihood and prior for the current beta and gamma
+# calc likelihood and prior for the current beta and gamma
 solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, current_beta, current_gamma, u, v, w))
-I_current = solve.T[3]  # Get the infected individuals from the model output
+I_current = solve.T[3]  #get  infected individuals from the model 
 current_likelihood = np.exp(-0.5 * np.sum((I_current - observed_data) ** 2))
 current_beta_prior = np.exp(-0.5 * ((current_beta - beta_prior_mean) / beta_prior_std) ** 2)
 current_gamma_prior = np.exp(-0.5 * ((current_gamma - gamma_prior_mean) / gamma_prior_std) ** 2)
 
-# Create the loading bar
+
 progress_bar = tqdm(total=num_iterations, ncols=80, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}')
 
-# Perform the MCMC sampling
+# perform the mcmc 
 for i in range(num_iterations):
     # Propose new values for beta and gamma from their respective proposal distributions
     proposed_beta = np.random.normal(current_beta, beta_proposal_std)
@@ -114,4 +117,24 @@ plt.title('Posterior Distribution of Gamma')
 plt.legend()
 
 plt.tight_layout()
+plt.show()
+
+
+# traces
+plt.figure(figsize=(8, 4))
+plt.plot(range(num_iterations), beta_samples, color='blue', alpha=0.7)
+plt.axhline(y=beta_mean, color='red', linestyle='--', label='Mean')
+plt.xlabel('Iteration')
+plt.ylabel('Beta')
+plt.title('Trace Plot for Beta')
+plt.legend()
+plt.show()
+########################################################################
+plt.figure(figsize=(8, 4))
+plt.plot(range(num_iterations), gamma_samples, color='green', alpha=0.7)
+plt.axhline(y=gamma_mean, color='red', linestyle='--', label='Mean')
+plt.xlabel('Iteration')
+plt.ylabel('Gamma')
+plt.title('Trace Plot for Gamma')
+plt.legend()
 plt.show()
