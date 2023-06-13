@@ -50,18 +50,19 @@ current_gamma_prior = np.exp(-0.5 * ((current_gamma - gamma_prior_mean) / gamma_
 
 progress_bar = tqdm(total=num_iterations, ncols=80, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}')
 
-# perform the mcmc 
-for i in range(num_iterations):
-    # Propose new values for beta and gamma from their respective proposal distributions
+# perform the mcmc
+#in the loop new values for params are proposed from distributions using normal dist
+for i in range(num_iterations): #iterates num_iterations
     proposed_beta = np.random.normal(current_beta, beta_proposal_std)
     proposed_gamma = np.random.normal(current_gamma, gamma_proposal_std)
     
-    # Update the model with the proposed beta and gamma values
+    # model is updated with proposed param values
+    # number of infecteds (I_prop) is calculated from the updated model
     solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, proposed_beta, proposed_gamma, u, v, w))
-    I_proposed = solve.T[3]  # Get the infected individuals from the model output
+    I_prop = solve.T[3]  # get infected individuals from the model output
     
-    # Calculate the likelihood of the proposed beta and gamma values
-    proposed_likelihood = np.exp(-0.5 * np.sum((I_proposed - observed_data) ** 2))
+    # calc likelihood of the proposed beta and gamma values
+    proposed_likelihood = np.exp(-0.5 * np.sum((I_prop - observed_data) ** 2))
     
     # Calculate the prior probabilities of the proposed beta and gamma values
     proposed_beta_prior = np.exp(-0.5 * ((proposed_beta - beta_prior_mean) / beta_prior_std) ** 2)
@@ -107,7 +108,7 @@ plt.xlabel('Beta')
 plt.ylabel('Posterior Density')
 plt.title('Posterior Distribution of Beta')
 plt.legend()
-
+##########################################################################
 plt.subplot(2, 1, 2)
 plt.hist(gamma_samples, bins=30, density=True, color='green', alpha=0.7)
 plt.axvline(x=gamma_mean, color='red', linestyle='--', label='Mean')
