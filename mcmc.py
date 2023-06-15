@@ -30,7 +30,12 @@ beta_proposal_std = 0.5  # Standard deviation for the proposal distribution of b
 gamma_proposal_std = 0.05  # Standard deviation for the proposal distribution of gamma
 
 #num of iterations for mcmc
-num_iterations = 100
+num_iterations = 10
+
+beta_lower_bound = 0.0
+beta_upper_bound = 10.0
+gamma_lower_bound = 0.0
+gamma_upper_bound = 1.0
 
 #lists to store param samples
 beta_samples = []
@@ -56,22 +61,23 @@ for i in range(num_iterations): #iterates num_iterations
     proposed_beta = np.random.normal(current_beta, beta_proposal_std)
     proposed_gamma = np.random.normal(current_gamma, gamma_proposal_std)
     
-    # model is updated with proposed param values
-    # number of infecteds (I_prop) is calculated from the updated model
-    solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, proposed_beta, proposed_gamma, u, v, w))
-    I_prop = solve.T[3]  # get infected individuals from the model output
-    
-    # calc likelihood of the proposed beta and gamma values
-    proposed_likelihood = np.exp(-0.5 * np.sum((I_prop - observed_data) ** 2))
-    
-    # Calculate the prior probabilities of the proposed beta and gamma values
-    proposed_beta_prior = np.exp(-0.5 * ((proposed_beta - beta_prior_mean) / beta_prior_std) ** 2)
-    proposed_gamma_prior = np.exp(-0.5 * ((proposed_gamma - gamma_prior_mean) / gamma_prior_std) ** 2)
-    
-    # Calculate the acceptance ratio
-    acceptance_ratio = (proposed_likelihood * proposed_beta_prior * proposed_gamma_prior) / \
-                       (current_likelihood * current_beta_prior * current_gamma_prior + 1e-10)
-    
+# Check if the proposed beta and gamma values are within the specified bounds
+    if beta_lower_bound <= proposed_beta <= beta_upper_bound and \
+            gamma_lower_bound <= proposed_gamma <= gamma_upper_bound:
+        # Update the model with the proposed beta and gamma values
+        solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, proposed_beta, proposed_gamma, u, v, w))
+        I_proposed = solve.T[3]  # Get the infected individuals from the model output
+
+        # Calculate the likelihood of the proposed beta and gamma values
+        proposed_likelihood = np.exp(-0.5 * np.sum((I_proposed - observed_data) ** 2))
+
+        # Calculate the prior probabilities of the proposed beta and gamma values
+        proposed_beta_prior = np.exp(-0.5 * ((proposed_beta - beta_prior_mean) / beta_prior_std) ** 2)
+        proposed_gamma_prior = np.exp(-0.5 * ((proposed_gamma - gamma_prior_mean) / gamma_prior_std) ** 2)
+
+        # Calculate the acceptance ratio
+        acceptance_ratio = (proposed_likelihood * proposed_beta_prior * proposed_gamma_prior) / \
+                           (current_likelihood * current_beta_prior * current_gamma_prior + 1e-10)    
     # Accept or reject the proposed beta and gamma values based on the acceptance ratio
     if np.random.rand() < acceptance_ratio:
         current_beta = proposed_beta
