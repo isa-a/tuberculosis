@@ -64,27 +64,27 @@ current_gamma_prior = (1 / (gamma_prior_std * np.sqrt(2 * np.pi))) * np.exp(-0.5
 progress_bar = tqdm(total=num_iterations, ncols=80, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}')
 
 # perform the mcmc
-#in the loop new values for params are proposed from distributions using normal dist
+# loop iterates num of samples
 for i in range(num_iterations):
-    # Propose new values for beta and gamma
+    # new vals for params are proposed from their distributions 
     proposed_beta = np.random.normal(current_beta, beta_proposal_std)
     proposed_gamma = np.random.normal(current_gamma, gamma_proposal_std)
-    # Update the model with the proposed beta and gamma values
+    
+    # model is updated with the new proposed vals and the likelihood and priors are calculated
     solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, proposed_beta, proposed_gamma, u, v, w))
     I_proposed = solve.T[3]
 
-    # Calculate the likelihood of the proposed beta and gamma values
     proposed_likelihood = np.exp(-0.5 * np.sum((I_proposed - observed_data) ** 2))
-
-    # Calculate the prior probabilities of the proposed beta and gamma values
     proposed_beta_prior = np.exp(-0.5 * ((proposed_beta - beta_prior_mean) / beta_prior_std) ** 2)
     proposed_gamma_prior = np.exp(-0.5 * ((proposed_gamma - gamma_prior_mean) / gamma_prior_std) ** 2)
 
-    # Calculate the acceptance ratio
+    # acceptance ratio is calculated based off the proposed and current values of 
+    # params, likelihood and prior probabilities
     acceptance_ratio = (proposed_likelihood * proposed_beta_prior * proposed_gamma_prior) / \
                        (current_likelihood * current_beta_prior * current_gamma_prior)
 
-    # Accept or reject the proposed beta and gamma values based on the acceptance ratio
+    # proposed vals are evaluated based on the acceptance ratio
+    # and current vals are updated
     if np.random.rand() < acceptance_ratio:
         current_beta = proposed_beta
         current_gamma = proposed_gamma
@@ -92,21 +92,17 @@ for i in range(num_iterations):
         current_beta_prior = proposed_beta_prior
         current_gamma_prior = proposed_gamma_prior
 
-    # Store the samples
+    # current vals stored in lists
     beta_samples.append(current_beta)
     gamma_samples.append(current_gamma)
     progress_bar.update(1)
 
-# Close the progress bar
 progress_bar.close()
 
-# Compute the mean values of beta and gamma
+# get mean values of params
 beta_mean = np.mean(beta_samples)
 gamma_mean = np.mean(gamma_samples)
 
-
-
-# Print the results
 print("Inferred values:")
 print("Beta:", beta_mean)
 print("Gamma:", gamma_mean)
