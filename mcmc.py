@@ -28,11 +28,11 @@ gamma_prior_std = 0.1  #  sd gamma
 #during each iteration of the MCMC new values for 
 #params are proposed by sampling from these dists
 #proposed values are evaluated based on their likelihood and priors
-beta_proposal_std = 0.5  # Standard deviation for the proposal distribution of beta
-gamma_proposal_std = 0.05  # Standard deviation for the proposal distribution of gamma
+beta_proposal_std = 0.75  # Standard deviation for the proposal distribution of beta
+gamma_proposal_std = 0.2  # Standard deviation for the proposal distribution of gamma
 
 #num of iterations for mcmc
-num_iterations = 10
+num_iterations = 100
 
 #param bounds
 beta_lower_bound = 0.0
@@ -103,6 +103,8 @@ progress_bar.close()
 beta_mean = np.mean(beta_samples)
 gamma_mean = np.mean(gamma_samples)
 
+parameter_list = [beta_mean, gamma_mean]
+
 print("Inferred values:")
 print("Beta:", beta_mean)
 print("Gamma:", gamma_mean)
@@ -126,3 +128,4 @@ plt.ylabel('Gamma')
 plt.title('Trace Plot for Gamma')
 plt.legend()
 plt.show()
+
