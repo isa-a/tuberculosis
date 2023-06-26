@@ -35,10 +35,14 @@ muTB         = 1/6
 prop_imm     = 0.8
 # Interventions 
 migrTPT      = 0
-TPTeff       = 0.6                                                     
+TPTeff       = 0.6     
+rho          = 1
+c            = 0.2                            
     
 # Total population, N.
 N = 1
+# number of stratified subpopulations
+sub_pops = 1
 # Initial number of infected and recovered individuals, I0 and R0.
 I0, R0 = 0.001, 0
 # Everyone else, U0, is susceptible to infection initially.
@@ -62,8 +66,7 @@ t= np.linspace(0,500,500+1)
 def get_addresses():
     # Create the matrix
     #n is multiplier for subpopulations
-    n=1
-    matrix = np.zeros((5*n,5*n))
+    matrix = np.zeros((5*sub_pops,5*sub_pops))
       
     #assuming each population has 5 states
     #U, Lf, Ls, I, R
@@ -78,7 +81,7 @@ def get_addresses():
     #based on the number of subpops there are
     #e.g. if we have n=2, domestic and foreign born, then this will
     #create rows as U, Lf, Ls, I, R and then U_1, Lf_1, Ls_1, I_1, R_1
-    for i in range((n-1)):
+    for i in range((sub_pops-1)):
         row_labels += ["%s%d" % (lbl,i+1) for lbl in labels_base]
         col_labels += ["%s%d" % (lbl,i+1) for lbl in labels_base]
   
@@ -95,13 +98,12 @@ def get_addresses():
 
 
 def get_lambda_addresses():
-    m = 1
-    vector = np.zeros((5 * m))
+    vector = np.zeros((5 * sub_pops))
     vector_labels_base = ['U', 'Lf', 'Ls', 'I', 'R']
     vector_row_labels = vector_labels_base[:]
     vector_col_labels = vector_labels_base[:]
     
-    for i in range((m-1)):
+    for i in range((sub_pops-1)):
         vector_row_labels += ["%s%d" % (lbl,i+1) for lbl in vector_labels_base]
         vector_col_labels += ["%s%d" % (lbl,i+1) for lbl in vector_labels_base]
         
@@ -119,8 +121,11 @@ def make_model():
     #the order for the mapping is destination, source
     zero_mat[get_addresses()[('Ls', 'Lf')]] = u
     zero_mat[get_addresses()[('I', 'Lf')]] = v
+    zero_mat[get_addresses()[('Lf', 'Ls')]] = c
     zero_mat[get_addresses()[('I', 'Ls')]] = w
     zero_mat[get_addresses()[('R', 'I')]] = gamma
+    zero_mat[get_addresses()[('Lf', 'R')]] = c
+    zero_mat[get_addresses()[('I', 'R')]] = rho
 
     #sort out diagonal
     #function sums up columns of matrix
@@ -146,10 +151,10 @@ def make_model():
     
     #sort out diagonal for nonlinear matrix
     def sum_diags_nonlin():
-        return np.sum(lam_zeros_mat, axis=0)
+        return np.sum(nonlinearmatrix, axis=0)
     
     for index_map in lam_zeros_mat:
-        np.fill_diagonal(lam_zeros_mat, -sum_diags_nonlin())
+        np.fill_diagonal(nonlinearmatrix, -sum_diags_nonlin())
     
     lambda_matrix = np.zeros((5))
     lambda_matrix[get_lambda_addresses()[('I')]] = beta
@@ -176,7 +181,7 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     tbdeaths = state_vec * mort_mat[:, 1]
     tbdeaths = np.sum(tbdeaths)
 
-    births = tbdeaths / mu
+    births = N * mu
     lambda_value = np.dot(make_model()[2], state_vec)
 
     all_mat = make_model()[0] + lambda_value * make_model()[1]
@@ -185,30 +190,30 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
 
     # Subtract mortality rates from the solver_feed
     solver_feed -= np.sum(mort_mat, axis=1) * state_vec
+    solver_feed[3] -= tbdeaths
     solver_feed = np.array(solver_feed)
 
     # Add births to the U state
-    #solver_feed[0] += births
+    solver_feed[0] += births
 
     return solver_feed
 
 solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
 U, Lf, Ls, I, R = solve.T
 
-# fig = plt.figure(facecolor='w')
-# ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
-# #ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
-# #ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
-# #ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
-# ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
-# ax.plot(t, R*100000, 'blue', alpha=1, lw=2, label='recovered')
-# ax.set_xlabel('Time')
-# ax.set_ylabel('Number')
-# #ax.set_xlim(2019, 2030)
-# ax.grid(which='major', c='w', lw=2, ls='-')
-# legend = ax.legend()
-# legend.get_frame().set_alpha(0.5)
-# #plt.title("Incidence")
-# plt.show()
-
+fig = plt.figure(facecolor='w')
+ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
+#ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
+#ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
+#ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
+ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
+ax.plot(t, R*100000, 'blue', alpha=1, lw=2, label='recovered')
+ax.set_xlabel('Time')
+ax.set_ylabel('Number')
+#ax.set_xlim(2019, 2030)
+ax.grid(which='major', c='w', lw=2, ls='-')
+legend = ax.legend()
+legend.get_frame().set_alpha(0.5)
+#plt.title("Incidence")
+plt.show()
 

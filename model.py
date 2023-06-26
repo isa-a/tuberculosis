@@ -61,7 +61,7 @@ J_diff = cInc[1:] - cInc[:-1]
 #J_diff = np.diff(cInc)
 fig = plt.figure(facecolor='w')
 ax = fig.add_subplot(111, facecolor='#dddddd', axisbelow=True)
-ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
+#ax.plot(t, U*100000, 'black', alpha=1, lw=2, label='uninfected')
 #ax.plot(t, Lf*100000, 'black', alpha=1, lw=2, label='latent fast')
 #ax.plot(t, Ls*100000, 'purple', alpha=1, lw=2, label='latent slow')
 ax.plot(t, I*100000, 'green', alpha=1, lw=2, label='infected')
