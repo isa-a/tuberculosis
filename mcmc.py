@@ -13,6 +13,7 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from scipy.stats import norm
 
 # defining the observed data
 observed_data = I  # uses observed data for the number for I

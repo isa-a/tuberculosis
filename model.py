@@ -26,7 +26,7 @@ J0_m = I0_m
 Lf0, Ls0 = 0, 0
 Lf0_m, Ls0_m = 0, 0
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
-beta, gamma = 8, 0.4
+beta, gamma = 8, 1/6
 beta_m, gamma_m = 13.21245908, 365/75
 mu, muTB, sigma, rho = 1/80, 1/6, 1/6, 0.03
 mu_m, muTB_m, sigma_m, rho_m = 1/80, 1/6, 1/6, 0.03

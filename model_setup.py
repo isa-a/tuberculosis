@@ -29,16 +29,17 @@ progression  = 0.0826
 LTBI_stabil  = 0.872
 reactivation = 0.0006
 Tx           = 2
-self_cure    = 0.4
+self_cure    = 1/6
 mu           = 1/80
 muTB         = 1/6
 prop_imm     = 0.8
+rho          = 0.03
+c            = 0.2                            
+
 # Interventions 
 migrTPT      = 0
 TPTeff       = 0.6     
-rho          = 1
-c            = 0.2                            
-    
+
 # Total population, N.
 N = 1
 # number of stratified subpopulations
@@ -59,6 +60,8 @@ Lf = Lf0
 Ls=Ls0
 I=I0
 R=R0
+births = N * mu
+
 t= np.linspace(0,500,500+1)
 
 
@@ -147,6 +150,8 @@ def make_model():
     #call it nonlinear component
     #destination first, then source
     lam_zeros_mat[get_addresses()[('Lf', 'U')]] = 1
+    lam_zeros_mat[get_addresses()[('Lf', 'Ls')]] = 1
+    lam_zeros_mat[get_addresses()[('Lf', 'R')]] = 1
     nonlinearmatrix = lam_zeros_mat
     
     #sort out diagonal for nonlinear matrix
@@ -181,7 +186,6 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     tbdeaths = state_vec * mort_mat[:, 1]
     tbdeaths = np.sum(tbdeaths)
 
-    births = N * mu
     lambda_value = np.dot(make_model()[2], state_vec)
 
     all_mat = make_model()[0] + lambda_value * make_model()[1]
@@ -198,7 +202,14 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
 
     return solver_feed
 
-solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
+def get_beta(t):
+    initial_beta = 8  # Initial value of beta
+    beta_decline_rate = 0.02  # Rate at which beta declines per unit of time
+    return initial_beta * np.exp(-beta_decline_rate * t)
+
+solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, get_beta(t), gamma, u, v, w))
+
+#solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
 U, Lf, Ls, I, R = solve.T
 
 fig = plt.figure(facecolor='w')
