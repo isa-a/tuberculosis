@@ -60,7 +60,8 @@ Lf = Lf0
 Ls=Ls0
 I=I0
 R=R0
-births = N * mu
+birth_rate = 0.01
+
 
 t= np.linspace(0,500,500+1)
 
@@ -196,20 +197,15 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     solver_feed -= np.sum(mort_mat, axis=1) * state_vec
     solver_feed[3] -= tbdeaths
     solver_feed = np.array(solver_feed)
+    births = birth_rate * N
 
     # Add births to the U state
     solver_feed[0] += births
 
     return solver_feed
 
-def get_beta(t):
-    initial_beta = 8  # Initial value of beta
-    beta_decline_rate = 0.02  # Rate at which beta declines per unit of time
-    return initial_beta * np.exp(-beta_decline_rate * t)
 
-solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, get_beta(t), gamma, u, v, w))
-
-#solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
+solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta, gamma, u, v, w))
 U, Lf, Ls, I, R = solve.T
 
 fig = plt.figure(facecolor='w')
@@ -227,4 +223,3 @@ legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
 #plt.title("Incidence")
 plt.show()
-
