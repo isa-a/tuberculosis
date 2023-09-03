@@ -50,55 +50,56 @@ gamma_samples = []
 current_beta = np.random.normal(beta_prior_mean, beta_prior_std)
 current_gamma = np.random.normal(gamma_prior_mean, gamma_prior_std)
 
-# calc likelihood and prior for the current beta and gamma
+# calc log likelihood and prior for the current beta and gamma
 #model equations are solved using the current values of params
 #the resulting infected individuals are compared to the observed data
-#to calculate likelihood. priors probabilities of the current params values are also computed
+#to calculate log likelihood. log priors probabilities of the current params values are also computed
 solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, current_beta, current_gamma, u, v, w))
-I_current = solve.T[3]  #get  infected individuals from the model 
-current_likelihood = np.exp(-0.5 * np.sum((I_current - observed_data) ** 2)) #likelihood for current params given observed
-#normal pdf used to calc priors of current params
-current_beta_prior = (1 / (beta_prior_std * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((current_beta - beta_prior_mean) / beta_prior_std) ** 2)
-current_gamma_prior = (1 / (gamma_prior_std * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((current_gamma - gamma_prior_mean) / gamma_prior_std) ** 2)
+I_current = solve.T[3]  # Get infected individuals from the model
+#calculate current LL 
+current_log_likelihood = -0.5 * np.sum((I_current - observed_data) ** 2) - 0.5 * len(observed_data) * np.log(2 * np.pi)
+
+# Use log-normal pdf to calculate log priors of current params
+current_log_beta_prior = -0.5 * ((current_beta - beta_prior_mean) / beta_prior_std) ** 2 - np.log(beta_prior_std * np.sqrt(2 * np.pi))
+current_log_gamma_prior = -0.5 * ((current_gamma - gamma_prior_mean) / gamma_prior_std) ** 2 - np.log(gamma_prior_std * np.sqrt(2 * np.pi))
+
 
 
 progress_bar = tqdm(total=num_iterations, ncols=80, bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt}')
 
-# perform the mcmc
-# loop iterates num of samples
+# Perform the MCMC
+# Loop iterates num of samples
 for i in range(num_iterations):
-    # new vals for params are proposed from their distributions 
+    # new vals for params are proposed from their distributions
     proposed_beta = np.random.normal(current_beta, beta_proposal_std)
     proposed_gamma = np.random.normal(current_gamma, gamma_proposal_std)
-    
-    # model is updated with the new proposed vals and the likelihood and priors are calculated
+
+    # Model is updated with the new proposed vals and the log likelihood and log priors are calculated
     solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, proposed_beta, proposed_gamma, u, v, w))
     I_proposed = solve.T[3]
 
-    proposed_likelihood = np.exp(-0.5 * np.sum((I_proposed - observed_data) ** 2))
-    proposed_beta_prior = np.exp(-0.5 * ((proposed_beta - beta_prior_mean) / beta_prior_std) ** 2)
-    proposed_gamma_prior = np.exp(-0.5 * ((proposed_gamma - gamma_prior_mean) / gamma_prior_std) ** 2)
+    proposed_log_likelihood = -0.5 * np.sum((I_proposed - observed_data) ** 2) - 0.5 * len(observed_data) * np.log(2 * np.pi)
+    proposed_log_beta_prior = -0.5 * ((proposed_beta - beta_prior_mean) / beta_prior_std) ** 2 - np.log(beta_prior_std * np.sqrt(2 * np.pi))
+    proposed_log_gamma_prior = -0.5 * ((proposed_gamma - gamma_prior_mean) / gamma_prior_std) ** 2 - np.log(gamma_prior_std * np.sqrt(2 * np.pi))
 
-    # acceptance ratio is calculated based off the proposed and current values of 
-    # params, likelihood and prior probabilities
-    acceptance_ratio = (proposed_likelihood * proposed_beta_prior * proposed_gamma_prior) / \
-                       (current_likelihood * current_beta_prior * current_gamma_prior)
+    #acceptance ratio is calculated based on the proposed and current values of
+    # params, log likelihood, and log prior probabilities
+    acceptance_ratio = (proposed_log_likelihood + proposed_log_beta_prior + proposed_log_gamma_prior) - \
+                       (current_log_likelihood + current_log_beta_prior + current_log_gamma_prior)
 
     # proposed vals are evaluated based on the acceptance ratio
     # and current vals are updated
-    if np.random.rand() < acceptance_ratio:
+    if np.log(np.random.rand()) < acceptance_ratio:
         current_beta = proposed_beta
         current_gamma = proposed_gamma
-        current_likelihood = proposed_likelihood
-        current_beta_prior = proposed_beta_prior
-        current_gamma_prior = proposed_gamma_prior
+        current_log_likelihood = proposed_log_likelihood
+        current_log_beta_prior = proposed_log_beta_prior
+        current_log_gamma_prior = proposed_log_gamma_prior
 
-    # current vals stored in lists
+    # Current vals stored in lists
     beta_samples.append(current_beta)
     gamma_samples.append(current_gamma)
     progress_bar.update(1)
-
-progress_bar.close()
 
 # get mean values of params
 beta_mean = np.mean(beta_samples)
