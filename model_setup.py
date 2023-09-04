@@ -62,17 +62,7 @@ I=I0
 R=R0
 birth_rate = 0.01
 
-# Define the start and end years
-start_year = 2000
-end_year = 2020
-
-# Calculate the number of time steps based on the desired range
-num_years = end_year - start_year + 1  # +1 to include the end year
-num_time_steps = num_years * 365  # Assuming daily time steps
-
-# Create the time array to represent years from 2010 to 2020
-t = np.linspace(start_year, end_year, num_time_steps)
-#t= np.linspace(0,10,1001)
+t= np.linspace(0,500, 500+1)
 
 
 #----------------------- FUNCTIONS 1 & 2---------------------------------------
@@ -174,11 +164,12 @@ def make_model():
     lambda_matrix = np.zeros((5))
     lambda_matrix[get_lambda_addresses()[('I')]] = beta
     
+    
         
     return linearmatrix, nonlinearmatrix, lambda_matrix
 
 #----------------------- FUNCTION 4---------------------------------------
-
+beta_dec = 0.07
 
 def gov_eqs(y, t, N, beta, gamma, u, v, w):
     U, Lf, Ls, I, R = y
@@ -197,6 +188,8 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
     tbdeaths = np.sum(tbdeaths)
 
     lambda_value = np.dot(make_model()[2], state_vec)
+    
+    lam = np.dot(make_model()[2], state_vec)/sum(state_vec)*(1-beta_dec)**(max((t-2010),0))
 
     all_mat = make_model()[0] + lambda_value * make_model()[1]
 
@@ -232,3 +225,6 @@ legend = ax.legend()
 legend.get_frame().set_alpha(0.5)
 #plt.title("Incidence")
 plt.show()
+
+
+
