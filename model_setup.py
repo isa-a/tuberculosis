@@ -62,8 +62,17 @@ I=I0
 R=R0
 birth_rate = 0.01
 
+# Define the start and end years
+start_year = 2000
+end_year = 2020
 
-t= np.linspace(0,500,500+1)
+# Calculate the number of time steps based on the desired range
+num_years = end_year - start_year + 1  # +1 to include the end year
+num_time_steps = num_years * 365  # Assuming daily time steps
+
+# Create the time array to represent years from 2010 to 2020
+t = np.linspace(start_year, end_year, num_time_steps)
+#t= np.linspace(0,10,1001)
 
 
 #----------------------- FUNCTIONS 1 & 2---------------------------------------

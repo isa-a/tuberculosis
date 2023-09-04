@@ -11,8 +11,18 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 
+# Define the start and end years
+start = 2000
+end = 2020
 
-solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), t, args=(N, beta_mean, gamma_mean, u, v, w))
+# Calculate the number of time steps based on the desired range
+num_years = end_year - start_year + 1  # +1 to include the end year
+num_time_steps = num_years * 365  # Assuming daily time steps
+
+# Create the time array to represent years from 2010 to 2020
+time_range = np.linspace(start, end, num_time_steps)
+
+solve = odeint(gov_eqs, (U0, Lf0, Ls0, I0, R0), time_range, args=(N, beta_mean, gamma_mean, u, v, w))
 
 
 fig = plt.figure(facecolor='w')
