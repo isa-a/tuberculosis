@@ -169,7 +169,6 @@ def make_model():
     return linearmatrix, nonlinearmatrix, lambda_matrix
 
 #----------------------- FUNCTION 4---------------------------------------
-beta_dec = 0.07
 
 def gov_eqs(y, t, N, beta, gamma, u, v, w):
     U, Lf, Ls, I, R = y
@@ -183,14 +182,16 @@ def gov_eqs(y, t, N, beta, gamma, u, v, w):
             mort_mat[i, 0] = mu
 
     mort_mat[3, 1] = muTB
-
+    
+    #deaths total to inform birth rate
+    totaldeaths = state_vec * ((np.sum(mort_mat, axis=1)))
+    
+    
     tbdeaths = state_vec * mort_mat[:, 1]
     tbdeaths = np.sum(tbdeaths)
 
     lambda_value = np.dot(make_model()[2], state_vec)
     
-    lam = np.dot(make_model()[2], state_vec)/sum(state_vec)*(1-beta_dec)**(max((t-2010),0))
-
     all_mat = make_model()[0] + lambda_value * make_model()[1]
 
     solver_feed = np.dot(all_mat, state_vec)

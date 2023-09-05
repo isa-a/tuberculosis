@@ -14,15 +14,91 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy.stats import norm
+from scipy.stats import norm  # Add this import
+from scipy.stats import lognorm, beta
 
-# defining the observed data
-observed_data = I  # uses observed data for the number for I
+data = {
+    'treatment_access': np.array([0.39, 0.41, 0.43]),
+    'treatment_comp': np.array([0.76, 0.78, 0.8]),
+    'mort': np.array([0.28, 0.3, 0.32]),
+    'p_migrTB': np.array([0.708, 0.728, 0.748]),
+    'p_migrpopn': np.array([0.138, 0.168, 0.198]),
+    'p_LTBI': np.array([0.15, 0.2, 0.25])
+}
 
-# defining stats for priors of params
-beta_prior_mean = 8  # mean beta
-beta_prior_std = 2  # sd beta
-gamma_prior_mean = 0.4  #  mean  gamma
-gamma_prior_std = 0.1  #  sd gamma
+def get_distribution_fns(data, distribution_type, show=False):
+    if distribution_type == 'lognorm':
+        params = lognorm.fit(data, floc=0)
+        dist = lognorm(*params)
+    elif distribution_type == 'beta':
+        params = beta.fit(data, floc=0, fscale=1)
+        dist = beta(*params)
+    else:
+        raise ValueError("Unsupported distribution type")
+
+    if show:
+        # Optionally, you can plot the distribution here
+        pass
+
+    return dist
+
+f1a = get_distribution_fns(data['incd2010'], 'lognorm')
+f1b = get_distribution_fns(data['incd2020'], 'lognorm')
+f2 = get_distribution_fns(data['mort'], 'lognorm')
+f3 = get_distribution_fns(data['p_migrTB'], 'beta')
+f4 = get_distribution_fns(data['p_migrpopn'], 'beta')
+f5 = get_distribution_fns(data['p_LTBI'], 'beta')
+
+def likelihood(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI):
+    return f1a.pdf(incd2010) + f1b.pdf(incd2020) + f2.pdf(mort) + f3.pdf(p_migrTB) + f4.pdf(p_migrpopn) + f5.pdf(p_LTBI)
+# ... (previous code)
+
+# MCMC settings
+num_iterations = 100
+beta_samples = []
+gamma_samples = []
+
+# Initialize current values
+current_beta = np.random.normal(8, 2)
+current_gamma = np.random.normal(0.4, 0.1)
+
+# Define priors for beta and gamma
+beta_prior_mean = 8
+beta_prior_std = 2
+gamma_prior_mean = 0.4
+gamma_prior_std = 0.1
+
+# ... (initialize progress bar, etc.)
+
+# MCMC loop
+for i in range(num_iterations):
+    # Calculate likelihood for current beta and gamma
+    current_likelihood = likelihood(data['incd2010'], data['incd2020'], data['mort'], data['p_migrTB'], data['p_migrpopn'], data['p_LTBI'])
+
+    # Calculate log priors for beta and gamma
+    current_log_beta_prior = norm.logpdf(current_beta, beta_prior_mean, beta_prior_std)
+    current_log_gamma_prior = norm.logpdf(current_gamma, gamma_prior_mean, gamma_prior_std)
+
+    # Calculate acceptance ratio
+    acceptance_ratio = (current_likelihood + current_log_beta_prior + current_log_gamma_prior) - \
+                       (np.log(np.random.rand()) + current_log_beta_prior + current_log_gamma_prior)
+
+    # Accept or reject based on the acceptance ratio
+    if np.any(acceptance_ratio > 0) or np.log(np.random.rand()) < acceptance_ratio:
+        beta_samples.append(current_beta)
+        gamma_samples.append(current_gamma)
+
+    # ... (update progress bar, etc.)
+
+# Calculate posterior means for beta and gamma
+beta_mean = np.mean(beta_samples)
+gamma_mean = np.mean(gamma_samples)
+
+# Display the results
+print("Estimated Beta:", beta_mean)
+print("Estimated Gamma:", gamma_mean)
+
+
 
 
 #sds for the proposal distributions of beta and gamma
