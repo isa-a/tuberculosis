@@ -40,8 +40,19 @@ def get_distribution_fns(data, distribution_type, show=False):
         raise ValueError("Unsupported distribution type")
 
     if show:
-        # Optionally, you can plot the distribution here
-        pass
+        # Create a range of x values for plotting
+       x = np.linspace(data.min(), data.max(), 1000)
+
+       # Plot the fitted distribution
+       plt.plot(x, dist.pdf(x), label=distribution_type)
+       plt.xlabel('Value')
+       plt.ylabel('Probability Density')
+       plt.legend()
+       plt.title(f'{distribution_type} Distribution')
+
+       # Show the plot
+       plt.show()
+
 
     return dist
 
@@ -52,8 +63,16 @@ f3 = get_distribution_fns(data['p_migrTB'], 'beta')
 f4 = get_distribution_fns(data['p_migrpopn'], 'beta')
 f5 = get_distribution_fns(data['p_LTBI'], 'beta')
 
+
+# f1a = get_distribution_fns(data['treatment_access'], 'lognorm', show=True)
+# f1b = get_distribution_fns(data['treatment_comp'], 'lognorm', show=True)
+# f2 = get_distribution_fns(data['mort'], 'lognorm', show=True)
+# f3 = get_distribution_fns(data['p_migrTB'], 'beta', show=True)
+# f4 = get_distribution_fns(data['p_migrpopn'], 'beta', show=True)
+# f5 = get_distribution_fns(data['p_LTBI'], 'beta', show=True)
+
 def likelihood(treatment_access, treatment_comp, mort, p_migrTB, p_migrpopn, p_LTBI):
-    return f1a.pdf(treatment_access) * f1b.pdf(treatment_comp) * f2.pdf(mort) * f3.pdf(p_migrTB) * f4.pdf(p_migrpopn) * f5.pdf(p_LTBI)
+    return f1a.pdf(treatment_access) + f1b.pdf(treatment_comp) + f2.pdf(mort) + f3.pdf(p_migrTB) + f4.pdf(p_migrpopn) + f5.pdf(p_LTBI)
 # ... (previous code)
 
 # MCMC settings
@@ -102,6 +121,11 @@ print("Estimated Gamma:", gamma_mean)
 
 
 
+
+
+
+
+##################  ignore   ###########################
 #sds for the proposal distributions of beta and gamma
 #during each iteration of the MCMC new values for 
 #params are proposed by sampling from these dists
