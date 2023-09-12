@@ -64,6 +64,31 @@ birth_rate = 0.01
 
 t= np.linspace(0,500, 500+1)
 
+born = ['dom']
+states = ['U','Lf','Ls','I','R']
+nstates = len(states)
+i = []
+s = []
+d = []
+lim = 0
+#----------------------- FUNCTIONS 1 & 2---------------------------------------
+def get_the_addresses(groups, i, s, d, lim):
+    if len(groups) == 1:
+        group1 = groups[0]
+        
+        for ig1 in range(1, len(group1) + 1):            
+            lim += 1
+            i[group1[ig1 - 1]] = lim  # Note: Python uses 0-based indexing
+            s[group1[ig1 - 1]] = s.get(group1[ig1 - 1], []) + [lim]  # Initialize with an empty list if necessary
+            d[lim] = [group1[ig1 - 1]]
+
+    return lim
+
+get_the_addresses([states, born], i, s, d, lim) == i,s,d,lim
+
+
+
+
 
 #----------------------- FUNCTIONS 1 & 2---------------------------------------
 def get_addresses():
