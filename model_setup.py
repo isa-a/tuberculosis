@@ -73,7 +73,7 @@ d = []
 lim = 0
 #----------------------- FUNCTIONS 1 & 2---------------------------------------
 def get_the_addresses(groups, i, s, d, lim):
-    if len(groups) == 1:
+    if len(groups) == 2:
         group1 = groups[0]
         
         for ig1 in range(1, len(group1) + 1):            
@@ -82,11 +82,21 @@ def get_the_addresses(groups, i, s, d, lim):
             s[group1[ig1 - 1]] = s.get(group1[ig1 - 1], []) + [lim]  # Initialize with an empty list if necessary
             d[lim] = [group1[ig1 - 1]]
 
-    return lim
+    return i,s,d,lim
 
 get_the_addresses([states, born], i, s, d, lim) == i,s,d,lim
 
+# Example lists of states and born values
+states = ['U', 'Lf', 'Ls', 'I', 'R']
+born = ['dom', 'for']
 
+# Create dictionaries for 'dom' and 'for' values
+dom_mapping = {states[i]: born[0] for i in range(len(states))}
+for_mapping = {states[i]: born[1] for i in range(len(states))}
+
+# Print the resulting dictionaries
+print("dom_mapping:", dom_mapping)
+print("for_mapping:", for_mapping)
 
 
 
