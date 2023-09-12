@@ -64,7 +64,7 @@ birth_rate = 0.01
 
 t= np.linspace(0,500, 500+1)
 
-born = ['dom']
+born = ['dom','for']
 states = ['U','Lf','Ls','I','R']
 nstates = len(states)
 i = []
