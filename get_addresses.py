@@ -184,10 +184,13 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
 states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
 gps_born = ['dom', 'for']
 
-result_i, result_s, result_d, result_lim = get_addresses([states, gps_born])
+i, s, d, lim = get_addresses([states, gps_born])
+
+
 
 # Print the results
 print("i:", result_i)
 print("s:", result_s)
 print("d:", result_d)
 print("lim:", result_lim)
+
