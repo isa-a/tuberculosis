@@ -8,12 +8,23 @@ Created on Wed Sep 13 22:20:56 2023
 from get_addresses import i,s,d,lim
 import numpy as np
 
+state = 'U'
+states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
+gps_born = ['dom', 'for']
+
 def make_model():
     
     m = np.zeros((i['nstates'],i['nstates']))
     
     for ip in range(len(gps_born)):
-        born = gps_born[ip]
+        for born in gps_born[]:
+            def geti(i, st, born):
+                key = (st, born)
+                return i.get(key)
+            
+            
+            U = geti(i, 'U', born)
+
 
 
 
@@ -22,7 +33,7 @@ def make_model(p, r, i, s, gps):
     # Create an empty matrix M with the same shape as m
     M = np.zeros((i['nstates'], i['nstates']))
 
-    for born in gps['born']:
+    
         # Define a helper function to retrieve indices
         def geti(state):
             return i[state][born]
@@ -43,3 +54,23 @@ def make_model(p, r, i, s, gps):
 
     return M
 
+if result is not None:
+    print(result)  # This will print 1
+else:
+    print("Key not found")
+
+
+def geti(i, st, born):
+    key = (st, born)
+    return i.get(key)
+
+def make_model():
+    m = np.zeros((i['nstates'], i['nstates']))
+    
+    for born in gps_born:
+        for state in states:
+            U = geti(i, state, born)
+            # Do something with U
+            print(U)  # Example usage
+
+make_model()
