@@ -42,20 +42,20 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
             lim += 1 # for each element in gp1, increment lim
             i[(gp1[ig1])] = lim - 1 # based off lim, assign an index to that element in i
             s[gp1[ig1]].append(lim - 1) # add the current index to the list attached to the state
-            d[lim - 1] = [gp1[ig1]] # 
+            d[lim - 1] = [gp1[ig1]] # state name is stored in d with the lim index as the key
 
-    if len(groups) == 2:
-        gp1 = groups[0]
+    if len(groups) == 2: # check if there's two elements in groups
+        gp1 = groups[0] # if there's two groups, call them gp1 and gp2
         gp2 = groups[1]
-        for ig1 in range(len(gp1)):
+        for ig1 in range(len(gp1)): # iterate over both groups gp1 and gp2
             for ig2 in range(len(gp2)):
-                lim += 1
-                i[(gp1[ig1], gp2[ig2])] = lim - 1  # Adjust to 0-based indexing
-                s[gp1[ig1]].append(lim - 1)
-                s[gp2[ig2]].append(lim - 1)
+                lim += 1 # for each element in these groups, increment lim
+                i[(gp1[ig1], gp2[ig2])] = lim - 1 # assigns a number index to the state key in the dict
+                s[gp1[ig1]].append(lim - 1) # adds index to the state in the first group
+                s[gp2[ig2]].append(lim - 1) # # adds index to the state in the second group
                 d[lim - 1] = [gp1[ig1], ' ', gp2[ig2]]
 
-    i['nstates'] = lim
+    i['nstates'] = lim # set total no. of states in i to final val for lim
     return i, s, d, lim
 
 
