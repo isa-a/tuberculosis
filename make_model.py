@@ -24,7 +24,7 @@ def get_states_for_born(i, born):
 
 
 m = np.zeros((i['nstates'], i['nstates']))
-
+gamma = 5
 for born in gps_born:
     state_values = get_states_for_born(i, born)
     
@@ -100,14 +100,14 @@ for born in gps_born:
     # Stabilization of relapse risk
     sources = [Rlo, Rhi]
     destin = R
-    rates = random.uniform(0, 1)  # Replace with a random number
+    rates = 0.5  # Replace with a random number
     m[destin, sources] = m[destin, sources] + rates
 
     # Initiation of TPT
     source = Lf
     destin = Pf
     rate = random.uniform(0, 1)  # Replace with a random number
-    m[destin, source] = m[destin, source] + rate
+    m[destin, source] = m[destin, source] + rate #cc
 
     source = Ls
     destin = Ps
