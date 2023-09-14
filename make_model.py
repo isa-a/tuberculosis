@@ -5,7 +5,7 @@ Created on Wed Sep 13 22:20:56 2023
 @author: ISA
 """
 
-from pie import i,s,d,lim
+from get_addresses import i,s,d,lim
 import numpy as np
 import random
 
@@ -126,33 +126,20 @@ for born in gps_born:
     m[destin, source] = m[destin, source] + rate
 
 
+progression  = 0.0826
+LTBI_stabil  = 0.872
+reactivation = 0.0006
 
+Tx            = 2
+default       = 0.01
 
+self_cure    = 1/6
+relapse      = [0.032, 0.14, 0.0015]
 
-
-
-
-
-r.progression  = 0.0826;
-r.LTBI_stabil  = 0.872;
-r.reactivation = 0.0006;
-
-r.Tx            = 2;
-r.default       = 0.01;
-
-r.self_cure    = 1/6;
-r.relapse      = [0.032 0.14 0.0015];
-% r.relapse      = [0 0 0];
-% r.mu           = 1/66;                                                   % natural mortality
-r.muTB         = 1/6;                                                      % TB related mortality
-p.imm          = 0.8;                                                      % Reduced susceptibility conferred by previous infection
-
-% --- Interventions 
-p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
-p.TPTeff       = 0.6;                                                      % Effectiveness of TPT
-r.TPT          = [0 0];
-r.ACF          = [0 0];
-r.ACF2         = [0 0];
+migrTPT      = 0                                                      
+TPTeff       = 0.6
+ACF          = [0,0]
+ACF2         = [0, 0]
 
 m = np.zeros((i['nstates'], i['nstates']))
     

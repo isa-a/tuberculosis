@@ -5,15 +5,18 @@ Created on Wed Sep 13 11:05:31 2023
 @author: ia19
 """
 
-# Example usage:
-states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
-gps_born = ['dom', 'for']
+#~~~~~~~~~~~PYTHON INDEXING STARTS AT 0 (ZERO)
 
-i = []
-s = []
+#combining states and born will be used as groups in function argument
+states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R'] # states
+gps_born = ['dom', 'for'] # where they are born
+groups = ([states, gps_born])
+#initialise lists
+i = [] # dict stores state and born, with index number
+s = [] # stores positions of states with born
 d = []
-lim = 0
-fnames = []
+lim = 0 # counter for length of all states, starting at 0
+
 
 def get_addresses(groups, i=None, s=None, d=None, lim=0):
     if i is None:
@@ -21,16 +24,20 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
     if s is None:
         s = {}
     if d is None:
-        d = {}
+        d = {} #creates empty dictionaries
+    
+    # here we're iterating over groups, which will be a list of lists
+    # initialising empty lists in s for each element in groups
+    # setting up data to organise the states by group
+    for ig in range(len(groups)): # iterates over the indices of groups. len(groups) gives number of groups in the groups list
+        gp = groups[ig] # extracts the n'th element from groups, call this subgroup gp
+        for ig2 in range(len(gp)): # inner loop iterates over the indices of gp
+            if gp[ig2] not in s: # check if the n-th element of gp is not already a key in s.
+                s[gp[ig2]] = [] # if the element from gp isnt in s, add it as a key to s with an empty list
 
-    for ig in range(len(groups)):
-        gp = groups[ig]
-        for ig2 in range(len(gp)):
-            if gp[ig2] not in s:
-                s[gp[ig2]] = []
 
-    if len(groups) == 1:
-        gp1 = groups[0]
+    if len(groups) == 1: #check if there's only one element in groups
+        gp1 = groups[0] # if there's only one group, call that group gp1 
         for ig1 in range(len(gp1)):
             lim += 1
             i[(gp1[ig1],)] = lim - 1  # Adjust to 0-based indexing
