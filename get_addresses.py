@@ -5,17 +5,15 @@ Created on Wed Sep 13 11:05:31 2023
 @author: ia19
 """
 
+# Example usage:
+states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
+gps_born = ['dom', 'for']
 
-born = ['dom','for']
-states = ['U','Lf','Ls','I','R']
-nstates = len(states)
 i = []
 s = []
 d = []
 lim = 0
 fnames = []
-
-
 
 def get_addresses(groups, i=None, s=None, d=None, lim=0):
     if i is None:
@@ -35,9 +33,9 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
         gp1 = groups[0]
         for ig1 in range(len(gp1)):
             lim += 1
-            i[(gp1[ig1],)] = lim
-            s[gp1[ig1]].append(lim)
-            d[lim] = [gp1[ig1]]
+            i[(gp1[ig1],)] = lim - 1  # Adjust to 0-based indexing
+            s[gp1[ig1]].append(lim - 1)
+            d[lim - 1] = [gp1[ig1]]
 
     if len(groups) == 2:
         gp1 = groups[0]
@@ -45,17 +43,13 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
         for ig1 in range(len(gp1)):
             for ig2 in range(len(gp2)):
                 lim += 1
-                i[(gp1[ig1], gp2[ig2])] = lim
-                s[gp1[ig1]].append(lim)
-                s[gp2[ig2]].append(lim)
-                d[lim] = [gp1[ig1], ' ', gp2[ig2]]
+                i[(gp1[ig1], gp2[ig2])] = lim - 1  # Adjust to 0-based indexing
+                s[gp1[ig1]].append(lim - 1)
+                s[gp2[ig2]].append(lim - 1)
+                d[lim - 1] = [gp1[ig1], ' ', gp2[ig2]]
 
     i['nstates'] = lim
     return i, s, d, lim
 
-# Example usage:
-states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
-gps_born = ['dom', 'for']
 
 i, s, d, lim = get_addresses([states, gps_born])
-

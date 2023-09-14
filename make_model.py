@@ -5,7 +5,7 @@ Created on Wed Sep 13 22:20:56 2023
 @author: ISA
 """
 
-from get_addresses import i,s,d,lim
+from pie import i,s,d,lim
 import numpy as np
 import random
 
@@ -107,7 +107,7 @@ for born in gps_born:
     source = Lf
     destin = Pf
     rate = random.uniform(0, 1)  # Replace with a random number
-    m[destin, source] = m[destin, source] + rate #cc
+    m[destin, source] = m[destin, source] + rate
 
     source = Ls
     destin = Ps
