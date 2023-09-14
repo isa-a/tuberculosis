@@ -38,11 +38,11 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
 
     if len(groups) == 1: #check if there's only one element in groups
         gp1 = groups[0] # if there's only one group, call that group gp1 
-        for ig1 in range(len(gp1)):
-            lim += 1
-            i[(gp1[ig1],)] = lim - 1  # Adjust to 0-based indexing
-            s[gp1[ig1]].append(lim - 1)
-            d[lim - 1] = [gp1[ig1]]
+        for ig1 in range(len(gp1)): # iterate over elements of gp1
+            lim += 1 # for each element in gp1, increment lim
+            i[(gp1[ig1])] = lim - 1 # based off lim, assign an index to that element in i
+            s[gp1[ig1]].append(lim - 1) # add the current index to the list attached to the state
+            d[lim - 1] = [gp1[ig1]] # 
 
     if len(groups) == 2:
         gp1 = groups[0]
