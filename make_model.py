@@ -7,8 +7,7 @@ Created on Wed Sep 13 22:20:56 2023
 
 from get_addresses import i,s,d,lim
 import numpy as np
-import random
-
+from scipy.sparse import csr_matrix
 
 states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
 gps_born = ['dom', 'for']
@@ -107,24 +106,29 @@ def make_model():
         # Initiation of TPT
         source = Lf
         destin = Pf
-        rate = random.uniform(0, 1)  # Replace with a random number
+        rate = 0.001  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         source = Ls
         destin = Ps
-        rate = random.uniform(0, 1)  # Replace with a random number
+        rate = 0.001  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         # Case-finding
         sources = [I, I2]
         destin = Tx
-        rate = random.uniform(0, 1)  # Replace with a random number
+        rate = 0.001  # Replace with a random number
         m[destin, sources] = m[destin, sources] + rate
     
         source = I2
         destin = Tx
-        rate = random.uniform(0, 1)  # Replace with a random number
+        rate = 0.001  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
+        
+        return m
+    
+
+
 
 
 progression  = 0.0826
@@ -145,7 +149,7 @@ ACF2         = [0, 0]
 file_path = 'matrix.txt'
 
 # Save the matrix to the text file
-np.savetxt(file_path, m, fmt='%.6f', delimiter='\t')
+np.savetxt(file_path, make_model(), fmt='%.6f', delimiter='\t')
 
 print(f"Matrix saved to {file_path}")
 
