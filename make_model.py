@@ -130,6 +130,11 @@ def make_model():
 
 
 
+column_sums = np.sum(make_model(), axis=0)
+diag_indices = np.diag_indices(min(make_model().shape))
+make_model()[diag_indices] -= column_sums
+
+
 
 progression  = 0.0826
 LTBI_stabil  = 0.872
@@ -143,13 +148,13 @@ relapse      = [0.032, 0.14, 0.0015]
 
 migrTPT      = 0                                                      
 TPTeff       = 0.6
-ACF          = [0,0]
+ACF          = [0, 0]
 ACF2         = [0, 0]
 
 file_path = 'matrix.txt'
 
 # Save the matrix to the text file
-np.savetxt(file_path, make_model(), fmt='%.6f', delimiter='\t')
+np.savetxt(file_path, sparse_matrix, fmt='%.6f', delimiter='\t')
 
 print(f"Matrix saved to {file_path}")
 
