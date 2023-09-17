@@ -7,7 +7,7 @@ Created on Wed Sep 13 22:20:56 2023
 
 from get_addresses import i,s,d,lim
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import dia_matrix
 
 states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
 gps_born = ['dom', 'for']
@@ -129,10 +129,22 @@ def make_model():
     
 
 
+# ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
+col_sums = np.sum(make_model(), axis=0)  # Calculate column sums
+modified_diagonal = make_model().diagonal() + col_sums  # Subtract column sums from diagonal
 
-column_sums = np.sum(make_model(), axis=0)
-diag_indices = np.diag_indices(min(make_model().shape))
-make_model()[diag_indices] -= column_sums
+# Create a sparse diagonal matrix with the modified diagonal elements
+offsets = [0]  # Diagonal offsets
+sparse_matrix = dia_matrix((modified_diagonal, offsets), shape=(i['nstates'], i['nstates']))
+sparse_matrix = sparse_matrix.toarray()
+# Now, 'sparse_matrix' contains the desired result with non-zero elements preserved
+
+M_lin = make_model() - sparse_matrix
+
+
+# ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
+
+
 
 
 
@@ -154,14 +166,14 @@ ACF2         = [0, 0]
 file_path = 'matrix.txt'
 
 # Save the matrix to the text file
-np.savetxt(file_path, sparse_matrix, fmt='%.6f', delimiter='\t')
+np.savetxt(file_path, M_lin, fmt='%.6f', delimiter='\t')
 
 print(f"Matrix saved to {file_path}")
 
 
 # Get the indices (coordinates) of non-zero elements in 'm'
-non_zero_indices = np.transpose(np.nonzero(m))
+non_zero_indices = np.transpose(np.nonzero(make_model()))
 
 # Display the non-zero positions and their coordinates
 for coord in non_zero_indices:
-    print(f"Coordinate: {tuple(coord)}, Value: {m[coord[0], coord[1]]}")
+    print(f"Coordinate: {tuple(coord)}, Value: {make_model()[coord[0], coord[1]]}")
