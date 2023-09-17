@@ -125,7 +125,20 @@ def make_model():
         rate = 0.001  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
         
-        return m
+    # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
+    col_sums = np.sum(make_model(), axis=0)  # Calculate column sums
+    modified_diagonal = make_model().diagonal() + col_sums  # Subtract column sums from diagonal
+    
+    # Create a sparse diagonal matrix with the modified diagonal elements
+    offsets = [0]  # Diagonal offsets
+    sparse_matrix = dia_matrix((modified_diagonal, offsets), shape=(i['nstates'], i['nstates']))
+    sparse_matrix = sparse_matrix.toarray()
+    # Now, 'sparse_matrix' contains the desired result with non-zero elements preserved
+    
+    M_lin = make_model() - sparse_matrix
+
+
+    return M_lin
     
 
 
@@ -143,6 +156,19 @@ M_lin = make_model() - sparse_matrix
 
 
 # ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
