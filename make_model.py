@@ -7,7 +7,7 @@ Created on Wed Sep 13 22:20:56 2023
 
 from get_addresses import i,s,d,lim
 import numpy as np
-from scipy.sparse import dia_matrix
+from scipy.sparse import dia_matrix, csr_matrix, diags
 
 states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
 gps_born = ['dom', 'for']
@@ -157,11 +157,19 @@ M_lin = make_model() - sparse_matrix
 
 # ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
 
+# Create an empty matrix m with the same shape as i.nstates
+# Define the sizes and parameters
 
+# Initialize the matrix m with zeros
+m = np.zeros((i['nstates'], i['nstates']))
 
+# Iterate over gps_born
+for born in gps_born:
+    # Find the indices of susceptible states that intersect with 'born'
+    susinds = np.intersect1d([s[state] for state in ['U', 'Lf', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
 
-
-
+    # Set the corresponding elements in m to 1
+    m[i[('Lf', born)], susinds] = 1
 
 
 
@@ -192,7 +200,7 @@ ACF2         = [0, 0]
 file_path = 'matrix.txt'
 
 # Save the matrix to the text file
-np.savetxt(file_path, M_lin, fmt='%.6f', delimiter='\t')
+np.savetxt(file_path, m, fmt='%.6f', delimiter='\t')
 
 print(f"Matrix saved to {file_path}")
 
