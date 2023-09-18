@@ -126,8 +126,8 @@ def make_model():
         m[destin, source] = m[destin, source] + rate
         
     # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
-    col_sums = np.sum(make_model(), axis=0)  # Calculate column sums
-    modified_diagonal = make_model().diagonal() + col_sums  # Subtract column sums from diagonal
+    col_sums = np.sum(m, axis=0)  # Calculate column sums
+    modified_diagonal = m.diagonal() + col_sums  # Subtract column sums from diagonal
     
     # Create a sparse diagonal matrix with the modified diagonal elements
     offsets = [0]  # Diagonal offsets
@@ -135,45 +135,59 @@ def make_model():
     sparse_matrix = sparse_matrix.toarray()
     # Now, 'sparse_matrix' contains the desired result with non-zero elements preserved
     
-    M_lin = make_model() - sparse_matrix
+    M_lin = m - sparse_matrix
+    
+    
+    # ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
+
+    # Create an empty matrix m with the same shape as i.nstates
+    # Define the sizes and parameters
+
+    # Initialize the matrix m with zeros
+    m = np.zeros((i['nstates'], i['nstates']))
+
+    # Iterate over gps_born
+    for born in gps_born: #iterate over where they are born
+        # Find the indices of susceptible states that intersect with 'born'
+        susinds = np.intersect1d([s[state] for state in ['U', 'Lf', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
+
+        # Set the corresponding elements in m to 1
+        m[i[('Lf', born)], susinds] = 1
 
 
-    return M_lin
+    # Define the indices of immune states
+    imminds = [s[state] for state in ['Lf', 'Ls', 'Rlo', 'Rhi', 'R']]
+    # Multiply the columns corresponding to immune states by (1 - imm)
+    m[:, imminds] *= (1 - 0.8)
+    # Calculate the column sums
+    col_sums = np.sum(m, axis=0)
+    # Adjust the diagonal elements to subtract the column sums
+    diagonal = np.diag(m).copy()
+    diagonal -= col_sums
+
+    # Create a sparse diagonal matrix with the modified diagonal elements
+    sparse_diagonal = dia_matrix((diagonal, [0]), shape=(i['nstates'], i['nstates']))
+    # Convert m to a sparse matrix
+    m_sparse = csr_matrix(m)
+    # Subtract the sparse diagonal matrix from m_sparse
+    M_nlin = m_sparse + sparse_diagonal
+    M_nlin = M_nlin.toarray()
+
+
+
+    return M_lin, M_nlin
     
 
+# Define the number of states (i.nstates) and initialize 'm' with zeros
+nstates = i['nstates']
+m = np.zeros(nstates)
+allI = [s['I'], s['I2']]
+# Set values in 'm' at indices specified by 's.allI' to 'r.beta'
+m[allI] = 8
 
-# ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
-col_sums = np.sum(make_model(), axis=0)  # Calculate column sums
-modified_diagonal = make_model().diagonal() + col_sums  # Subtract column sums from diagonal
-
-# Create a sparse diagonal matrix with the modified diagonal elements
-offsets = [0]  # Diagonal offsets
-sparse_matrix = dia_matrix((modified_diagonal, offsets), shape=(i['nstates'], i['nstates']))
-sparse_matrix = sparse_matrix.toarray()
-# Now, 'sparse_matrix' contains the desired result with non-zero elements preserved
-
-M_lin = make_model() - sparse_matrix
-
-
-# ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
-
-# Create an empty matrix m with the same shape as i.nstates
-# Define the sizes and parameters
-
-# Initialize the matrix m with zeros
-m = np.zeros((i['nstates'], i['nstates']))
-
-# Iterate over gps_born
-for born in gps_born:
-    # Find the indices of susceptible states that intersect with 'born'
-    susinds = np.intersect1d([s[state] for state in ['U', 'Lf', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
-
-    # Set the corresponding elements in m to 1
-    m[i[('Lf', born)], susinds] = 1
-
-
-
-
+# Create a sparse diagonal matrix 'M.lam' from 'm'
+M_lam = csr_matrix(m)
+M_lam = M_lam.toarray()
 
 
 
@@ -200,14 +214,28 @@ ACF2         = [0, 0]
 file_path = 'matrix.txt'
 
 # Save the matrix to the text file
-np.savetxt(file_path, m, fmt='%.6f', delimiter='\t')
+np.savetxt(file_path, result_sparse, fmt='%.6f', delimiter='\t')
 
 print(f"Matrix saved to {file_path}")
 
 
 # Get the indices (coordinates) of non-zero elements in 'm'
-non_zero_indices = np.transpose(np.nonzero(make_model()))
+non_zero_indices = np.transpose(np.nonzero(result_sparse))
 
 # Display the non-zero positions and their coordinates
 for coord in non_zero_indices:
-    print(f"Coordinate: {tuple(coord)}, Value: {make_model()[coord[0], coord[1]]}")
+    print(f"Coordinate: {tuple(coord)}, Value: {result_sparse[coord[0], coord[1]]}")
+
+
+
+
+
+
+
+# Get the indices (coordinates) of non-zero elements in 'm'
+non_zero_indices = np.transpose(np.nonzero(result_sparse))
+
+# Display the non-zero positions and their coordinates
+for coord in non_zero_indices:
+    incremented_coord = tuple(coord + 1)
+    print(f"{incremented_coord}, Value: {result_sparse[coord[0], coord[1]]}")
