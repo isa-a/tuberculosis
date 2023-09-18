@@ -59,4 +59,4 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
     return i, s, d, lim
 
 
-i, s, d, lim = get_addresses([states, gps_born])
+#i, s, d, lim = get_addresses([states, gps_born])
