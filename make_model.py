@@ -23,7 +23,7 @@ def get_states_for_born(i, born):
 
 
 
-def make_model():
+def make_model(prop, rate, i, s, gps):
     m = np.zeros((i['nstates'], i['nstates'])) # construct matrix
     for born in gps_born:
         state_values = get_states_for_born(i, born)
@@ -172,22 +172,36 @@ def make_model():
     # Subtract the sparse diagonal matrix from m_sparse
     M_nlin = m_sparse + sparse_diagonal
     M_nlin = M_nlin.toarray()
-
-
-
-    return M_lin, M_nlin
     
+    
+    # Define the number of states (i.nstates) and initialize 'm' with zeros
+    nstates = i['nstates']
+    m = np.zeros(nstates)
+    allI = [s['I'], s['I2']]
+    # Set values in 'm' at indices specified by 's.allI' to 'r.beta'
+    m[allI] = 8
 
-# Define the number of states (i.nstates) and initialize 'm' with zeros
-nstates = i['nstates']
-m = np.zeros(nstates)
-allI = [s['I'], s['I2']]
-# Set values in 'm' at indices specified by 's.allI' to 'r.beta'
-m[allI] = 8
+    # Create a sparse diagonal matrix 'M.lam' from 'm'
+    M_lam = csr_matrix(m)
+    M_lam = M_lam.toarray()
+    
+    # Define the number of states (i.nstates) and initialize 'm' with zeros
+    nstates = i['nstates']
+    m = np.zeros((nstates, 2))
 
-# Create a sparse diagonal matrix 'M.lam' from 'm'
-M_lam = csr_matrix(m)
-M_lam = M_lam.toarray()
+    # Set values in 'm' for the first column to 1/83
+    m[:, 0] = 1/83
+
+    # Set values in 'm' for the second column at indices specified by 's.allI' to 'r.muTB'
+    m[np.concatenate(allI), 1] = 1/6
+
+    # Create a sparse matrix 'M.mort' from 'm'
+    M_mort = (csr_matrix(m)).toarray()
+
+
+
+    return M_lin, M_nlin, M_lam, M_mort
+    
 
 
 
@@ -233,9 +247,9 @@ for coord in non_zero_indices:
 
 
 # Get the indices (coordinates) of non-zero elements in 'm'
-non_zero_indices = np.transpose(np.nonzero(result_sparse))
+non_zero_indices = np.transpose(np.nonzero(M_mort))
 
 # Display the non-zero positions and their coordinates
 for coord in non_zero_indices:
     incremented_coord = tuple(coord + 1)
-    print(f"{incremented_coord}, Value: {result_sparse[coord[0], coord[1]]}")
+    print(f"{incremented_coord}, Value: {M_mort[coord[0], coord[1]]}")
