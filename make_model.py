@@ -5,13 +5,13 @@ Created on Wed Sep 13 22:20:56 2023
 @author: ISA
 """
 
-from setup_model import i,s,d,lim
+from setup_model import i,s,d,lim,r,p
 import numpy as np
 from scipy.sparse import dia_matrix, csr_matrix, diags
 
 states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
 gps_born = ['dom', 'for']
-gamma = 5
+r['gamma'] = 5
 
 
 def get_states_for_born(i, born):
@@ -23,7 +23,7 @@ def get_states_for_born(i, born):
 
 
 
-def make_model():
+def make_model(p, r, i, s, gps):
     m = np.zeros((i['nstates'], i['nstates'])) # construct matrix
     for born in gps_born:
         state_values = get_states_for_born(i, born)
@@ -44,57 +44,57 @@ def make_model():
         # Progression from 'fast' latent
         source = Lf
         destin = I
-        rate = 0.0826  # Replace with a random number
+        rate = r['progression']  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         source = Pf
         destin = I2
-        rate = 0.0826 * (1 - 0.6)  # Replace with a random number
+        rate = r['progression'] * (1 - p['TPTeff'])  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         # Stabilization of 'fast' to 'slow' latent
         source = Lf
         destin = Ls
-        rate = 0.872  # Replace with a random number
+        rate = r['LTBI_stabil']  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         source = Pf
         destin = Ps
-        rate = 0.872  # Replace with a random number
+        rate = r['LTBI_stabil']  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         # Reactivation of 'slow' latent
         source = Ls
         destin = I
-        rate = 0.0006  # Replace with a random number
+        rate = r['reactivation']  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         source = Ps
         destin = I
-        rate = 0.0006*(1-0.6)  # Replace with a random number
+        rate = r['reactivation']*(1 - p['TPTeff'])  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         # Initiation of treatment
         source = I
         destins = [Tx, Rhi]
-        rates = [gamma,1/6]  # Replace with random numbers
+        rates = [r['gamma'], r['self_cure']]  # Replace with random numbers
         m[destins, source] = m[destins, source] + rates
     
         source = I2
         destins = [Tx, Rhi]
-        rates = [gamma,1/6]  # Replace with random numbers
+        rates = [r['gamma'], r['self_cure']]  # Replace with random numbers
         m[destins, source] = m[destins, source] + rates
     
         # Treatment completion or interruption
         source = Tx
         destins = [Rlo, Rhi]
-        rates = [2, 0.01]  # Replace with random numbers
+        rates = [r['Tx'], r['default']]  # Replace with random numbers
         m[destins, source] = m[destins, source] + rates
     
         # Relapse
         sources = [Rlo, Rhi, R]
         destin = I2
-        rates = [0.032, 0.14, 0.0015]  # Replace with a random number
+        rates = r['relapse']  # Replace with a random number
         m[destin, sources] = m[destin, sources] + rates
     
         # Stabilization of relapse risk
@@ -106,23 +106,23 @@ def make_model():
         # Initiation of TPT
         source = Lf
         destin = Pf
-        rate = 0.001  # Replace with a random number
+        rate = 0.0001 # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         source = Ls
         destin = Ps
-        rate = 0.001  # Replace with a random number
+        rate = 0.0001  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
     
         # Case-finding
         sources = [I, I2]
         destin = Tx
-        rate = 0.001  # Replace with a random number
+        rate = 0.0001  # Replace with a random number
         m[destin, sources] = m[destin, sources] + rate
     
         source = I2
         destin = Tx
-        rate = 0.001  # Replace with a random number
+        rate = 0.0001  # Replace with a random number
         m[destin, source] = m[destin, source] + rate
         
     # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
@@ -154,11 +154,10 @@ def make_model():
         # Set the corresponding elements in m to 1
         m[i[('Lf', born)], susinds] = 1
 
-
     # Define the indices of immune states
     imminds = [s[state] for state in ['Lf', 'Ls', 'Rlo', 'Rhi', 'R']]
     # Multiply the columns corresponding to immune states by (1 - imm)
-    m[:, imminds] *= (1 - 0.8)
+    m[:, imminds] *= (1 - p['imm'])
     # Calculate the column sums
     col_sums = np.sum(m, axis=0)
     # Adjust the diagonal elements to subtract the column sums
@@ -173,18 +172,21 @@ def make_model():
     M_nlin = m_sparse + sparse_diagonal
     M_nlin = M_nlin.toarray()
     
-    
+    # ~~~~~~~~~~~~~~~~ force of infection// lambda
+  
     # Define the number of states (i.nstates) and initialize 'm' with zeros
     nstates = i['nstates']
     m = np.zeros(nstates)
     allI = [s['I'], s['I2']]
     # Set values in 'm' at indices specified by 's.allI' to 'r.beta'
-    m[s['everyI']] = 8
+    m[s['everyI']] = 22.840
 
     # Create a sparse diagonal matrix 'M.lam' from 'm'
     M_lam = csr_matrix(m)
     M_lam = M_lam.toarray()
     
+    # ~~~~~~~~~~~~~~~~ mortality
+
     # Define the number of states (i.nstates) and initialize 'm' with zeros
     nstates = i['nstates']
     m = np.zeros((nstates, 2))
@@ -193,7 +195,7 @@ def make_model():
     m[:, 0] = 1/83
 
     # Set values in 'm' for the second column at indices specified by 's.allI' to 'r.muTB'
-    m[np.concatenate(allI), 1] = 1/6
+    m[np.concatenate(allI), 1] = r['muTB']
 
     # Create a sparse matrix 'M.mort' from 'm'
     M_mort = (csr_matrix(m)).toarray()
@@ -210,31 +212,31 @@ def make_model():
 
 
 
-file_path = 'matrix.txt'
+# file_path = 'matrix.txt'
 
-# Save the matrix to the text file
-np.savetxt(file_path, result_sparse, fmt='%.6f', delimiter='\t')
+# # Save the matrix to the text file
+# np.savetxt(file_path, result_sparse, fmt='%.6f', delimiter='\t')
 
-print(f"Matrix saved to {file_path}")
-
-
-# Get the indices (coordinates) of non-zero elements in 'm'
-non_zero_indices = np.transpose(np.nonzero(result_sparse))
-
-# Display the non-zero positions and their coordinates
-for coord in non_zero_indices:
-    print(f"Coordinate: {tuple(coord)}, Value: {result_sparse[coord[0], coord[1]]}")
+# print(f"Matrix saved to {file_path}")
 
 
+# # Get the indices (coordinates) of non-zero elements in 'm'
+# non_zero_indices = np.transpose(np.nonzero(result_sparse))
+
+# # Display the non-zero positions and their coordinates
+# for coord in non_zero_indices:
+#     print(f"Coordinate: {tuple(coord)}, Value: {result_sparse[coord[0], coord[1]]}")
 
 
 
 
 
-# Get the indices (coordinates) of non-zero elements in 'm'
-non_zero_indices = np.transpose(np.nonzero(M_mort))
 
-# Display the non-zero positions and their coordinates
-for coord in non_zero_indices:
-    incremented_coord = tuple(coord + 1)
-    print(f"{incremented_coord}, Value: {M_mort[coord[0], coord[1]]}")
+
+# # Get the indices (coordinates) of non-zero elements in 'm'
+# non_zero_indices = np.transpose(np.nonzero(M_mort))
+
+# # Display the non-zero positions and their coordinates
+# for coord in non_zero_indices:
+#     incremented_coord = tuple(coord + 1)
+#     print(f"{incremented_coord}, Value: {M_mort[coord[0], coord[1]]}")
