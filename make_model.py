@@ -23,7 +23,7 @@ def get_states_for_born(i, born):
 
 
 
-def make_model(p, r, i, s, gps):
+def make_model():
     m = np.zeros((i['nstates'], i['nstates'])) # construct matrix
     for born in gps_born:
         state_values = get_states_for_born(i, born)
@@ -45,95 +45,92 @@ def make_model(p, r, i, s, gps):
         source = Lf
         destin = I
         rate = r['progression']  # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
     
         source = Pf
         destin = I2
         rate = r['progression'] * (1 - p['TPTeff'])  # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
     
         # Stabilization of 'fast' to 'slow' latent
         source = Lf
         destin = Ls
         rate = r['LTBI_stabil']  # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
     
         source = Pf
         destin = Ps
         rate = r['LTBI_stabil']  # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
     
         # Reactivation of 'slow' latent
         source = Ls
         destin = I
         rate = r['reactivation']  # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
     
         source = Ps
         destin = I
         rate = r['reactivation']*(1 - p['TPTeff'])  # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
     
         # Initiation of treatment
         source = I
         destins = [Tx, Rhi]
         rates = [r['gamma'], r['self_cure']]  # Replace with random numbers
-        m[destins, source] = m[destins, source] + rates
+        m[destins, source] += rates
     
         source = I2
         destins = [Tx, Rhi]
         rates = [r['gamma'], r['self_cure']]  # Replace with random numbers
-        m[destins, source] = m[destins, source] + rates
+        m[destins, source] += rates
     
         # Treatment completion or interruption
         source = Tx
         destins = [Rlo, Rhi]
         rates = [r['Tx'], r['default']]  # Replace with random numbers
-        m[destins, source] = m[destins, source] + rates
+        m[destins, source] += rates
     
         # Relapse
         sources = [Rlo, Rhi, R]
         destin = I2
         rates = r['relapse']  # Replace with a random number
-        m[destin, sources] = m[destin, sources] + rates
+        m[destin, sources] += rates
     
         # Stabilization of relapse risk
         sources = [Rlo, Rhi]
         destin = R
         rates = 0.5  # Replace with a random number
-        m[destin, sources] = m[destin, sources] + rates
+        m[destin, sources] += rates
     
         # Initiation of TPT
         source = Lf
         destin = Pf
         rate = 0.0001 # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
     
         source = Ls
         destin = Ps
         rate = 0.0001  # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
     
         # Case-finding
         sources = [I, I2]
         destin = Tx
         rate = 0.0001  # Replace with a random number
-        m[destin, sources] = m[destin, sources] + rate
+        m[destin, sources] += rate
     
         source = I2
         destin = Tx
         rate = 0.0001  # Replace with a random number
-        m[destin, source] = m[destin, source] + rate
+        m[destin, source] += rate
         
     # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
-    col_sums = np.sum(m, axis=0)  # Calculate column sums
-    modified_diagonal = m.diagonal() + col_sums  # Subtract column sums from diagonal
+    col_sums = np.sum(m, axis=0)  # sum up each column
+    mod_diagonal = m.diagonal() + col_sums  # add column sums to the diagonal
     
-    # Create a sparse diagonal matrix with the modified diagonal elements
-    offsets = [0]  # Diagonal offsets
-    sparse_matrix = dia_matrix((modified_diagonal, offsets), shape=(i['nstates'], i['nstates']))
-    sparse_matrix = sparse_matrix.toarray()
-    # Now, 'sparse_matrix' contains the desired result with non-zero elements preserved
+    # make a sparse diagonal matrix with the modified diagonal elements
+    sparse_matrix = (dia_matrix((mod_diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
     
     M_lin = m - sparse_matrix
     
@@ -143,21 +140,24 @@ def make_model(p, r, i, s, gps):
     # Create an empty matrix m with the same shape as i.nstates
     # Define the sizes and parameters
 
-    # Initialize the matrix m with zeros
+    # make matrix m with zeros
     m = np.zeros((i['nstates'], i['nstates']))
 
-    # Iterate over gps_born
-    for born in gps_born: #iterate over where they are born
+    # iterate over gps_born
+    for born in gps_born: # iterate over where they are born e.g. dom and for
         # Find the indices of susceptible states that intersect with 'born'
         susinds = np.intersect1d([s[state] for state in ['U', 'Lf', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
+        # calculate intersection between two sets: the states in s, and where they're born
+        # born in s
 
-        # Set the corresponding elements in m to 1
-        m[i[('Lf', born)], susinds] = 1
+        # initialise those elements in the matrix with a 1
+        # use indices in i as the row index and susinds as the column indices
+        m[i[('Lf', born)], susinds] = 1 
 
-    # Define the indices of immune states
-    imminds = [s[state] for state in ['Lf', 'Ls', 'Rlo', 'Rhi', 'R']]
-    # Multiply the columns corresponding to immune states by (1 - imm)
-    m[:, imminds] *= (1 - p['imm'])
+    # latent and recovered states 
+    L_and_R = [s[state] for state in ['Lf', 'Ls', 'Rlo', 'Rhi', 'R']]
+    # multiply these by (1 - imm), take all rows only specified columns
+    m[:, L_and_R] *= (1 - p['imm'])
     # Calculate the column sums
     col_sums = np.sum(m, axis=0)
     # Adjust the diagonal elements to subtract the column sums
@@ -233,10 +233,10 @@ def make_model(p, r, i, s, gps):
 
 
 
-# # Get the indices (coordinates) of non-zero elements in 'm'
-# non_zero_indices = np.transpose(np.nonzero(M_mort))
+# Get the indices (coordinates) of non-zero elements in 'm'
+non_zero_indices = np.transpose(np.nonzero(make_model()[1]))
 
-# # Display the non-zero positions and their coordinates
-# for coord in non_zero_indices:
-#     incremented_coord = tuple(coord + 1)
-#     print(f"{incremented_coord}, Value: {M_mort[coord[0], coord[1]]}")
+# Display the non-zero positions and their coordinates
+for coord in non_zero_indices:
+    incremented_coord = tuple(coord + 1)
+    print(f"{incremented_coord}, Value: {make_model()[1][coord[0], coord[1]]}")
