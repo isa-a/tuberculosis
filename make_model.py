@@ -5,7 +5,7 @@ Created on Wed Sep 13 22:20:56 2023
 @author: ISA
 """
 
-from get_addresses import i,s,d,lim
+from setup_model import i,s,d,lim
 import numpy as np
 from scipy.sparse import dia_matrix, csr_matrix, diags
 
@@ -23,7 +23,7 @@ def get_states_for_born(i, born):
 
 
 
-def make_model(prop, rate, i, s, gps):
+def make_model():
     m = np.zeros((i['nstates'], i['nstates'])) # construct matrix
     for born in gps_born:
         state_values = get_states_for_born(i, born)
@@ -179,7 +179,7 @@ def make_model(prop, rate, i, s, gps):
     m = np.zeros(nstates)
     allI = [s['I'], s['I2']]
     # Set values in 'm' at indices specified by 's.allI' to 'r.beta'
-    m[allI] = 8
+    m[s['everyI']] = 8
 
     # Create a sparse diagonal matrix 'M.lam' from 'm'
     M_lam = csr_matrix(m)
@@ -209,21 +209,6 @@ def make_model(prop, rate, i, s, gps):
 
 
 
-
-progression  = 0.0826
-LTBI_stabil  = 0.872
-reactivation = 0.0006
-
-Tx            = 2
-default       = 0.01
-
-self_cure    = 1/6
-relapse      = [0.032, 0.14, 0.0015]
-
-migrTPT      = 0                                                      
-TPTeff       = 0.6
-ACF          = [0, 0]
-ACF2         = [0, 0]
 
 file_path = 'matrix.txt'
 

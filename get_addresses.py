@@ -57,6 +57,3 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
 
     i['nstates'] = lim # set total no. of states in i to final val for lim
     return i, s, d, lim
-
-
-#i, s, d, lim = get_addresses([states, gps_born])
