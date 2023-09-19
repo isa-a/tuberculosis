@@ -158,44 +158,38 @@ def make_model():
     L_and_R = [s[state] for state in ['Lf', 'Ls', 'Rlo', 'Rhi', 'R']]
     # multiply these by (1 - imm), take all rows only specified columns
     m[:, L_and_R] *= (1 - p['imm'])
-    # Calculate the column sums
+    # column sums
     col_sums = np.sum(m, axis=0)
     # Adjust the diagonal elements to subtract the column sums
     diagonal = np.diag(m).copy()
     diagonal -= col_sums
 
-    # Create a sparse diagonal matrix with the modified diagonal elements
-    sparse_diagonal = dia_matrix((diagonal, [0]), shape=(i['nstates'], i['nstates']))
-    # Convert m to a sparse matrix
-    m_sparse = csr_matrix(m)
-    # Subtract the sparse diagonal matrix from m_sparse
+    # same as linear
+    sparse_diagonal = (dia_matrix((diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
+    m_sparse = csr_matrix(m).toarray()
+
     M_nlin = m_sparse + sparse_diagonal
-    M_nlin = M_nlin.toarray()
+    
     
     # ~~~~~~~~~~~~~~~~ force of infection// lambda
   
-    # Define the number of states (i.nstates) and initialize 'm' with zeros
-    nstates = i['nstates']
-    m = np.zeros(nstates)
-    allI = [s['I'], s['I2']]
-    # Set values in 'm' at indices specified by 's.allI' to 'r.beta'
+    m = np.zeros(i['nstates'])
+    # Set values in m at indices specified for infectious states to beta val
     m[s['everyI']] = 22.840
 
     # Create a sparse diagonal matrix 'M.lam' from 'm'
-    M_lam = csr_matrix(m)
-    M_lam = M_lam.toarray()
+    M_lam = csr_matrix(m).toarray()
+    
     
     # ~~~~~~~~~~~~~~~~ mortality
 
-    # Define the number of states (i.nstates) and initialize 'm' with zeros
-    nstates = i['nstates']
-    m = np.zeros((nstates, 2))
+    m = np.zeros((i['nstates'], 2)) # mortality in each state
 
-    # Set values in 'm' for the first column to 1/83
+    # first column of m to life expectancy
     m[:, 0] = 1/83
 
-    # Set values in 'm' for the second column at indices specified by 's.allI' to 'r.muTB'
-    m[np.concatenate(allI), 1] = r['muTB']
+    # second column's infectious states have tb mort
+    m[s['everyI'], 1] = r['muTB']
 
     # Create a sparse matrix 'M.mort' from 'm'
     M_mort = (csr_matrix(m)).toarray()
@@ -215,7 +209,7 @@ def make_model():
 # file_path = 'matrix.txt'
 
 # # Save the matrix to the text file
-# np.savetxt(file_path, result_sparse, fmt='%.6f', delimiter='\t')
+# np.savetxt(file_path, m, fmt='%.6f', delimiter='\t')
 
 # print(f"Matrix saved to {file_path}")
 
@@ -233,10 +227,10 @@ def make_model():
 
 
 
-# Get the indices (coordinates) of non-zero elements in 'm'
-non_zero_indices = np.transpose(np.nonzero(make_model()[1]))
+# # Get the indices (coordinates) of non-zero elements in 'm'
+# non_zero_indices = np.transpose(np.nonzero(make_model()[1]))
 
-# Display the non-zero positions and their coordinates
-for coord in non_zero_indices:
-    incremented_coord = tuple(coord + 1)
-    print(f"{incremented_coord}, Value: {make_model()[1][coord[0], coord[1]]}")
+# # Display the non-zero positions and their coordinates
+# for coord in non_zero_indices:
+#     incremented_coord = tuple(coord + 1)
+#     print(f"{incremented_coord}, Value: {make_model()[1][coord[0], coord[1]]}")
