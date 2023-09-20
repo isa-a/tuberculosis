@@ -46,9 +46,14 @@ s['everyI'] = [s['I'], s['I2']] # all infectious
 
 auxillaries = ['inc', 'sources', 'mort']
 lengths = [3, 5, 1]
-lim=0
+lim=i['nstates']
 i['aux'] = {} #initialise aux in i
 
+for ii in range(len(auxillaries)): # loop over however many auxillaries there are
+    inds = list(range(lim + 1, lim + lengths[ii] + 1))
+    i['aux'][auxillaries[ii]] = inds
+    lim = inds[-1]
+i['nx'] = lim
 
 
 
