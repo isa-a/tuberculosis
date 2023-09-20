@@ -8,14 +8,10 @@ Created on Wed Sep 13 11:05:31 2023
 #~~~~~~~~~~~PYTHON INDEXING STARTS AT 0 (ZERO)
 
 #combining states and born will be used as groups in function argument
-states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R'] # states
-gps_born = ['dom', 'for'] # where they are born
-groups = ([states, gps_born])
+# states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R'] # states
+# gps_born = ['dom', 'for'] # where they are born
+# groups = ([states, gps_born])
 #initialise lists
-i = [] # dict stores state and born, with index number
-s = [] # stores positions of states with born
-d = []
-lim = 0 # counter for length of all states, starting at 0
 
 
 def get_addresses(groups, i=None, s=None, d=None, lim=0):
@@ -57,6 +53,3 @@ def get_addresses(groups, i=None, s=None, d=None, lim=0):
 
     i['nstates'] = lim # set total no. of states in i to final val for lim
     return i, s, d, lim
-
-
-i, s, d, lim = get_addresses([states, gps_born])
