@@ -163,20 +163,20 @@ def make_model():
     col_sums = np.sum(m, axis=0)
     # Adjust the diagonal elements to subtract the column sums
     diagonal = np.diag(m).copy()
-    diagonal -= col_sums
+    diagonal += col_sums
 
     # same as linear
     sparse_diagonal = (dia_matrix((diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
     m_sparse = csr_matrix(m).toarray()
 
-    M_nlin = m_sparse + sparse_diagonal
+    M_nlin = m_sparse - sparse_diagonal
     
     
     # ~~~~~~~~~~~~~~~~ force of infection// lambda
   
     m = np.zeros(i['nstates'])
     # Set values in m at indices specified for infectious states to beta val
-    m[s['everyI']] = 22.840
+    m[s['everyI']] = 22.840 # WILL BE BETA ONCE OTHER SCRIPTS ARE COMPLETE
 
     # Create a sparse diagonal matrix 'M.lam' from 'm'
     M_lam = csr_matrix(m).toarray()

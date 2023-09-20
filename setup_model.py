@@ -43,9 +43,6 @@ s['everyI'] = [s['I'], s['I2']] # all infectious
 
 # ~~~~~~~~~~~~ auxillary time
 
-<<<<<<< HEAD
-
-=======
 
 auxillaries = ['inc', 'sources', 'mort']
 lengths = [3, 5, 1]
