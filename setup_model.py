@@ -5,6 +5,10 @@ Created on Mon Sep 18 18:54:00 2023
 @author: ISA
 """
 from get_addresses import get_addresses
+import numpy as np
+from scipy.sparse import csr_matrix, dia_matrix
+
+
 
 # ~~~~~~~~~~~ Natural history params
 
@@ -38,7 +42,8 @@ gps_born = ['dom', 'for'] # where they are born
 
 i, s, d, lim = get_addresses([states, gps_born])
 
-s['everyI'] = [s['I'], s['I2']] # all infectious
+s['everyI'] = np.concatenate((s['I'], s['I2']))
+
 
 
 # ~~~~~~~~~~~~ auxillary time
@@ -55,8 +60,16 @@ for ii in range(len(auxillaries)): # loop over however many auxillaries there ar
     lim = inds[-1]
 i['nx'] = lim
 
+# --- Incidence
+tmp = np.zeros((2, i['nstates']))
+tmp[0, s['everyI']] = 1
+tmp[1, np.intersect1d(s['everyI'], s['dom'])] = 1
+tmp[2, np.intersect1d(s['everyI'], s['for'])] = 1
+agg_inc = csr_matrix(tmp)
 
-
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[s['allI'], :] = 1
+sel_inc = tmp - np.diag(np.diag(tmp))
 
 
 
