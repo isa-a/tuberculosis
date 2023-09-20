@@ -137,12 +137,16 @@ def make_model():
     
     # ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
 
+    # Create an empty matrix m with the same shape as i.nstates
+    # Define the sizes and parameters
+
     # make matrix m with zeros
     m = np.zeros((i['nstates'], i['nstates']))
 
     # iterate over gps_born
     for born in gps_born: # iterate over where they are born e.g. dom and for
         # find indices of specified states in s that intersect with 'born'
+        # Find the indices of susceptible states that intersect with 'born'
         susinds = np.intersect1d([s[state] for state in ['U', 'Lf', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
         # calculate intersection between two sets: the states in s, and where they're born
         # born in s
