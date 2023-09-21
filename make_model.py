@@ -24,6 +24,7 @@ def get_states_for_born(i, born):
 
 
 def make_model():
+    M = {}
     m = np.zeros((i['nstates'], i['nstates'])) # construct matrix
     for born in gps_born:
         state_values = get_states_for_born(i, born)
@@ -132,8 +133,8 @@ def make_model():
     # make a sparse diagonal matrix with the modified diagonal elements
     sparse_matrix = (dia_matrix((mod_diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
     
-    M_lin = m - sparse_matrix
-    
+    #M_lin = m - sparse_matrix
+    M['lin'] = m - sparse_matrix
     
     # ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
 
@@ -169,8 +170,8 @@ def make_model():
     sparse_diagonal = (dia_matrix((diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
     m_sparse = csr_matrix(m).toarray()
 
-    M_nlin = m_sparse - sparse_diagonal
-    
+    #M_nlin = m_sparse - sparse_diagonal
+    M['nlin'] = m_sparse - sparse_diagonal
     
     # ~~~~~~~~~~~~~~~~ force of infection// lambda
   
@@ -179,8 +180,8 @@ def make_model():
     m[s['everyI']] = 22.840 # WILL BE BETA ONCE OTHER SCRIPTS ARE COMPLETE
 
     # Create a sparse diagonal matrix 'M.lam' from 'm'
-    M_lam = csr_matrix(m).toarray()
-    
+    #M_lam = csr_matrix(m).toarray()
+    M['lam'] = csr_matrix(m).toarray()
     
     # ~~~~~~~~~~~~~~~~ mortality
 
@@ -193,11 +194,11 @@ def make_model():
     m[s['everyI'], 1] = r['muTB']
 
     # Create a sparse matrix 'M.mort' from 'm'
-    M_mort = (csr_matrix(m)).toarray()
+    #M_mort = (csr_matrix(m)).toarray()
+    M['mort'] = (csr_matrix(m)).toarray()
 
 
-
-    return M_lin, M_nlin, M_lam, M_mort
+    return M
     
 
 
