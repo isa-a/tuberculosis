@@ -77,7 +77,7 @@ agg['inc'] = csr_matrix(tmp).toarray()
 
 tmp = np.zeros((i['nstates'], i['nstates']))
 tmp[s['everyI'], :] = 1
-sel_inc = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
+sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
 
 # Create empty dictionaries to store selectors and aggregators
 
@@ -108,3 +108,39 @@ tmp = np.zeros((i['nstates'], i['nstates']))
 tmp[0, s['everyI']] = 1
 tmp[1, [s['R'][0], s['Rlo'][0], s['Rhi'][0]]] = 1
 sel['R2I'] = tmp - np.diag(np.diag(tmp))
+
+
+
+
+#~~~~~~~~~~~~~~~~~ parameters
+
+free_params = ['beta', 'betadec', 'gamma', 'p_birth', 'p_kLf']
+param_lengths = [1,         1,         1,       1,          1]
+
+
+limit = 0
+xi = {}
+
+for ii in range(len(free_params)):
+    indices = list(range(limit + 1, limit + param_lengths[ii] + 1))
+    xi[free_params[ii]] = indices
+    limit = indices[-1]
+
+prm = {}
+prm['bounds'] = {
+    'beta': [0, 40],
+    'betadec': [0, 0.15],
+    'gamma': [0, 50],
+    'p_birth': [0, 1],
+    'p_kLf': [1, 200]
+}
+
+ref = {}
+
+
+ref['i'] = i
+ref['s'] = s
+ref['xi'] = xi
+
+
+
