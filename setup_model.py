@@ -55,44 +55,23 @@ lim=i['nstates']
 i['aux'] = {} #initialise aux in i
 
 for ii in range(len(auxillaries)): # loop over however many auxillaries there are
+    # in each iteration of the loop create a list of integers starting 
+    # from lim + 1 and ending at lim + lengths[ii] + 1. Here, lim is a variable that 
+    # keeps track of the last index used, and lengths[ii] is the length associated 
+    # with the current auxiliary.
     inds = list(range(lim + 1, lim + lengths[ii] + 1))
     i['aux'][auxillaries[ii]] = inds
     lim = inds[-1]
 i['nx'] = lim
 
 # --- Incidence
-tmp = np.zeros((2, i['nstates']))
+tmp = np.zeros((3, i['nstates']))
 tmp[0, s['everyI']] = 1
 tmp[1, np.intersect1d(s['everyI'], s['dom'])] = 1
 tmp[2, np.intersect1d(s['everyI'], s['for'])] = 1
-agg_inc = csr_matrix(tmp)
+agg_inc = csr_matrix(tmp).toarray()
 
 tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[s['allI'], :] = 1
-sel_inc = tmp - np.diag(np.diag(tmp))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+tmp[s['everyI'], :] = 1
+sel_inc = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
 
