@@ -75,3 +75,34 @@ tmp = np.zeros((i['nstates'], i['nstates']))
 tmp[s['everyI'], :] = 1
 sel_inc = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
 
+# Create empty dictionaries to store selectors and aggregators
+sel = {}
+agg = {}
+
+# --- Incidence
+
+# From recent infection
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[0, s['everyI']] = 1
+sel['Lf2I'] = tmp - np.diag(np.diag(tmp))
+
+# From recent infection, TPT
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[1, s['everyI']] = 1
+sel['Pf2I'] = tmp - np.diag(np.diag(tmp))
+
+# From remote infection
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[0, s['everyI']] = 1
+sel['Ls2I'] = tmp - np.diag(np.diag(tmp))
+
+# From remote infection, TPT
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[1, s['everyI']] = 1
+sel['Ps2I'] = tmp - np.diag(np.diag(tmp))
+
+# From relapse
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[0, s['everyI']] = 1
+tmp[1, [s['R'][0], s['Rlo'][0], s['Rhi'][0]]] = 1
+sel['R2I'] = tmp - np.diag(np.diag(tmp))
