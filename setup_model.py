@@ -31,6 +31,10 @@ p = {
     'TPTeff': 0.6
     }
 
+sel = {}
+agg = {}
+
+
 r['TPT']          = [0,0]
 r['ACF']          = [0, 0]
 r['ACF2']         = [0, 0]
@@ -69,15 +73,13 @@ tmp = np.zeros((3, i['nstates']))
 tmp[0, s['everyI']] = 1
 tmp[1, np.intersect1d(s['everyI'], s['dom'])] = 1
 tmp[2, np.intersect1d(s['everyI'], s['for'])] = 1
-agg_inc = csr_matrix(tmp).toarray()
+agg['inc'] = csr_matrix(tmp).toarray()
 
 tmp = np.zeros((i['nstates'], i['nstates']))
 tmp[s['everyI'], :] = 1
 sel_inc = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
 
 # Create empty dictionaries to store selectors and aggregators
-sel = {}
-agg = {}
 
 # --- Incidence
 
