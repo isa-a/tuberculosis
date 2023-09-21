@@ -25,3 +25,15 @@ invec = insert[:i['nstates']]
 
 # new infections
 lam = make_model()['lam'] * invec / np.sum(invec) * (1 - 0.14) ** np.maximum((t - 2010), 0)
+
+
+allmat = make_model()['lin'] + lam * make_model()['nlin']
+out[:i['nstates']] = np.dot(allmat, invec.reshape(-1, 1))
+
+
+morts = make_model()['mort'] * invec
+out[:i['nstates']] -= np.sum(morts, axis=1)
+
+allmorts = np.sum(morts)
+births = p['birth'] * allmorts
+out[i['U']['dom']] += births
