@@ -24,4 +24,4 @@ out = np.zeros((len(insert), 1))
 invec = insert[:i['nstates']]
 
 # new infections
-lam = make_model()['lam'] * invec / np.sum(invec) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
+lam = make_model()['lam'] * invec / np.sum(invec) * (1 - 0.14) ** np.maximum((t - 2010), 0)
