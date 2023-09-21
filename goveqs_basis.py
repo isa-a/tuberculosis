@@ -8,12 +8,15 @@
 import numpy as np
 from setup_model import i,s,d,lim,r,p
 
-def goveqs_basis2(t, in_vec, i, s, M, agg, sel, r, p):
-    
+def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     return 
 
-in_vec = {}
+insert = np.zeros(i['nx']) # delete when finished
+seed = 1e-5
 
+# Assuming 'in' is a NumPy array of shape (31, 1)
+out = np.zeros((len(insert), 1))
+invec = insert[:i['nstates']]
 
 
 out = np.zeros(len(in_vec))
