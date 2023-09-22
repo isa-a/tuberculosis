@@ -6,7 +6,7 @@
 """
 
 import numpy as np
-from setup_model import i,s,d,lim,r,p
+from setup_model import i,s,d,lim,r,p,agg,sel,ref,xi,prm
 from make_model import make_model
 
 def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
@@ -47,15 +47,13 @@ out[s['for']] += vec
 
 
 # aux
-
-out[i['aux']['inc']] = agg_inc.dot(sel_inc * allmat).dot(invec)
-out[i['aux']['incsources'][0]] = np.sum(sel_Lf2I * allmat).dot(invec)
-out[i['aux']['incsources'][1]] = np.sum(sel_Pf2I * allmat).dot(invec)
-out[i['aux']['incsources'][2]] = np.sum(sel_Ls2I * allmat).dot(invec)
-out[i['aux']['incsources'][3]] = np.sum(sel_Ps2I * allmat).dot(invec)
-out[i['aux']['incsources'][4]] = np.sum(sel_R2I * allmat).dot(invec)
-out[i['aux']['mort']] = np.sum(morts[:, 1])
-
+out_aux_inc = agg['inc'] * (sel['inc'] * np.dot(sel['inc'], invec))
+out_aux_incsources_1 = np.sum(sel['Lf2I'] * np.dot(sel['Lf2I'], invec))
+out_aux_incsources_2 = np.sum(sel['Pf2I'] * np.dot(sel['Pf2I'], invec))
+out_aux_incsources_3 = np.sum(sel['Ls2I'] * np.dot(sel['Ls2I'], invec))
+out_aux_incsources_4 = np.sum(sel['Ps2I'] * np.dot(sel['Ps2I'], invec))
+out_aux_incsources_5 = np.sum(sel['R2I'] * np.dot(sel['R2I'], invec))
+out_aux_mort = np.sum(morts[:, 1])
 
 
 
