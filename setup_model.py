@@ -33,6 +33,9 @@ for ii in range(len(auxillaries)): # loop over however many auxillaries there ar
     # the last index used, and lengths[ii] is the length associated 
     # with the current auxiliary.
     inds = list(range(lim + 1, lim + lengths[ii] + 1))
+    # below assign the indices 'inds' to their corresponding aux 
+    # keys in i. e.g. , if auxillaries[ii] at beginning where ii==0
+    # is 'inc', the indices associated with 'inc' are stored as a list in i['aux']['inc']
     i['aux'][auxillaries[ii]] = inds
     # lim is updated to last index in inds to make sure the next aux
     # category will start from the next available index.
@@ -40,7 +43,7 @@ for ii in range(len(auxillaries)): # loop over however many auxillaries there ar
 i['nx'] = lim
 
 
-
+# store selectors and aggregators
 sel = {}
 agg = {}
 # --- Incidence
@@ -54,9 +57,8 @@ tmp = np.zeros((i['nstates'], i['nstates']))
 tmp[s['everyI'], :] = 1
 sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
 
-# Create empty dictionaries to store selectors and aggregators
 
-# --- Incidence
+#~~~~~~~~~incidence sources
 
 # From recent infection
 tmp = np.zeros((i['nstates'], i['nstates']))

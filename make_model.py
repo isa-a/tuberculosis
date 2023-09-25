@@ -177,7 +177,7 @@ def make_model(p, r, i, s, gps):
   
     m = np.zeros(i['nstates'])
     # Set values in m at indices specified for infectious states to beta val
-    m[s['everyI']] = 22.840 # WILL BE BETA ONCE OTHER SCRIPTS ARE COMPLETE
+    m[s['everyI']] = 23.9410 # WILL BE BETA ONCE OTHER SCRIPTS ARE COMPLETE
 
     # Create a sparse diagonal matrix 'M.lam' from 'm'
     #M_lam = csr_matrix(m).toarray()
