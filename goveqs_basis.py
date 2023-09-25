@@ -52,6 +52,21 @@ out[s['for']] += vec.reshape(-1, 1)
 
 # aux
 
+out[i['aux']['inc']] = agg['inc'] @ (sel['inc'] * allmat) @ invec.reshape(-1, 1)
+
+out[i['aux']['sources'][0]] = np.sum((sel['Lf2I'] * allmat) @ invec.reshape(-1, 1))
+
+out[i['aux']['sources'][1]] = np.sum((sel['Pf2I'] * allmat) @ invec.reshape(-1, 1))
+
+out[i['aux']['sources'][2]] = np.sum((sel['Ls2I'] * allmat) @ invec.reshape(-1, 1))
+
+out[i['aux']['sources'][3]] = np.sum((sel['Ps2I'] * allmat) @ invec.reshape(-1, 1))
+
+out[i['aux']['sources'][4]] = np.sum((sel['R2I'] * allmat) @ invec.reshape(-1, 1))
+
+out[i['aux']['mort']] = np.sum(morts[:, 1])
+
+
 
 
 

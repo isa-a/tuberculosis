@@ -14,7 +14,7 @@ out(1:i.nstates) = allmat*invec;
 morts = M.mort.*invec;
 out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
 
-allmorts = sum(morts(:));
+allmorts = sum(morts(:));*
 births = p.birth*allmorts;
 out(i.U.dom) = out(i.U.dom) + births;
 
