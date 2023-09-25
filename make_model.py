@@ -23,7 +23,7 @@ def get_states_for_born(i, born):
 
 
 
-def make_model():
+def make_model(p, r, i, s, gps):
     M = {}
     m = np.zeros((i['nstates'], i['nstates'])) # construct matrix
     for born in gps_born:
