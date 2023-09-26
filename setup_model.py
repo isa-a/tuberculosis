@@ -7,7 +7,7 @@ Created on Mon Sep 18 18:54:00 2023
 from get_addresses import get_addresses
 import numpy as np
 from scipy.sparse import csr_matrix, dia_matrix
-from get_dist import get_distribution_fns
+from get_dist import get_dist
 
 
 # combining states and born will be used as groups in get_addresses
@@ -160,12 +160,12 @@ data = {
     'p_LTBI': [0.15, 0.2, 0.25]
 }
 
-f1a = get_distribution_fns(data['incd2010'], 'lognorm')
-f1b = get_distribution_fns(data['incd2020'], 'lognorm')
-f2 = get_distribution_fns(data['mort'], 'lognorm')
-f3 = get_distribution_fns(data['p_migrTB'], 'beta')
-f4 = get_distribution_fns(data['p_migrpopn'], 'beta')
-f5 = get_distribution_fns(data['p_LTBI'], 'beta')
+f1a = get_dist(data['incd2010'], 'lognorm')
+f1b = get_dist(data['incd2020'], 'lognorm')
+f2 = get_dist(data['mort'], 'lognorm')
+f3 = get_dist(data['p_migrTB'], 'beta')
+f4 = get_dist(data['p_migrpopn'], 'beta')
+f5 = get_dist(data['p_LTBI'], 'beta')
 
 
 # Define the likelihood function

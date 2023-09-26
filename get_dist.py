@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 from scipy.stats import lognorm, beta
 
-def get_distribution_fns(prctiles, distribution, visualizing=False):
+def get_dist(prctiles, distribution, visualizing=False):
     # Sort the percentiles
     dat = sorted(prctiles)
     
