@@ -7,6 +7,8 @@ Created on Sun Sep 24 13:29:40 2023
 
 from setup_model import p,r,xi
 
+
+
 def allocate_parameters(x, p, r, xi):
     r['beta'] = x[xi['beta'][0]]
     p['betadec'] = x[xi['betadec'][0]]

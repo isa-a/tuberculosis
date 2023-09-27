@@ -121,12 +121,21 @@ free_params = ['beta', 'betadec', 'gamma', 'p_birth', 'p_kLf']
 param_lengths = [1,         1,         1,       1,          1]
 
 
+# give indices to parameters for later allocation
 limit = -1
 xi = {}
 
-for ii in range(len(free_params)):
+for ii in range(len(free_params)): #iterate over each free param
+    # calculate list of indices for current param. in this case, it would 
+    # start with zero (limit + 1) and ends with limit + param_lengths[ii] + 1, 
+    # where param_lengths[ii] is how many indices it occupies (1 each here). 
+    # essentially assigns a range of indices to each parameter, ensuring that they do not overlap.
     indices = list(range(limit + 1, limit + param_lengths[ii] + 1))
+    # matches param name with list of indices calculated in previous step. 
+    # stores this mapping in the xi dictionary.
     xi[free_params[ii]] = indices
+    # updates the limit to the index where it left off. 
+    # making sure the next param will receive indices that dont overlap
     limit = indices[-1]
 
 prm = {}
@@ -149,44 +158,3 @@ ref['s'] = s
 ref['xi'] = xi
 
 
-# ~~~~~~~~~~~~~~~~~~~~~data 
-
-data = {
-    'incd2010': [14.1, 14.6, 15.1],
-    'incd2020': [6.5, 7, 7.5],
-    'mort': [0.28, 0.3, 0.32],
-    'p_migrTB': [0.708, 0.728, 0.748],
-    'p_migrpopn': [0.138, 0.168, 0.198],
-    'p_LTBI': [0.15, 0.2, 0.25]
-}
-
-f1a = get_dist(data['incd2010'], 'lognorm')
-f1b = get_dist(data['incd2020'], 'lognorm')
-f2 = get_dist(data['mort'], 'lognorm')
-f3 = get_dist(data['p_migrTB'], 'beta')
-f4 = get_dist(data['p_migrpopn'], 'beta')
-f5 = get_dist(data['p_LTBI'], 'beta')
-
-
-# Define the likelihood function
-def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI):
-    likelihood = (
-        np.sum(f1a(np.array(incd2010))) +
-        np.sum(f1b(np.array(incd2020))) +
-        np.sum(f2(np.array(mort))) +
-        np.sum(f3(np.array(p_migrTB))) +
-        np.sum(f4(np.array(p_migrpopn))) +
-        np.sum(f5(np.array(p_LTBI)))
-    )
-    return likelihood
-
-# Example usage with data as lists or arrays
-incd2010 = [14.1, 14.6, 15.1]
-incd2020 = [6.5, 7, 7.5]
-mort = [0.28, 0.3, 0.32]
-p_migrTB = [0.708, 0.728, 0.748]
-p_migrpopn = [0.138, 0.168, 0.198]
-p_LTBI = [0.15, 0.2, 0.25]
-
-likelihood = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
-print(likelihood)
