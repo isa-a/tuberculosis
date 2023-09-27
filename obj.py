@@ -77,9 +77,8 @@ def get_objective(x, ref, prm, gps, calfn):
     p_migrpopn = np.sum(sfin[s['for']]) / np.sum(sfin[:i['nstates']])
     
     if np.any(incd > 0.1):
-        
-        #out = add likelihood function here 
-        
+        #out = calfn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
+        out = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
         # add to the auxillaries with calculated values
         aux = {
             'soln': soln0,
