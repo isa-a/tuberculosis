@@ -8,7 +8,7 @@ Created on Wed Sep 27 21:21:26 2023
 import numpy as np
 import numpy.random as npr
 from scipy.stats import multivariate_normal
-from setup_model import i,s,d,lim,r,p,agg,sel,ref,xi,prm,gps_born,likelihood
+from setup_model import i,s,lim,r,p,agg,sel,ref,xi,prm,gps_born,likelihood
 from obj import get_objective
 
 
@@ -22,7 +22,9 @@ p_LTBI = [0.15, 0.2, 0.25]
 
 F = lambda x: get_objective(x, ref, prm, gps_born, likelihood)
 
-
+x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930]
+n,sigma,fixinds,blockind=50000,1,[],[],[]
+cov0=[]
 
 def MCMC_adaptive(F, x0, n, sigma, fixinds, blockind, cov0, displ):
     d = len(x0)
@@ -53,7 +55,7 @@ def MCMC_adaptive(F, x0, n, sigma, fixinds, blockind, cov0, displ):
 
     xsto[:, 0] = x0[:]
     xbar = xsto.copy()
-    FX = F(x0)
+    FX = F(x0)[0]
     outsto[0] = FX
     acc = 0
 
