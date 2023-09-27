@@ -94,4 +94,4 @@ def get_objective(x, ref, prm, gps, calfn):
         out = -np.inf
         aux = np.nan
         
-        return out, aux
+    return out, aux

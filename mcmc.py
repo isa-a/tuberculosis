@@ -20,7 +20,7 @@ p_migrTB = [0.708, 0.728, 0.748]
 p_migrpopn = [0.138, 0.168, 0.198]
 p_LTBI = [0.15, 0.2, 0.25]
 
-FX = lambda x: get_objective(x, ref, prm, gps_born, likelihood)
+F = lambda x: get_objective(x, ref, prm, gps_born, likelihood)
 
 
 
@@ -112,3 +112,4 @@ def MCMC_adaptive(F, x0, n, sigma, fixinds, blockind, cov0, displ):
 
     accept_rate = acc / n
     return xsto, outsto, history, accept_rate
+
