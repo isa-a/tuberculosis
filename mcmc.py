@@ -11,7 +11,6 @@ from scipy.stats import multivariate_normal
 from setup_model import i,s,lim,r,p,agg,sel,ref,xi,prm,gps_born,likelihood
 from obj import get_objective
 
-
 # Example usage with data as lists or arrays
 incd2010 = [14.1, 14.6, 15.1]
 incd2020 = [6.5, 7, 7.5]
@@ -23,8 +22,8 @@ p_LTBI = [0.15, 0.2, 0.25]
 F = lambda x: get_objective(x, ref, prm, gps_born, likelihood)
 
 x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930]
-n,sigma,fixinds,blockind=50000,1,[],[],[]
-cov0=[]
+n,sigma,fixinds,blockind=10,1,[],[]
+cov0=None
 
 def MCMC_adaptive(F, x0, n, sigma, fixinds, blockind, cov0, displ):
     d = len(x0)
@@ -46,6 +45,7 @@ def MCMC_adaptive(F, x0, n, sigma, fixinds, blockind, cov0, displ):
 
     cov0[:blockind, blockind:] = 0
     cov0[blockind:, :blockind] = 0
+
     
 
     # Initialize output matrices
@@ -89,7 +89,7 @@ def MCMC_adaptive(F, x0, n, sigma, fixinds, blockind, cov0, displ):
 
             # --- Decide whether to accept or not
             FY = F(Y)
-            if (npr.rand() < np.exp(FY - FX)) and (abs(FY) < np.inf):
+            if (npr.rand() < np.exp(FY - (-72.7197))) and (abs(FY) < np.inf):
                 # Accept
                 xsel = Y[:]
                 FX = FY
