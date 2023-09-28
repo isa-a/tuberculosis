@@ -58,13 +58,6 @@ def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
         if displ:
             print(f'Iteration {t} of {n} ({t/n*100:.1f}% complete)')
 
-        
-        
-        # if displ and t % (n // 25) == 0:
-        #     print(f"Progress: {t / n * 25:.2f}%")
-        # if displ and t % 200 == 0:
-        #     pass  # Plotting code here if needed
-
     accept_rate = acc / n
 
     return xsto, outsto, history, accept_rate
@@ -91,4 +84,33 @@ cov0 = np.eye(len(x0))
 # Run the MCMC algorithm
 xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
 
-# You can now analyze the results in the variables xsto, outsto, history, and accept_rate
+
+
+
+
+import matplotlib.pyplot as plt
+
+# Assuming 'samples' is a NumPy array with shape (n_iterations, n_parameters)
+n_iterations, n_parameters = xsto.shape
+
+# Create a figure with subplots for each parameter
+fig, axes = plt.subplots(n_parameters, figsize=(8, 2 * n_parameters), sharex=True, dpi=800)
+
+# Loop over each parameter and plot its trace
+for i in range(n_parameters):
+    ax = axes[i]
+    parameter_trace = xsto[:, i]  # Extract the trace for the i-th parameter
+    ax.plot(parameter_trace, color='b', alpha=0.7, label=f'Parameter {i + 1}')
+    ax.set_ylabel(f'Parameter {i + 1}')
+    ax.axhline(y=parameter_trace.mean(), color='r', linestyle='--', label='Mean')
+    ax.legend()
+
+# Add a common x-axis label (assuming the x-axis represents iterations)
+axes[-1].set_xlabel('Iteration')
+
+# Adjust spacing between subplots
+plt.tight_layout()
+
+# Show the trace plot
+plt.show()
+

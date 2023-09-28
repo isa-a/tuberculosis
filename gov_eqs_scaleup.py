@@ -8,7 +8,7 @@ Created on Tue Jun 14 13:33:40 2023
 import numpy as np
 from goveqs_basis import goveqs_basis2
 from allocate import allocate_parameters
-from setup_model import r,p,gps_born,i,s
+from setup_model import i,s,d,lim,r,p,agg,sel,ref,xi,prm,gps_born
 from make_model import make_model
 
 
@@ -16,11 +16,13 @@ from make_model import make_model
 times = [2022, 2025]
 t=np.arange(2022, 2037)
 
-p['migrTPT'] = 0
-p1 = p
-r1 = r
-p1['migrTPT'] = 1
+p0, r0 = allocate_parameters(x0, p, r, xi)
 M0 = make_model(p, r, i, s, gps_born)
+
+
+p['migrTPT'] = 0
+p1, r1 = p0, r0
+p1['migrTPT'] = 1
 M1 = make_model(p1, r1, i, s, gps_born)
 
 
@@ -38,3 +40,38 @@ def goveqs_scaleup(t, insert, i, s, M0, M1, p0, p1, times, agg, sel, r):
     out = goveqs_basis2(t, insert, i, s, Ms, agg, sel, r, ps)
     
     return out
+
+
+
+import numpy as np
+from scipy.integrate import odeint
+
+models = {'M0': M0,
+          'M1': M1}
+
+# Define the differential equation function geq
+def geq(t, in_):
+    return goveqs_scaleup(t, insert, i, s, M0, models[mi], p0, p1, times, agg, sel, r)
+
+
+# Initialize arrays to store results
+incsto = np.zeros((len(t) - 1, len(models)))
+mrtsto = np.zeros((len(t) - 1, len(models)))
+props = np.zeros((len(models), len(i['aux']['sources'])))
+
+# Loop through different models
+for mi, model in enumerate(models):
+    for ii in range(len(t) - 1):
+        t=np.arange(2022, 2037)
+        soln = odeint(geq, init, t).flatten()
+
+        # Calculate differences between consecutive rows of soln
+        sdiff = np.diff(soln, axis=0)
+        
+        # Store incidence and mortality in the corresponding arrays
+        incsto[:, ii, mi] = sdiff[:, i.aux.inc[0]] * 1e5
+        mrtsto[:, ii, mi] = sdiff[:, i.aux.mort] * 1e5
+        
+        # Calculate proportions from different sources
+        vec = sdiff[-1, i.aux.incsources] * 1e5
+        props[mi, :, ii] = vec / np.sum(vec)
