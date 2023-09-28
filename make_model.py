@@ -11,7 +11,6 @@ from scipy.sparse import dia_matrix, csr_matrix, diags
 
 states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
 gps_born = ['dom', 'for']
-r['gamma'] = 5
 
 
 def get_states_for_born(i, born):
@@ -107,23 +106,23 @@ def make_model(p, r, i, s, gps):
         # Initiation of TPT
         source = Lf
         destin = Pf
-        rate = 0.0001 # Replace with a random number
+        rate = r['TPT'][0] # Replace with a random number
         m[destin, source] += rate
     
         source = Ls
         destin = Ps
-        rate = 0.0001  # Replace with a random number
+        rate = r['TPT'][0]  # Replace with a random number
         m[destin, source] += rate
     
         # Case-finding
         sources = [I, I2]
         destin = Tx
-        rate = 0.0001  # Replace with a random number
+        rate = r['ACF'][0]  # Replace with a random number
         m[destin, sources] += rate
     
         source = I2
         destin = Tx
-        rate = 0.0001  # Replace with a random number
+        rate = r['ACF2'][0]   # Replace with a random number
         m[destin, source] += rate
         
     # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
@@ -177,7 +176,7 @@ def make_model(p, r, i, s, gps):
   
     m = np.zeros(i['nstates'])
     # Set values in m at indices specified for infectious states to beta val
-    m[s['everyI']] = 23.9410 # WILL BE BETA ONCE OTHER SCRIPTS ARE COMPLETE
+    m[s['everyI']] = r['beta'] # WILL BE BETA ONCE OTHER SCRIPTS ARE COMPLETE
 
     # Create a sparse diagonal matrix 'M.lam' from 'm'
     #M_lam = csr_matrix(m).toarray()

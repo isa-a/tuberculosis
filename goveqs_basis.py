@@ -21,7 +21,7 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     # lambda with declining beta process over time
     # will be scalar
-    lam = make_model(p, r, i, s, gps)['lam'] @ (invec.reshape(-1,1)) / np.sum(invec.reshape(-1,1)) * (1 - 0.1473) ** np.maximum((t - 2010), 0)
+    lam = make_model(p, r, i, s, gps)['lam'] @ (invec.reshape(-1,1)) / np.sum(invec.reshape(-1,1)) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
     
     # full specification of the model
     # allmat is 22x22, invec.T is 22x1
@@ -37,18 +37,18 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     # and births
     allmorts = np.sum(morts)
-    births = 0.7268 * allmorts
+    births = p['birth'] * allmorts
     # add births to uninfected compartment
     out[i[('U', 'dom')]] += births
     
     # subset of state vec selecting all domestic
     vec = invec[s['dom']]
     # 1 - migrant tpt
-    vec[1:3] = vec[1:3] * 12.3779 * (1 - 0)
+    vec[1:3] = vec[1:3] * p['p_kLf'] * (1 - p['migrTPT'])
     # migrant tpt
-    vec[3:5] = vec[3:5] * 12.3779 * 0
+    vec[3:5] = vec[3:5] * p['p_kLf'] * p['migrTPT']
     # 1- p.birth * allmorts
-    vec = vec / sum(vec) * (1 - 0.7268) * allmorts
+    vec = vec / sum(vec) * (1 - p['birth']) * allmorts
     out[s['for']] += vec.reshape(-1, 1)
     
     

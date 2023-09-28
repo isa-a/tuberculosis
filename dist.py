@@ -60,7 +60,3 @@ def get_distribution_fns(data, distribution, show=True):
         plt.show()
 
     return
-
-
-# Example usage:
-get_distribution_fns(data['p_migrTB'], 'beta')

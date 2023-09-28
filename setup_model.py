@@ -173,7 +173,7 @@ f1a = get_dist(data['incd2010'], 'lognorm')
 f1b = get_dist(data['incd2020'], 'lognorm')
 f2 = get_dist(data['mort'], 'lognorm')
 f3 = get_dist(data['p_migrTB'], 'beta')
-f4 = get_dist(data['p_migrpopn'], 'beta')
+f4 = get_dist(data['p_migrpopn'], 'lognorm')
 f5 = get_dist(data['p_LTBI'], 'beta')
 
 

@@ -31,12 +31,11 @@ def MCMC_adaptive(F, x0, n, sigma, fixinds, blockind, cov0, displ):
     sd = sigma * (2.4**2) / d
     
     if fixinds is None:
-        fixinds = []
-        inds = fixinds[0]
-        vals = fixinds[1]
-    else:
         inds = []
         vals = []
+    else:
+        inds = fixinds[0]
+        vals = fixinds[1]
 
     # Checks on the initial covariance matrix
     if cov0 is None:
@@ -89,7 +88,7 @@ def MCMC_adaptive(F, x0, n, sigma, fixinds, blockind, cov0, displ):
 
             # --- Decide whether to accept or not
             FY = F(Y)
-            if (npr.rand() < np.exp(FY - (-72.7197))) and (abs(FY) < np.inf):
+            if (npr.rand() < np.exp(FY - FX)) and (abs(FY) < np.inf):
                 # Accept
                 xsel = Y[:]
                 FX = FY

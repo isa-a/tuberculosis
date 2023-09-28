@@ -11,6 +11,7 @@ from scipy.integrate import odeint
 from setup_model import i,s,lim,r,p,agg,sel,ref,xi,prm,gps_born,likelihood
 from obj import get_objective
 from pyDOE2 import lhs
+from mcmc import MCMC_adaptive
 
 
 gps, lhd = gps_born,likelihood
@@ -22,7 +23,7 @@ nobj = lambda x: -obj(x)
 
 # Number of samples
 nsam = int(10)
-mk = int(nsam / 25)
+mk = int(100 / 25)
 
 # Set the number of samples
 nsam = 10
@@ -39,63 +40,12 @@ lhs_samples = lhs(len(param_names), samples=nsam)
 xsam = np.zeros((nsam, len(param_names)))
 for i in range(len(param_names)):
     xsam[:, i] = param_min_values[i] + lhs_samples[:, i] * (param_max_values[i] - param_min_values[i])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Generate Latin Hypercube Samples
-num_vars = len(prm['bounds'])
-
-# Generate Latin Hypercube samples
-xsam = np.zeros((nsam, num_vars))
-param_names = list(prm['bounds'].keys())
-
-xsam_list = []
-
-for param_name in param_names:
-    param_min, param_max = prm['bounds'][param_name]
-    param_samples = param_min + np.diff([param_min, param_max]) * lhs(num_vars, samples=nsam)
-    xsam_list.append(param_samples)
-
-# Concatenate the parameter samples to form xsam
-xsam = np.concatenate(xsam_list, axis=1)    
-    
-xsam = prm['bounds'][0] + np.diff(prm['bounds']) * lhs(num_vars, samples=nsam)
-xsam = prm['bounds'][0] + np.diff(prm['bounds']) * lhs(num_vars, samples=nsam)
 outs = np.zeros(nsam)
 
 for ii in range(nsam):
     if ii % mk == 0:
         print(f'{ii / mk:.5g} ', end='')
-    outs[ii] = obj(xsam[ii])
+    outs[ii] = obj(xsam[ii])[0]
     
     
 # Order by fit
@@ -108,9 +58,10 @@ xord = xsam[ord - 1, :]
 from scipy.optimize import fmin
 
 x0 = fmin(nobj, xord[0, :], disp=False)
+x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930]
 
 # Perform MCMC
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, int(5e4), 1, None, None, None, True)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, int(100), 1, None, None, None, True)
 
 # Find indices of max outsto
 inds = np.where(outsto == np.max(outsto))[0]
