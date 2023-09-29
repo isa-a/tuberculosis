@@ -46,6 +46,8 @@ i['nx'] = lim
 # store selectors and aggregators
 sel = {}
 agg = {}
+
+
 # --- Incidence
 tmp = np.zeros((3, i['nstates']))
 tmp[0, s['everyI']] = 1
@@ -62,28 +64,37 @@ sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms a
 
 # From recent infection
 tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[0, s['everyI']] = 1
+for i_idx in s['everyI']:
+    for j_idx in s['Lf']:
+        tmp[i_idx, j_idx] = 1
 sel['Lf2I'] = tmp - np.diag(np.diag(tmp))
 
 # From recent infection, TPT
 tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[1, s['everyI']] = 1
+for i_idx in s['everyI']:
+    for j_idx in s['Pf']:
+        tmp[i_idx, j_idx] = 1
 sel['Pf2I'] = tmp - np.diag(np.diag(tmp))
 
 # From remote infection
 tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[0, s['everyI']] = 1
+for i_idx in s['everyI']:
+    for j_idx in s['Ls']:
+        tmp[i_idx, j_idx] = 1
 sel['Ls2I'] = tmp - np.diag(np.diag(tmp))
 
 # From remote infection, TPT
 tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[1, s['everyI']] = 1
+for i_idx in s['everyI']:
+    for j_idx in s['Ps']:
+        tmp[i_idx, j_idx] = 1
 sel['Ps2I'] = tmp - np.diag(np.diag(tmp))
 
 # From relapse
 tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[0, s['everyI']] = 1
-tmp[1, [s['R'][0], s['Rlo'][0], s['Rhi'][0]]] = 1
+for i_idx in s['everyI']:
+    for j_idx in [s['R'], s['Rlo'], s['Rhi']]:
+        tmp[i_idx, j_idx] = 1
 sel['R2I'] = tmp - np.diag(np.diag(tmp))
 
 
@@ -199,3 +210,4 @@ p_LTBI = [0.15, 0.2, 0.25]
 
 likelihood = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
 print(likelihood)
+

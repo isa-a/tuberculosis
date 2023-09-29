@@ -11,7 +11,7 @@ from scipy.integrate import odeint
 from setup_model import i,s,lim,r,p,agg,sel,ref,xi,prm,gps_born,likelihood
 from obj import get_objective
 from pyDOE2 import lhs
-from mcmc import MCMC_adaptive
+from mcmc2 import MCMC_adaptive
 
 
 gps, lhd = gps_born,likelihood
@@ -22,11 +22,11 @@ obj = lambda x: get_objective(x, ref, prm, gps, lhd)
 nobj = lambda x: -obj(x)
 
 # Number of samples
-nsam = int(10)
-mk = int(100 / 25)
+nsam = int(100)
+mk = int(nsam / 25)
 
 # Set the number of samples
-nsam = 10
+nsam = 100
 
 # Extract parameter names and bounds
 param_names = list(prm['bounds'].keys())
@@ -45,7 +45,7 @@ outs = np.zeros(nsam)
 for ii in range(nsam):
     if ii % mk == 0:
         print(f'{ii / mk:.5g} ', end='')
-    outs[ii] = obj(xsam[ii])[0]
+    outs[ii] = obj(xsam[ii])
     
     
 # Order by fit
@@ -57,10 +57,24 @@ xord = xsam[ord - 1, :]
 # Initial optimization
 from scipy.optimize import fmin
 
-x0 = fmin(nobj, xord[0, :], disp=False)
+x0 = fmin(nobj, xord[0, :], disp=1)
 x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930]
+obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood_function)[0]
 
+cov0 = np.eye(len(x0))
 # Perform MCMC
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, nsam, 0.1, cov0)
+
+
+# Find the parameter set with the maximum log-posterior density
+inds = np.where(outsto == np.max(outsto))[0]
+x0 = xsto[inds[0], :]
+
+# Run MCMC again with updated cov0 (without blockinds or fixinds)
+cov0 = np.cov(xsto.T)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 1, cov0)
+
+
 xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, int(100), 1, None, None, None, True)
 
 # Find indices of max outsto
@@ -77,3 +91,28 @@ cov0 = np.cov(xsto)
 
 # Perform MCMC again
 xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, int(1e4), 1, None, None, cov0, True)
+
+
+# Assuming you have already run the MCMC and have xsto as the parameter samples
+nx = 50
+ix0 = xsto.shape[0] // 2
+dx = xsto.shape[0] // (2 * nx)
+xs = xsto[ix0::dx, :]
+
+mk = xs.shape[0] // 24
+sim = np.zeros((xs.shape[0], 9))  # Assuming there are 9 variables in aux
+
+for ii in range(xs.shape[0]):
+    if ii % mk == 0:
+        print("{:.5g} ".format(ii // mk), end="")
+
+    x = xs[ii, :]
+    out, aux = obj(x)  # Assuming obj is your objective function
+    # Access the values in aux using keys
+    sim[ii, 0] = aux['incd'][0]  # Change this to the correct key for incd
+    sim[ii, 1] = aux['mort']
+    sim[ii, 2] = aux['p_migrTB']
+    sim[ii, 3] = aux['p_migrpopn']
+    sim[ii, 4] = aux['p_LTBI']
+
+print('\n')

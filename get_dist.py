@@ -67,7 +67,7 @@ def get_dist(prctiles, distribution, visualizing=True):
             plt.axvline(x=d, linestyle='--', color='gray')
         plt.show()
     
-    return logfn
+    return logfn, out, aux
 
 # Example usage:
 # prctiles = [2.5, 50, 97.5]

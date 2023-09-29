@@ -83,8 +83,71 @@ sigma = 0.1
 # Optionally, specify the initial covariance matrix (cov0)
 cov0 = np.eye(len(x0))
 
+# Initial MCMC run
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
+
+# Find the parameter set with the maximum log-posterior density
+inds = np.where(outsto == np.max(outsto))[0]
+x0 = xsto[inds[0], :]
+
+# Run MCMC again with updated cov0 (without blockinds or fixinds)
+cov0 = np.cov(xsto.T)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Run the MCMC algorithm
 xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
+
+
+
+
+
+
+
+
+
 
 
 
