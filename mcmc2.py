@@ -6,7 +6,12 @@ Created on Thu Sep 28 21:21:49 2023
 """
 
 import numpy as np
+from obj import get_objective
+from setup_model import r,p,agg,sel,ref,xi,prm,gps_born,likelihood_function
+import numba as nb
 
+
+@nb.jit
 def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
     d = len(x0)
     b = 0.05
@@ -56,7 +61,7 @@ def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
 
         # Display options
         if displ:
-            print(f'Iteration {t} of {n} ({t/n*100:.1f}% complete)')
+            print('Iteration', t, 'of', n, '({:.1f}% complete)'.format(t/n*100))
 
     accept_rate = acc / n
 
@@ -64,16 +69,13 @@ def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
 
 
 
-# Define your log-posterior density function F
-def log_posterior(x):
-    # Replace this with your actual log-posterior calculation
-    return -0.5 * np.sum(x**2)
+obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood_function)[0]
 
 # Initial parameter set x0
 x0 = [21.2257, 0.1499, 5.0908, 0.788, 21.493]
 
 # Number of iterations
-n = 1000
+n = 50
 
 # Proposal standard deviation (sigma)
 sigma = 0.1
