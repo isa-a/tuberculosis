@@ -8,8 +8,6 @@
 import numpy as np
 from setup_model import i,s,d,lim,r,p,agg,sel,ref,xi,prm,gps_born
 from make_model import make_model
-gps = gps_born
-
 
 
 def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
@@ -21,17 +19,17 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     # lambda with declining beta process over time
     # will be scalar
-    lam = make_model(p, r, i, s, gps)['lam'] @ (invec.reshape(-1,1)) / np.sum(invec.reshape(-1,1)) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
+    lam = make_model(p, r, i, s, gps_born)['lam'] @ (invec.reshape(-1,1)) / np.sum(invec.reshape(-1,1)) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
     
     # full specification of the model
     # allmat is 22x22, invec.T is 22x1
-    allmat = make_model(p, r, i, s, gps)['lin'] + (lam * make_model(p, r, i, s, gps)['nlin'])
+    allmat = make_model(p, r, i, s, gps_born)['lin'] + (lam * make_model(p, r, i, s, gps_born)['nlin'])
     # again just the compartments of the model
     # full model times state vec gives 22x1
     out[:i['nstates']] = np.dot(allmat, invec.reshape(-1, 1))
     
     # mortality
-    morts = make_model(p, r, i, s, gps)['mort'] * invec.reshape(-1, 1)
+    morts = make_model(p, r, i, s, gps_born)['mort'] * invec.reshape(-1, 1)
     # substract mortality from the states
     out[:i['nstates']] -= np.sum(morts, axis=1).reshape(-1, 1)
     

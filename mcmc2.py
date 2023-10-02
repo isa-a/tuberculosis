@@ -8,10 +8,8 @@ Created on Thu Sep 28 21:21:49 2023
 import numpy as np
 from obj import get_objective
 from setup_model import r,p,agg,sel,ref,xi,prm,gps_born,likelihood_function
-import numba as nb
 
 
-@nb.jit
 def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
     d = len(x0)
     b = 0.05
@@ -69,30 +67,30 @@ def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
 
 
 
-obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood_function)[0]
+# obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood_function)[0]
 
-# Initial parameter set x0
-x0 = [21.2257, 0.1499, 5.0908, 0.788, 21.493]
+# # Initial parameter set x0
+# x0 = [21.2257, 0.1499, 5.0908, 0.788, 21.493]
 
-# Number of iterations
-n = 50
+# # Number of iterations
+# n = 50
 
-# Proposal standard deviation (sigma)
-sigma = 0.1
+# # Proposal standard deviation (sigma)
+# sigma = 0.1
 
-# Optionally, specify the initial covariance matrix (cov0)
-cov0 = np.eye(len(x0))
+# # Optionally, specify the initial covariance matrix (cov0)
+# cov0 = np.eye(len(x0))
 
-# Initial MCMC run
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
+# # Initial MCMC run
+# xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
 
-# Find the parameter set with the maximum log-posterior density
-inds = np.where(outsto == np.max(outsto))[0]
-x0 = xsto[inds[0], :]
+# # Find the parameter set with the maximum log-posterior density
+# inds = np.where(outsto == np.max(outsto))[0]
+# x0 = xsto[inds[0], :]
 
-# Run MCMC again with updated cov0 (without blockinds or fixinds)
-cov0 = np.cov(xsto.T)
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
+# # Run MCMC again with updated cov0 (without blockinds or fixinds)
+# cov0 = np.cov(xsto.T)
+# xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
 
 
 
@@ -138,7 +136,7 @@ xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
 
 
 # Run the MCMC algorithm
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
+# xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
 
 
 
@@ -153,29 +151,29 @@ xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, n, sigma, cov0)
 
 
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
-# Assuming 'samples' is a NumPy array with shape (n_iterations, n_parameters)
-n_iterations, n_parameters = xsto.shape
+# # Assuming 'samples' is a NumPy array with shape (n_iterations, n_parameters)
+# n_iterations, n_parameters = xsto.shape
 
-# Create a figure with subplots for each parameter
-fig, axes = plt.subplots(n_parameters, figsize=(8, 2 * n_parameters), sharex=True, dpi=800)
+# # Create a figure with subplots for each parameter
+# fig, axes = plt.subplots(n_parameters, figsize=(8, 2 * n_parameters), sharex=True, dpi=800)
 
-# Loop over each parameter and plot its trace
-for i in range(n_parameters):
-    ax = axes[i]
-    parameter_trace = xsto[:, i]  # Extract the trace for the i-th parameter
-    ax.plot(parameter_trace, color='b', alpha=0.7, label=f'Parameter {i + 1}')
-    ax.set_ylabel(f'Parameter {i + 1}')
-    ax.axhline(y=parameter_trace.mean(), color='r', linestyle='--', label='Mean')
-    ax.legend()
+# # Loop over each parameter and plot its trace
+# for i in range(n_parameters):
+#     ax = axes[i]
+#     parameter_trace = xsto[:, i]  # Extract the trace for the i-th parameter
+#     ax.plot(parameter_trace, color='b', alpha=0.7, label=f'Parameter {i + 1}')
+#     ax.set_ylabel(f'Parameter {i + 1}')
+#     ax.axhline(y=parameter_trace.mean(), color='r', linestyle='--', label='Mean')
+#     ax.legend()
 
-# Add a common x-axis label (assuming the x-axis represents iterations)
-axes[-1].set_xlabel('Iteration')
+# # Add a common x-axis label (assuming the x-axis represents iterations)
+# axes[-1].set_xlabel('Iteration')
 
-# Adjust spacing between subplots
-plt.tight_layout()
+# # Adjust spacing between subplots
+# plt.tight_layout()
 
-# Show the trace plot
-plt.show()
+# # Show the trace plot
+# plt.show()
 

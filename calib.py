@@ -14,19 +14,15 @@ from pyDOE2 import lhs
 from mcmc2 import MCMC_adaptive
 
 
-gps, lhd = gps_born,likelihood
 
 # Objectives
 # Objectives
-obj = lambda x: get_objective(x, ref, prm, gps, lhd)
+obj = lambda x: get_objective(x, ref, prm, gps_born, likelihood)[0]
 nobj = lambda x: -obj(x)
 
 # Number of samples
-nsam = int(100)
+nsam = int(1000)
 mk = int(nsam / 25)
-
-# Set the number of samples
-nsam = 100
 
 # Extract parameter names and bounds
 param_names = list(prm['bounds'].keys())
@@ -59,11 +55,12 @@ from scipy.optimize import fmin
 
 x0 = fmin(nobj, xord[0, :], disp=1)
 x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930]
-obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood_function)[0]
+obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood)[0]
+obj2 = lambda x: get_objective(x, ref, prm, gps_born,likelihood)
 
 cov0 = np.eye(len(x0))
 # Perform MCMC
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, nsam, 0.1, cov0)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 10000, 0.1, cov0)
 
 
 # Find the parameter set with the maximum log-posterior density
@@ -72,25 +69,12 @@ x0 = xsto[inds[0], :]
 
 # Run MCMC again with updated cov0 (without blockinds or fixinds)
 cov0 = np.cov(xsto.T)
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 1, cov0)
-
-
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, int(100), 1, None, None, None, True)
-
-# Find indices of max outsto
-inds = np.where(outsto == np.max(outsto))[0]
-x0 = xsto[:, inds[0]]
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 0.1, cov0)
 
 # Evaluate objective with x0
 out, aux = obj(x0)
 sfin = aux['soln'][-1, :]
-result = np.sum(sfin[np.intersect1d(sel['for'], [sel['Lf'], sel['Ls']])]) / np.sum(sfin[sel['for']])
-
-# Calculate covariance
-cov0 = np.cov(xsto)
-
-# Perform MCMC again
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, int(1e4), 1, None, None, cov0, True)
+result = np.sum(sfin[np.intersect1d(s['for'], [s['Lf'], s['Ls']])]) / np.sum(sfin[s['for']])
 
 
 # Assuming you have already run the MCMC and have xsto as the parameter samples
@@ -107,7 +91,7 @@ for ii in range(xs.shape[0]):
         print("{:.5g} ".format(ii // mk), end="")
 
     x = xs[ii, :]
-    out, aux = obj(x)  # Assuming obj is your objective function
+    out, aux = obj2(x)  # Assuming obj is your objective function
     # Access the values in aux using keys
     sim[ii, 0] = aux['incd'][0]  # Change this to the correct key for incd
     sim[ii, 1] = aux['mort']

@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 from scipy.stats import lognorm, beta
+from scipy.special import betaln
 
 def get_dist(prctiles, distribution, visualizing=True):
     # Sort the percentiles
@@ -49,7 +50,7 @@ def get_dist(prctiles, distribution, visualizing=True):
         logfn = lambda x: -((np.log(x) - mu)**2 / (2 * sigma**2)) - np.log(x * sigma * np.sqrt(2 * np.pi))
     elif distribution == 'beta':
         a, b = out[0], out[1]
-        logfn = lambda x: (a - 1) * np.log(x) + (b - 1) * np.log(1 - x) - beta.logpdf(x, a, b)
+        logfn = lambda x: (a - 1) * np.log(x) + (b - 1) * np.log(1 - x) - betaln(a, b)
     
     aux = {'sim': np.array([lognorm.cdf(d, out[1], loc=0, scale=np.exp(out[0])) if distribution == 'lognorm'
                            else beta.cdf(d, out[0], out[1], loc=0, scale=1) for d in dat]),
@@ -67,7 +68,7 @@ def get_dist(prctiles, distribution, visualizing=True):
             plt.axvline(x=d, linestyle='--', color='gray')
         plt.show()
     
-    return logfn, out, aux
+    return logfn
 
 # Example usage:
 # prctiles = [2.5, 50, 97.5]

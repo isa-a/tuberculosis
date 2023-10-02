@@ -5,12 +5,9 @@ Created on Wed Sep 13 22:20:56 2023
 @author: ISA
 """
 
-from setup_model import i,s,d,lim,r,p
+from setup_model import i,s,d,lim,r,p,states,gps_born
 import numpy as np
 from scipy.sparse import dia_matrix, csr_matrix, diags
-
-states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R']
-gps_born = ['dom', 'for']
 
 
 def get_states_for_born(i, born):
@@ -147,7 +144,7 @@ def make_model(p, r, i, s, gps):
     for born in gps_born: # iterate over where they are born e.g. dom and for
         # find indices of specified states in s that intersect with 'born'
         # Find the indices of susceptible states that intersect with 'born'
-        susinds = np.intersect1d([s[state] for state in ['U', 'Lf', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
+        susinds = np.intersect1d([s[state] for state in ['U', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
         # calculate intersection between two sets: the states in s, and where they're born
         # born in s
 
@@ -229,9 +226,9 @@ def make_model(p, r, i, s, gps):
 
 
 # # Get the indices (coordinates) of non-zero elements in 'm'
-# non_zero_indices = np.transpose(np.nonzero(make_model()[1]))
+# non_zero_indices = np.transpose(np.nonzero(M['mort']))
 
 # # Display the non-zero positions and their coordinates
 # for coord in non_zero_indices:
 #     incremented_coord = tuple(coord + 1)
-#     print(f"{incremented_coord}, Value: {make_model()[1][coord[0], coord[1]]}")
+#     print(f"{incremented_coord}, Value: {M['mort'][coord[0], coord[1]]}")

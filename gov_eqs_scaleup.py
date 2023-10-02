@@ -40,37 +40,3 @@ def goveqs_scaleup(t, insert, i, s, M0, M1, p0, p1, times, agg, sel, r):
     
     return out
 
-
-
-import numpy as np
-from scipy.integrate import odeint
-
-models = {'M0': M0,
-          'M1': M1}
-
-# Define the differential equation function geq
-def geq(t, in_):
-    return goveqs_scaleup(t, insert, i, s, M0, models[mi], p0, p1, times, agg, sel, r)
-
-
-# Initialize arrays to store results
-incsto = np.zeros((len(t) - 1, len(models)))
-mrtsto = np.zeros((len(t) - 1, len(models)))
-props = np.zeros((len(models), len(i['aux']['sources'])))
-
-# Loop through different models
-for mi, model in enumerate(models):
-    for ii in range(len(t) - 1):
-        t=np.arange(2022, 2037)
-        soln = odeint(geq, init, t).flatten()
-
-        # Calculate differences between consecutive rows of soln
-        sdiff = np.diff(soln, axis=0)
-        
-        # Store incidence and mortality in the corresponding arrays
-        incsto[:, ii, mi] = sdiff[:, i.aux.inc[0]] * 1e5
-        mrtsto[:, ii, mi] = sdiff[:, i.aux.mort] * 1e5
-        
-        # Calculate proportions from different sources
-        vec = sdiff[-1, i.aux.incsources] * 1e5
-        props[mi, :, ii] = vec / np.sum(vec)

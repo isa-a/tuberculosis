@@ -13,10 +13,6 @@ from setup_model import ref, prm, sel, agg, gps_born, likelihood_function
 from goveqs_basis import goveqs_basis2
 from get_addresses import get_addresses
 
-gps = gps_born
-# def get_objective2(x, ref, prm, gps, calfn):
-
-#     return out, aux
 def get_objective(x, ref, prm, gps, calfn):
     
     # extract dictionaries
