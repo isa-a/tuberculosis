@@ -8,11 +8,12 @@
 import numpy as np
 from setup_model import i,s,d,lim,r,p,agg,sel,ref,xi,prm,gps_born
 from make_model import make_model
+from scipy.sparse import csr_matrix
 
 
 def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
-    M = make_model(p, r, i, s, gps_born)
+    #M = make_model(p, r, i, s, gps_born)
     
     # initialise out vector used in odeint
     out = np.zeros((len(insert), 1))
@@ -22,19 +23,19 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     # lambda with declining beta process over time
     # will be scalar
-    lam = M['lam'] @ (invec) / np.sum(invec) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
-    
+    lam = (M['lam'] @ invec) / np.sum(invec) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
+
     # full specification of the model
     # allmat is 22x22, invec.T is 22x1
-    allmat = M['lin'] + (lam * M['nlin'])
+    allmat = M['lin'] + (lam[0,0] * M['nlin'])
     # again just the compartments of the model
     # full model times state vec gives 22x1
-    out[:i['nstates']] = np.dot(allmat, invec)
+    out[:i['nstates'], 0] = allmat @ invec[:,0]
     
     # mortality
-    morts = M['mort'] * invec
+    morts = M['mort'].multiply(invec)
     # substract mortality from the states
-    out[:i['nstates']] -= np.sum(morts, axis=1).reshape(-1, 1)
+    out[:i['nstates'], 0] -= np.array(morts.sum(axis=1)).flatten()
     
     # and births
     allmorts = np.sum(morts)
@@ -43,7 +44,8 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     out[i[('U', 'dom')]] += births
     
     # subset of state vec selecting all domestic
-    vec = invec[s['dom']]
+    #vec = invec[s['dom']]
+    vec = invec[s['dom']].flatten()
     # 1 - migrant tpt
     vec[1:3] = vec[1:3] * p['p_kLf'] * (1 - p['migrTPT'])
     # migrant tpt
@@ -55,19 +57,23 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     # aux
     
-    out[i['aux']['inc']] = agg['inc'] @ (sel['inc'] * allmat) @ invec
+    out[i['aux']['inc'], 0] = (agg['inc'] @ (sel['inc'] * allmat) @ invec)[0,0]
+    #out[i['aux']['inc']] = agg['inc'] @ (sel['inc'] * allmat) @ invec
     
-    out[i['aux']['sources'][0]] = np.sum((sel['Lf2I'] * allmat) @ invec)
+    for j, key in enumerate(['Lf2I', 'Pf2I', 'Ls2I', 'Ps2I', 'R2I']):
+        out[i['aux']['sources'][j], 0] = (csr_matrix(sel[key]).multiply(allmat) @ invec).sum()
     
-    out[i['aux']['sources'][1]] = np.sum((sel['Pf2I'] * allmat) @ invec)
+    # out[i['aux']['sources'][0]] = np.sum((sel['Lf2I'] * allmat) @ invec)
     
-    out[i['aux']['sources'][2]] = np.sum((sel['Ls2I'] * allmat) @ invec)
+    # out[i['aux']['sources'][1]] = np.sum((sel['Pf2I'] * allmat) @ invec)
     
-    out[i['aux']['sources'][3]] = np.sum((sel['Ps2I'] * allmat) @ invec)
+    # out[i['aux']['sources'][2]] = np.sum((sel['Ls2I'] * allmat) @ invec)
     
-    out[i['aux']['sources'][4]] = np.sum((sel['R2I'] * allmat) @ invec)
+    # out[i['aux']['sources'][3]] = np.sum((sel['Ps2I'] * allmat) @ invec)
     
-    out[-1] = np.sum(morts[:, 1])
+    # out[i['aux']['sources'][4]] = np.sum((sel['R2I'] * allmat) @ invec)
+    
+    # out[-1] = np.sum(morts[:, 1])
     
     return out
 

@@ -6,7 +6,7 @@ Created on Sun Sep 24 16:51:37 2023
 """
 
 import numpy as np
-from scipy.integrate import odeint
+from scipy.integrate import odeint, solve_ivp
 from make_model import make_model
 from allocate import allocate_parameters
 from setup_model import ref, prm, sel, agg, gps_born, likelihood_function
@@ -62,6 +62,8 @@ def get_objective(x, ref, prm, gps, calfn):
         # time range for solving equation until
         t0 = np.arange(2021)
         soln0 = odeint(geq, init, t0, tfirst=True)
+        #soln0 = solve_ivp(geq, (t0[0], t0[-1]), init, t_eval=t0, vectorized=True).y.T
+
         
         # calculates the differences between rows of soln0
         dsol = np.diff(soln0, axis=0)
