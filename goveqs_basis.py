@@ -11,25 +11,28 @@ from make_model import make_model
 
 
 def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
-        
+    
+    M = make_model(p, r, i, s, gps_born)
+    
     # initialise out vector used in odeint
     out = np.zeros((len(insert), 1))
     # select just the compartments, no aggregators or selectors
     invec = insert[:i['nstates']]
+    invec = invec.reshape(-1,1)
     
     # lambda with declining beta process over time
     # will be scalar
-    lam = make_model(p, r, i, s, gps_born)['lam'] @ (invec.reshape(-1,1)) / np.sum(invec.reshape(-1,1)) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
+    lam = M['lam'] @ (invec) / np.sum(invec) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
     
     # full specification of the model
     # allmat is 22x22, invec.T is 22x1
-    allmat = make_model(p, r, i, s, gps_born)['lin'] + (lam * make_model(p, r, i, s, gps_born)['nlin'])
+    allmat = M['lin'] + (lam * M['nlin'])
     # again just the compartments of the model
     # full model times state vec gives 22x1
-    out[:i['nstates']] = np.dot(allmat, invec.reshape(-1, 1))
+    out[:i['nstates']] = np.dot(allmat, invec)
     
     # mortality
-    morts = make_model(p, r, i, s, gps_born)['mort'] * invec.reshape(-1, 1)
+    morts = M['mort'] * invec
     # substract mortality from the states
     out[:i['nstates']] -= np.sum(morts, axis=1).reshape(-1, 1)
     
@@ -52,17 +55,17 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     # aux
     
-    out[i['aux']['inc']] = agg['inc'] @ (sel['inc'] * allmat) @ invec.reshape(-1, 1)
+    out[i['aux']['inc']] = agg['inc'] @ (sel['inc'] * allmat) @ invec
     
-    out[i['aux']['sources'][0]] = np.sum((sel['Lf2I'] * allmat) @ invec.reshape(-1, 1))
+    out[i['aux']['sources'][0]] = np.sum((sel['Lf2I'] * allmat) @ invec)
     
-    out[i['aux']['sources'][1]] = np.sum((sel['Pf2I'] * allmat) @ invec.reshape(-1, 1))
+    out[i['aux']['sources'][1]] = np.sum((sel['Pf2I'] * allmat) @ invec)
     
-    out[i['aux']['sources'][2]] = np.sum((sel['Ls2I'] * allmat) @ invec.reshape(-1, 1))
+    out[i['aux']['sources'][2]] = np.sum((sel['Ls2I'] * allmat) @ invec)
     
-    out[i['aux']['sources'][3]] = np.sum((sel['Ps2I'] * allmat) @ invec.reshape(-1, 1))
+    out[i['aux']['sources'][3]] = np.sum((sel['Ps2I'] * allmat) @ invec)
     
-    out[i['aux']['sources'][4]] = np.sum((sel['R2I'] * allmat) @ invec.reshape(-1, 1))
+    out[i['aux']['sources'][4]] = np.sum((sel['R2I'] * allmat) @ invec)
     
     out[-1] = np.sum(morts[:, 1])
     

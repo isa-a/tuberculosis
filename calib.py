@@ -69,10 +69,10 @@ x0 = xsto[inds[0], :]
 
 # Run MCMC again with updated cov0 (without blockinds or fixinds)
 cov0 = np.cov(xsto.T)
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 0.1, cov0)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 10000, 0.1, cov0)
 
 # Evaluate objective with x0
-out, aux = obj(x0)
+out, aux = obj2(x0)
 sfin = aux['soln'][-1, :]
 result = np.sum(sfin[np.intersect1d(s['for'], [s['Lf'], s['Ls']])]) / np.sum(sfin[s['for']])
 

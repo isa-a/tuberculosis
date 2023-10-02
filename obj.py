@@ -82,8 +82,6 @@ def get_objective(x, ref, prm, gps, calfn):
         sfin = soln0[-1, :]
         # within this subset, look for latent foreign states, to get proportion of latent
         p_LTBI = np.sum(sfin[np.intersect1d(s['for'], [s['Lf'], s['Ls']])]) / np.sum(sfin[s['for']])
-        
-        sfin = soln0[-1, :]
         # proportion of migrants is all foreign compartments over total pop
         p_migrpopn = np.sum(sfin[s['for']]) / np.sum(sfin[:i['nstates']])
         

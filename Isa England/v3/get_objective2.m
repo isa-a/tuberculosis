@@ -30,7 +30,7 @@ else
     mort     = dsol(end,i.aux.mort)*1e5;
     p_migrTB = incd(3)/incd(1);
     
-    sfin = soln0(end,:);
+    sfin =    soln0(end,:);
     p_LTBI   = sum(sfin(intersect(s.for,[s.Lf, s.Ls])))/sum(sfin(s.for));
     
     sfin    = soln0(end,:);

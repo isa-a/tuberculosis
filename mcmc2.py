@@ -8,7 +8,8 @@ Created on Thu Sep 28 21:21:49 2023
 import numpy as np
 from obj import get_objective
 from setup_model import r,p,agg,sel,ref,xi,prm,gps_born,likelihood_function
-
+from tqdm import tqdm
+import time
 
 def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
     d = len(x0)
@@ -33,7 +34,11 @@ def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
     if displ:
         print("Starting MCMC...")
 
-    for t in range(1, n):
+    start_time = time.time()  # Start the timer
+
+    #for t in range(1, n):
+    # Wrapping the range with tqdm for progress bar display
+    for t in tqdm(range(1, n), total=n-1, desc="MCMC Progress", ncols=100):
         X = xsto[t - 1]
 
         # Make a proposal from the distribution
@@ -56,10 +61,16 @@ def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
         xsto[t] = xsel
         outsto[t] = FX
         xbar[t] = (xbar[t - 1] * t + xsel) / (t + 1)
+        
+        end_time = time.time()  # End the timer
+
+        elapsed_time = end_time - start_time  # Calculate elapsed time
+
 
         # Display options
         if displ:
-            print('Iteration', t, 'of', n, '({:.1f}% complete)'.format(t/n*100))
+            #print('Iteration', t, 'of', n, '({:.1f}% complete)'.format(t/n*100))
+            print(f"MCMC completed in {elapsed_time:.2f} seconds.")
 
     accept_rate = acc / n
 
