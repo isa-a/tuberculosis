@@ -7,7 +7,8 @@ Created on Mon Sep 18 18:54:00 2023
 from get_addresses import get_addresses
 import numpy as np
 from scipy.sparse import csr_matrix, dia_matrix
-from get_dist import get_dist
+#from get_dist import get_dist
+from get_dist2 import get_dist2
 
 
 # combining states and born will be used as groups in get_addresses
@@ -180,13 +181,19 @@ data = {
     'p_LTBI': [0.15, 0.2, 0.25]
 }
 
-f1a = get_dist(data['incd2010'], 'lognorm')
-f1b = get_dist(data['incd2020'], 'lognorm')
-f2 = get_dist(data['mort'], 'lognorm')
-f3 = get_dist(data['p_migrTB'], 'beta')
-f4 = get_dist(data['p_migrpopn'], 'beta')
-f5 = get_dist(data['p_LTBI'], 'beta')
+# f1a = get_dist(data['incd2010'], 'lognorm')
+# f1b = get_dist(data['incd2020'], 'lognorm')
+# f2 = get_dist(data['mort'], 'lognorm')
+# f3 = get_dist(data['p_migrTB'], 'beta')
+# f4 = get_dist(data['p_migrpopn'], 'beta')
+# f5 = get_dist(data['p_LTBI'], 'beta')
 
+f1a = get_dist2(data['incd2010'], 'lognorm')
+f1b = get_dist2(data['incd2020'], 'lognorm')
+f2 = get_dist2(data['mort'], 'lognorm')
+f3 = get_dist2(data['p_migrTB'], 'beta')
+f4 = get_dist2(data['p_migrpopn'], 'beta')
+f5 = get_dist2(data['p_LTBI'], 'beta')
 
 # Define the likelihood function
 def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI):
@@ -210,4 +217,3 @@ p_LTBI = [0.15, 0.2, 0.25]
 
 likelihood = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
 print(likelihood)
-

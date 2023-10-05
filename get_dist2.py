@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Sep 23 16:40:01 2023
+Created on Thu Oct  5 14:19:04 2023
 
 @author: ISA
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 from scipy.stats import lognorm, beta
 from scipy.special import betaln
 
-def get_dist(prctiles, distribution, visualizing=True):
+def get_dist2(prctiles, distribution, visualizing=True):
     # Sort the percentiles
     dat = sorted(prctiles)
     
@@ -29,13 +28,19 @@ def get_dist(prctiles, distribution, visualizing=True):
     # Initial guess for parameters
     mu = np.log(mn)
     sigma = np.sqrt(np.log(var / mn**2 + 1))
-    a = mn * (1 - mn) / var - 1
-    b = (1 - mn) * (mn * (1 - mn) / var - 1)
+    
+    # Adjusted initialization for beta
+    if mn < 0.5:
+        alpha_init = mn * (mn * (1 - mn) / var - 1)
+        beta_init = (1 - mn) * (mn * (1 - mn) / var - 1)
+    else:
+        alpha_init = (2 - mn) * ((1 - mn) / var - 1)
+        beta_init = (1 - mn) * ((2 - mn) * (1 - mn) / var - 1)
     
     if distribution == 'lognorm':
         init = [mu, sigma]
     elif distribution == 'beta':
-        init = [a, b]
+        init = [alpha_init, beta_init]
     
     # Optimize to fit the distribution
     result = minimize(objective, init, method='Nelder-Mead', options={'maxiter': 1e6, 'maxfev': 1e6})
@@ -68,9 +73,4 @@ def get_dist(prctiles, distribution, visualizing=True):
             plt.axvline(x=d, linestyle='--', color='gray')
         plt.show()
     
-    return logfn,out,aux
-
-# Example usage:
-# prctiles = [2.5, 50, 97.5]
-# distribution = 'lognorm'
-# logfn, params, aux = get_distribution_fns(data['p_LTBI'], 'beta', visualizing=True)
+    return logfn

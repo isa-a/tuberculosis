@@ -127,10 +127,10 @@ def make_model(p, r, i, s, gps):
     mod_diagonal = m.diagonal() + col_sums  # add column sums to the diagonal
     
     # make a sparse diagonal matrix with the modified diagonal elements
-    sparse_matrix = (dia_matrix((mod_diagonal, [0]), shape=(i['nstates'], i['nstates'])))
+    sparse_matrix = (dia_matrix((mod_diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
     
     #M_lin = m - sparse_matrix
-    M['lin'] = csr_matrix(m - sparse_matrix.toarray())
+    M['lin'] = m - sparse_matrix
     
     # ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
 
@@ -163,8 +163,8 @@ def make_model(p, r, i, s, gps):
     diagonal += col_sums
 
     # same as linear
-    sparse_diagonal = (dia_matrix((diagonal, [0]), shape=(i['nstates'], i['nstates'])))
-    m_sparse = csr_matrix(m)
+    sparse_diagonal = (dia_matrix((diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
+    m_sparse = csr_matrix(m).toarray()
 
     #M_nlin = m_sparse - sparse_diagonal
     M['nlin'] = m_sparse - sparse_diagonal
@@ -177,7 +177,7 @@ def make_model(p, r, i, s, gps):
 
     # Create a sparse diagonal matrix 'M.lam' from 'm'
     #M_lam = csr_matrix(m).toarray()
-    M['lam'] = csr_matrix(m)
+    M['lam'] = csr_matrix(m).toarray()
     
     # ~~~~~~~~~~~~~~~~ mortality
 
@@ -191,7 +191,7 @@ def make_model(p, r, i, s, gps):
 
     # Create a sparse matrix 'M.mort' from 'm'
     #M_mort = (csr_matrix(m)).toarray()
-    M['mort'] = (csr_matrix(m))
+    M['mort'] = (csr_matrix(m)).toarray()
 
 
     return M

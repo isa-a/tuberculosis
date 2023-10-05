@@ -60,7 +60,7 @@ obj2 = lambda x: get_objective(x, ref, prm, gps_born,likelihood)
 
 cov0 = np.eye(len(x0))
 # Perform MCMC
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 10000, 0.1, cov0)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 1000, 0.1, cov0)
 
 
 # Find the parameter set with the maximum log-posterior density
@@ -70,6 +70,30 @@ x0 = xsto[inds[0], :]
 # Run MCMC again with updated cov0 (without blockinds or fixinds)
 cov0 = np.cov(xsto.T)
 xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 10000, 0.1, cov0)
+
+#################################################################
+import matplotlib.pyplot as plt
+
+def plot_trace(xsto):
+    plt.figure(figsize=(10, 6))
+    plt.plot(xsto)
+    plt.title("Trace plot")
+    plt.xlabel("Iteration")
+    plt.ylabel("Sampled value of $a$")
+    plt.grid(True)
+    plt.show()
+
+# Assuming you've already run your MCMC:
+# xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 10000, 0.1, cov0)
+
+# Plot the trace
+plot_trace(xsto[:, 0])
+plot_trace(xsto[:, 1])
+plot_trace(xsto[:, 2])
+plot_trace(xsto[:, 3])
+plot_trace(xsto[:, 4])
+
+###################################################################
 
 # Evaluate objective with x0
 out, aux = obj2(x0)
