@@ -9,7 +9,7 @@ import time
 from tqdm import tqdm
 
 
-def hoby(F, x0, n, sigma, cov0, displ=True):
+def MCMC3(F, x0, n, sigma, cov0, displ=True):
     d = len(x0)
     b = 0.05
     sd = sigma * 2.4**2 / d
