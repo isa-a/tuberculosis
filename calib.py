@@ -12,6 +12,8 @@ from setup_model import i,s,lim,r,p,agg,sel,ref,xi,prm,gps_born,likelihood
 from obj import get_objective
 from pyDOE2 import lhs
 from mcmc2 import MCMC_adaptive
+from tqdm import tqdm
+np.random.seed(42)
 
 
 
@@ -21,7 +23,7 @@ obj = lambda x: get_objective(x, ref, prm, gps_born, likelihood)[0]
 nobj = lambda x: -obj(x)
 
 # Number of samples
-nsam = int(1000)
+nsam = int(100)
 mk = int(nsam / 25)
 
 # Extract parameter names and bounds
@@ -38,7 +40,9 @@ for i in range(len(param_names)):
     xsam[:, i] = param_min_values[i] + lhs_samples[:, i] * (param_max_values[i] - param_min_values[i])
 outs = np.zeros(nsam)
 
-for ii in range(nsam):
+
+# Assuming nsam and mk are already defined
+for ii in tqdm(range(nsam), total=nsam, desc="Progress", ncols=100):
     if ii % mk == 0:
         print(f'{ii / mk:.5g} ', end='')
     outs[ii] = obj(xsam[ii])
@@ -53,6 +57,14 @@ xord = xsam[ord - 1, :]
 # Initial optimization
 from scipy.optimize import fmin
 
+# Create a progress bar
+# Callback function to print the current value of the objective function
+def print_fun(x):
+    print("Current value of objective function:", nobj(x))
+
+# Optimization with callback
+x0 = fmin(nobj, xord[0, :], callback=print_fun, disp=1, xtol=1e-4, ftol=1e-4, maxiter=100)
+
 x0 = fmin(nobj, xord[0, :], disp=1)
 x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930]
 obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood)[0]
@@ -60,7 +72,7 @@ obj2 = lambda x: get_objective(x, ref, prm, gps_born,likelihood)
 
 cov0 = np.eye(len(x0))
 # Perform MCMC
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 1000, 0.1, cov0)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 1, cov0)
 
 
 # Find the parameter set with the maximum log-posterior density
@@ -69,7 +81,7 @@ x0 = xsto[inds[0], :]
 
 # Run MCMC again with updated cov0 (without blockinds or fixinds)
 cov0 = np.cov(xsto.T)
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 10000, 0.1, cov0)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 1000, 1, cov0)
 
 #################################################################
 import matplotlib.pyplot as plt

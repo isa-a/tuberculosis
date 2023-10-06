@@ -23,7 +23,7 @@ def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
     xsto = np.zeros((n, d))
     outsto = np.zeros(n)
     history = np.zeros((n, d + 1))
-    accept_rate = 0
+    #accept_rate = 0
 
     xsto[0] = x0
     xbar = xsto.copy()
