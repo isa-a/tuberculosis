@@ -23,8 +23,7 @@ import copy
 
 # Load data
 # Assuming calibration_res.mat and Model_setup.mat have been converted to Python-friendly formats
-data = np.load("calibration_res.npy", allow_pickle=True)
-model_setup = np.load("Model_setup.npy", allow_pickle=True)
+xsto = np.load('xsto.npy')
 
 # Function definition
 obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood)

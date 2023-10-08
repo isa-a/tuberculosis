@@ -70,7 +70,7 @@ obj2 = lambda x: get_objective(x, ref, prm, gps_born,likelihood)
 
 cov0 = np.eye(len(x0))
 # Perform MCMC
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 1, cov0)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 10000, 1, cov0)
  
 
 # Find the parameter set with the maximum log-posterior density
@@ -80,6 +80,8 @@ x0 = xsto[inds[0], :]
 # Run MCMC again with updated cov0 (without blockinds or fixinds)
 cov0 = np.cov(xsto.T)
 xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 1000, 1, cov0)
+
+np.save('xsto.npy', xsto)
 
 #################################################################
 import matplotlib.pyplot as plt
