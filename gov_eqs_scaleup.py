@@ -12,18 +12,8 @@ from setup_model import i,s,d,lim,r,p,agg,sel,ref,xi,prm,gps_born
 from make_model import make_model
 
 
-times = [2022, 2025]
-t=np.arange(2022, 2037)
-
-p0, r0 = allocate_parameters(x0, p, r, xi)
-M0 = make_model(p, r, i, s, gps_born)
-
-
-p['migrTPT'] = 0
-p1, r1 = p0, r0
-p1['migrTPT'] = 1
-M1 = make_model(p1, r1, i, s, gps_born)
-
+# times = [2022, 2025]
+# t=np.arange(2022, 2037)
 
 def goveqs_scaleup(t, insert, i, s, M0, M1, p0, p1, times, agg, sel, r):
     #scale = min(max((t - times[0]) / (times[1] - times[0]), 0), 1)

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Sep 13 22:20:56 2023
+Created on Sun Oct  8 16:45:39 2023
 
 @author: ISA
 """
-
 from setup_model import states,gps_born
 import numpy as np
-from scipy.sparse import dia_matrix, csr_matrix
 
+from scipy.sparse import csr_matrix, diags
 
 def get_states_for_born(i, born):
     state_values = {} # dict to store state values based on where they're born
@@ -17,10 +16,10 @@ def get_states_for_born(i, born):
         state_values[state] = i.get(key) # for each state, use the key to look it up in i 
     return state_values
 
-
-
-def make_model(p, r, i, s, gps):
+def make_model2(p, r, i, s, gps):
     M = {}
+
+    # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
     m = np.zeros((i['nstates'], i['nstates'])) # construct matrix
     for born in gps_born:
         state_values = get_states_for_born(i, born)
@@ -121,114 +120,33 @@ def make_model(p, r, i, s, gps):
         destin = Tx
         rate = r['ACF2'][0]   # Replace with a random number
         m[destin, source] += rate
-        
-    # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
+
     col_sums = np.sum(m, axis=0)  # sum up each column
-    mod_diagonal = m.diagonal() + col_sums  # add column sums to the diagonal
-    
-    # make a sparse diagonal matrix with the modified diagonal elements
-    sparse_matrix = (dia_matrix((mod_diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
-    
-    #M_lin = m - sparse_matrix
-    M['lin'] = m - sparse_matrix
-    
+    sparse_matrix = diags(col_sums, format="csr")
+    M['lin'] = csr_matrix(m) - sparse_matrix
+
     # ~~~~~~~~~~~~~~~~ NON LINEAR COMPONENT
-
-    # Create an empty matrix m with the same shape as i.nstates
-    # Define the sizes and parameters
-
-    # make matrix m with zeros
     m = np.zeros((i['nstates'], i['nstates']))
-
-    # iterate over gps_born
-    for born in gps_born: # iterate over where they are born e.g. dom and for
-        # find indices of specified states in s that intersect with 'born'
-        # Find the indices of susceptible states that intersect with 'born'
+    for born in gps_born:
         susinds = np.intersect1d([s[state] for state in ['U', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
-        # calculate intersection between two sets: the states in s, and where they're born
-        # born in s
-
-        # initialise those elements in the matrix with a 1
-        # use indices in i as the row index and susinds as the column indices
         m[i[('Lf', born)], susinds] = 1 
 
-    # latent and recovered states 
     L_and_R = [s[state] for state in ['Lf', 'Ls', 'Rlo', 'Rhi', 'R']]
-    # multiply these by (1 - imm), take all rows only specified columns
     m[:, L_and_R] *= (1 - p['imm'])
-    # column sums
+    
     col_sums = np.sum(m, axis=0)
-    # Adjust the diagonal elements to subtract the column sums
-    diagonal = np.diag(m).copy()
-    diagonal += col_sums
+    sparse_diagonal = diags(col_sums, format="csr")
+    M['nlin'] = csr_matrix(m) - sparse_diagonal
 
-    # same as linear
-    sparse_diagonal = (dia_matrix((diagonal, [0]), shape=(i['nstates'], i['nstates']))).toarray()
-    m_sparse = csr_matrix(m).toarray()
-
-    #M_nlin = m_sparse - sparse_diagonal
-    M['nlin'] = m_sparse - sparse_diagonal
-    
     # ~~~~~~~~~~~~~~~~ force of infection// lambda
-  
     m = np.zeros(i['nstates'])
-    # Set values in m at indices specified for infectious states to beta val
-    m[s['everyI']] = r['beta'] # WILL BE BETA ONCE OTHER SCRIPTS ARE COMPLETE
+    m[s['everyI']] = r['beta']
+    M['lam'] = diags(m, format="csr")
 
-    # Create a sparse diagonal matrix 'M.lam' from 'm'
-    #M_lam = csr_matrix(m).toarray()
-    M['lam'] = csr_matrix(m).toarray()
-    
     # ~~~~~~~~~~~~~~~~ mortality
-
-    m = np.zeros((i['nstates'], 2)) # mortality in each state
-
-    # first column of m to life expectancy
+    m = np.zeros((i['nstates'], 2))
     m[:, 0] = 1/83
-
-    # second column's infectious states have tb mort
     m[s['everyI'], 1] = r['muTB']
-
-    # Create a sparse matrix 'M.mort' from 'm'
-    #M_mort = (csr_matrix(m)).toarray()
-    M['mort'] = (csr_matrix(m)).toarray()
-
+    M['mort'] = csr_matrix(m)
 
     return M
-    
-
-
-
-
-
-
-
-
-# file_path = 'matrix.txt'
-
-# # Save the matrix to the text file
-# np.savetxt(file_path, m, fmt='%.6f', delimiter='\t')
-
-# print(f"Matrix saved to {file_path}")
-
-
-# # Get the indices (coordinates) of non-zero elements in 'm'
-# non_zero_indices = np.transpose(np.nonzero(result_sparse))
-
-# # Display the non-zero positions and their coordinates
-# for coord in non_zero_indices:
-#     print(f"Coordinate: {tuple(coord)}, Value: {result_sparse[coord[0], coord[1]]}")
-
-
-
-
-
-
-
-# # Get the indices (coordinates) of non-zero elements in 'm'
-# non_zero_indices = np.transpose(np.nonzero(M['mort']))
-
-# # Display the non-zero positions and their coordinates
-# for coord in non_zero_indices:
-#     incremented_coord = tuple(coord + 1)
-#     print(f"{incremented_coord}, Value: {M['mort'][coord[0], coord[1]]}")

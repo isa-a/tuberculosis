@@ -11,6 +11,7 @@ from make_model import make_model
 from allocate import allocate_parameters
 from setup_model import likelihood_function
 from goveqs_basis import goveqs_basis2
+#from make_model2 import make_model2
 
 def get_objective(x, ref, prm, gps, calfn):
     

@@ -6,8 +6,7 @@ Created on Mon Sep 18 18:54:00 2023
 """
 from get_addresses import get_addresses
 import numpy as np
-from scipy.sparse import csr_matrix, dia_matrix
-#from get_dist import get_dist
+from scipy.sparse import csr_matrix
 from get_dist2 import get_dist2
 
 
@@ -181,13 +180,6 @@ data = {
     'p_LTBI': [0.15, 0.2, 0.25]
 }
 
-# f1a = get_dist(data['incd2010'], 'lognorm')
-# f1b = get_dist(data['incd2020'], 'lognorm')
-# f2 = get_dist(data['mort'], 'lognorm')
-# f3 = get_dist(data['p_migrTB'], 'beta')
-# f4 = get_dist(data['p_migrpopn'], 'beta')
-# f5 = get_dist(data['p_LTBI'], 'beta')
-
 f1a = get_dist2(data['incd2010'], 'lognorm')
 f1b = get_dist2(data['incd2020'], 'lognorm')
 f2 = get_dist2(data['mort'], 'lognorm')
@@ -208,12 +200,12 @@ def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI):
     return likelihood
 
 # Example usage with data as lists or arrays
-incd2010 = [14.1, 14.6, 15.1]
-incd2020 = [6.5, 7, 7.5]
-mort = [0.28, 0.3, 0.32]
-p_migrTB = [0.708, 0.728, 0.748]
-p_migrpopn = [0.138, 0.168, 0.198]
-p_LTBI = [0.15, 0.2, 0.25]
+# incd2010 = [14.1, 14.6, 15.1]
+# incd2020 = [6.5, 7, 7.5]
+# mort = [0.28, 0.3, 0.32]
+# p_migrTB = [0.708, 0.728, 0.748]
+# p_migrpopn = [0.138, 0.168, 0.198]
+# p_LTBI = [0.15, 0.2, 0.25]
 
-likelihood = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
+likelihood = likelihood_function(data['incd2010'], data['incd2020'], data['mort'], data['p_migrTB'], data['p_migrpopn'], data['p_LTBI'])
 print(likelihood)

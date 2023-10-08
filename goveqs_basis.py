@@ -6,7 +6,7 @@
 """
 
 import numpy as np
-from setup_model import i,s,d,lim,r,p,agg,sel,ref,xi,prm,gps_born
+from setup_model import gps_born
 from make_model import make_model
 
 

@@ -10,7 +10,7 @@ from scipy.optimize import minimize
 from scipy.stats import lognorm, beta
 from scipy.special import betaln
 
-def get_dist2(prctiles, distribution, visualizing=True):
+def get_dist2(prctiles, distribution, visualizing=False):
     # Sort the percentiles
     dat = sorted(prctiles)
     

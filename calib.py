@@ -6,9 +6,7 @@ Created on Thu Sep 28 15:58:59 2023
 """
 
 import numpy as np
-from scipy.stats import multivariate_normal
-from scipy.integrate import odeint
-from setup_model import i,s,lim,r,p,agg,sel,ref,xi,prm,gps_born,likelihood
+from setup_model import s,ref,prm,gps_born,likelihood
 from obj import get_objective
 from pyDOE2 import lhs
 from mcmc2 import MCMC_adaptive
@@ -36,8 +34,8 @@ lhs_samples = lhs(len(param_names), samples=nsam)
 
 # Scale and shift the samples to match the parameter bounds
 xsam = np.zeros((nsam, len(param_names)))
-for i in range(len(param_names)):
-    xsam[:, i] = param_min_values[i] + lhs_samples[:, i] * (param_max_values[i] - param_min_values[i])
+for p in range(len(param_names)):
+    xsam[:, p] = param_min_values[p] + lhs_samples[:, p] * (param_max_values[p] - param_min_values[p])
 outs = np.zeros(nsam)
 
 
@@ -63,7 +61,7 @@ def print_fun(x):
     print("Current value of objective function:", nobj(x))
 
 # Optimization with callback
-x0 = fmin(nobj, xord[0, :], callback=print_fun, disp=1, xtol=1e-4, ftol=1e-4, maxiter=100)
+x0 = fmin(nobj, xord[0, :], callback=print_fun, disp=1, xtol=1e-4, ftol=1e-4, maxiter=500)
 
 x0 = fmin(nobj, xord[0, :], disp=1)
 x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930]
@@ -73,7 +71,7 @@ obj2 = lambda x: get_objective(x, ref, prm, gps_born,likelihood)
 cov0 = np.eye(len(x0))
 # Perform MCMC
 xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 1, cov0)
-
+ 
 
 # Find the parameter set with the maximum log-posterior density
 inds = np.where(outsto == np.max(outsto))[0]
