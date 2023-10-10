@@ -101,26 +101,42 @@ def make_model(p, r, i, s, gps):
         m[destin, sources] += rates
     
         # Initiation of TPT
-        source = Lf
-        destin = Pf
-        rate = r['TPT'][0] # Replace with a random number
-        m[destin, source] += rate
+        rate = r['TPT'][gps_born.index(born)]
+        for src, dst in [(Lf, Pf)]:
+           m[dst, src] += rate
+        
+        # source = Lf
+        # destin = Pf
+        # rate = r['TPT'][0] # Replace with a random number
+        # m[destin, source] += rate
+        
+        rate = r['TPT'][gps_born.index(born)]
+        for src, dst in [(Ls, Ps)]:
+           m[dst, src] += rate
     
-        source = Ls
-        destin = Ps
-        rate = r['TPT'][0]  # Replace with a random number
-        m[destin, source] += rate
+        # source = Ls
+        # destin = Ps
+        # rate = r['TPT'][0]  # Replace with a random number
+        # m[destin, source] += rate
+        
+        rate = r['ACF'][gps_born.index(born)]
+        for src, dst in [(I, I2)]:
+           m[dst, src] += rate
     
-        # Case-finding
-        sources = [I, I2]
-        destin = Tx
-        rate = r['ACF'][0]  # Replace with a random number
-        m[destin, sources] += rate
+        # # Case-finding
+        # sources = [I, I2]
+        # destin = Tx
+        # rate = r['ACF'][0]  # Replace with a random number
+        # m[destin, sources] += rate
+        
+        rate = r['ACF2'][gps_born.index(born)]
+        for src, dst in [(I2, Tx)]:
+           m[dst, src] += rate
     
-        source = I2
-        destin = Tx
-        rate = r['ACF2'][0]   # Replace with a random number
-        m[destin, source] += rate
+        # source = I2
+        # destin = Tx
+        # rate = r['ACF2'][0]   # Replace with a random number
+        # m[destin, source] += rate
         
     # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
     col_sums = np.sum(m, axis=0)  # sum up each column
@@ -226,9 +242,9 @@ def make_model(p, r, i, s, gps):
 
 
 # # Get the indices (coordinates) of non-zero elements in 'm'
-# non_zero_indices = np.transpose(np.nonzero(M['mort']))
+# non_zero_indices = np.transpose(np.nonzero(M3['lin']))
 
 # # Display the non-zero positions and their coordinates
 # for coord in non_zero_indices:
 #     incremented_coord = tuple(coord + 1)
-#     print(f"{incremented_coord}, Value: {M['mort'][coord[0], coord[1]]}")
+#     print(f"{incremented_coord}, Value: {M3['lin'][coord[0], coord[1]]}")
