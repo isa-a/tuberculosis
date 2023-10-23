@@ -9,7 +9,7 @@ import numpy as np
 from scipy.integrate import odeint
 from make_model import make_model
 from allocate import allocate_parameters
-from setup_model import likelihood_function
+from setup_model import likelihood_function, data
 from goveqs_basis import goveqs_basis2
 #from make_model2 import make_model2
 
@@ -55,12 +55,25 @@ def get_objective(x, ref, prm, gps, calfn):
         init[i[('U', 'dom')]] = 1 - seed
         init[i[('I', 'dom')]] = seed
         
-        # wrapper for gov eqs basis taking only insert and time
+        def r_TPT_linear_increase(t, r_migrTPT2019):
+            if t < 2015:
+                return 0
+            elif 2015 <= t <= 2019:
+                return (r_migrTPT2019 / (2019 - 2014)) * (t - 2014)
+            else:
+                return r_migrTPT2019
+        
         def geq(t, in_):
+            r['TPT'][1] = r_TPT_linear_increase(t, target_rate)
             return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
+
+        
+        # wrapper for gov eqs basis taking only insert and time
+        # def geq(t, in_):
+        #     return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
         
         # time range for solving equation until
-        t0 = np.arange(2016)
+        t0 = np.arange(2020)
         soln0 = odeint(geq, init, t0, tfirst=True)
         #soln0 = solve_ivp(geq, (t0[0], t0[-1]), init, t_eval=t0, vectorized=True)
         #soln0=soln0.y.T
@@ -88,9 +101,12 @@ def get_objective(x, ref, prm, gps, calfn):
         # proportion of migrants is all foreign compartments over total pop
         p_migrpopn = np.sum(sfin[s['for']]) / np.sum(sfin[:i['nstates']])
         
+        # number of tpt
+        n_tpt2019 = sfin[i['Pf']] + sfin[i['Ps']]
+        
         if np.any(incd > 0.1):
             #out = calfn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
-            out = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
+            out = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, n_tpt2019)
             # add to the auxillaries with calculated values
             aux = {
                 'soln': soln0,
@@ -101,6 +117,7 @@ def get_objective(x, ref, prm, gps, calfn):
                 'p_migrTB': p_migrTB,
                 'p_migrpopn': p_migrpopn,
                 'p_LTBI': p_LTBI,
+                'n_tpt2019': n_tpt2019
             }
         else:
             out = -np.inf

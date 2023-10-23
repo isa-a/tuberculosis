@@ -177,7 +177,8 @@ data = {
     'mort': [0.28, 0.3, 0.32],
     'p_migrTB': [0.708, 0.728, 0.748],
     'p_migrpopn': [0.138, 0.168, 0.198],
-    'p_LTBI': [0.15, 0.2, 0.25]
+    'p_LTBI': [0.15, 0.2, 0.25],
+    'n_tpt2019': [915, 925, 935]
 }
 
 f1a = get_dist2(data['incd2010'], 'lognorm')
@@ -186,16 +187,18 @@ f2 = get_dist2(data['mort'], 'lognorm')
 f3 = get_dist2(data['p_migrTB'], 'beta')
 f4 = get_dist2(data['p_migrpopn'], 'beta')
 f5 = get_dist2(data['p_LTBI'], 'beta')
+f6 = get_dist2(data['n_tpt2019'], 'lognorm')
 
 # Define the likelihood function
-def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI):
+def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, n_tpt2019):
     likelihood = (
         np.sum(f1a(np.array(incd2010))) +
         np.sum(f1b(np.array(incd2020))) +
         np.sum(f2(np.array(mort))) +
         np.sum(f3(np.array(p_migrTB))) +
         np.sum(f4(np.array(p_migrpopn))) +
-        np.sum(f5(np.array(p_LTBI)))
+        np.sum(f5(np.array(p_LTBI))) +
+        np.sum(f6(np.array(n_tpt2019)))
     )
     return likelihood
 
@@ -207,5 +210,5 @@ def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI):
 # p_migrpopn = [0.138, 0.168, 0.198]
 # p_LTBI = [0.15, 0.2, 0.25]
 
-likelihood = likelihood_function(data['incd2010'], data['incd2020'], data['mort'], data['p_migrTB'], data['p_migrpopn'], data['p_LTBI'])
+likelihood = likelihood_function(data['incd2010'], data['incd2020'], data['mort'], data['p_migrTB'], data['p_migrpopn'], data['p_LTBI'], data['n_tpt2019'])
 print(likelihood)
