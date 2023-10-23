@@ -128,8 +128,8 @@ r['ACF2']         = [0, 0]
 
 #~~~~~~~~~~~~~~~~~ parameters
 
-free_params = ['beta', 'betadec', 'gamma', 'p_birth', 'p_kLf']
-param_lengths = [1,         1,         1,       1,          1]
+free_params = ['beta', 'betadec', 'gamma', 'p_birth', 'p_kLf', 'r_TPT19']
+param_lengths = [1,         1,         1,       1,          1,         1]
 
 
 # give indices to parameters for later allocation

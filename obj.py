@@ -60,7 +60,7 @@ def get_objective(x, ref, prm, gps, calfn):
             return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
         
         # time range for solving equation until
-        t0 = np.arange(2021)
+        t0 = np.arange(2016)
         soln0 = odeint(geq, init, t0, tfirst=True)
         #soln0 = solve_ivp(geq, (t0[0], t0[-1]), init, t_eval=t0, vectorized=True)
         #soln0=soln0.y.T

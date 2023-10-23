@@ -105,38 +105,18 @@ def make_model(p, r, i, s, gps):
         for src, dst in [(Lf, Pf)]:
            m[dst, src] += rate
         
-        # source = Lf
-        # destin = Pf
-        # rate = r['TPT'][0] # Replace with a random number
-        # m[destin, source] += rate
-        
         rate = r['TPT'][gps_born.index(born)]
         for src, dst in [(Ls, Ps)]:
            m[dst, src] += rate
-    
-        # source = Ls
-        # destin = Ps
-        # rate = r['TPT'][0]  # Replace with a random number
-        # m[destin, source] += rate
         
         rate = r['ACF'][gps_born.index(born)]
         for src, dst in [(I, I2)]:
            m[dst, src] += rate
     
-        # # Case-finding
-        # sources = [I, I2]
-        # destin = Tx
-        # rate = r['ACF'][0]  # Replace with a random number
-        # m[destin, sources] += rate
-        
+        # # Case-finding        
         rate = r['ACF2'][gps_born.index(born)]
         for src, dst in [(I2, Tx)]:
            m[dst, src] += rate
-    
-        # source = I2
-        # destin = Tx
-        # rate = r['ACF2'][0]   # Replace with a random number
-        # m[destin, source] += rate
         
     # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
     col_sums = np.sum(m, axis=0)  # sum up each column
