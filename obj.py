@@ -64,7 +64,7 @@ def get_objective(x, ref, prm, gps, calfn):
                 return r_migrTPT2019
         
         def geq(t, in_):
-            r['TPT'][1] = r_TPT_linear_increase(t, target_rate)
+            r['TPT'][1] = r_TPT_linear_increase(t, r_migrTPT2019)
             return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
 
         
@@ -102,7 +102,7 @@ def get_objective(x, ref, prm, gps, calfn):
         p_migrpopn = np.sum(sfin[s['for']]) / np.sum(sfin[:i['nstates']])
         
         # number of tpt
-        n_tpt2019 = sfin[i['Pf']] + sfin[i['Ps']]
+        n_tpt2019 = sfin[s['Pf']] + sfin[s['Ps']]
         
         if np.any(incd > 0.1):
             #out = calfn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)

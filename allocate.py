@@ -15,5 +15,6 @@ def allocate_parameters(x, p, r, xi):
     r['gamma'] = x[xi['gamma'][0]]
     p['birth'] = x[xi['p_birth'][0]]
     p['p_kLf'] = x[xi['p_kLf'][0]]
+    r['r_TPT19'] = x[xi['r_TPT19'][0]]
     
     return p, r

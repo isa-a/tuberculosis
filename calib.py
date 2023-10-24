@@ -64,13 +64,13 @@ def print_fun(x):
 x0 = fmin(nobj, xord[0, :], callback=print_fun, disp=1, xtol=1e-4, ftol=1e-4, maxiter=500)
 
 x0 = fmin(nobj, xord[0, :], disp=1)
-x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930]
+x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930, 0.25]
 obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood)[0]
 obj2 = lambda x: get_objective(x, ref, prm, gps_born,likelihood)
 
 cov0 = np.eye(len(x0))
 # Perform MCMC
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 10000, 1, cov0)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 1, cov0)
  
 
 # Find the parameter set with the maximum log-posterior density

@@ -155,7 +155,8 @@ prm['bounds'] = {
     'betadec': [0, 0.15],
     'gamma': [0, 50],
     'p_birth': [0, 1],
-    'p_kLf': [1, 200]}
+    'p_kLf': [1, 200],
+    'r_TPT19': [0, 0.5]}
 
 prm['p'] = p
 prm['r'] = r
