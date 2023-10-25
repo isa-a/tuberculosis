@@ -9,7 +9,7 @@ import numpy as np
 from scipy.integrate import odeint
 from make_model import make_model
 from allocate import allocate_parameters
-from setup_model import likelihood_function, data
+from setup_model import likelihood_function
 from goveqs_basis import goveqs_basis2
 #from make_model2 import make_model2
 
@@ -64,7 +64,7 @@ def get_objective(x, ref, prm, gps, calfn):
                 return r_migrTPT2019
         
         def geq(t, in_):
-            r['TPT'][1] = r_TPT_linear_increase(t, r_migrTPT2019)
+            r['TPT'][1] = r_TPT_linear_increase(t, 0.3)
             return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
 
         

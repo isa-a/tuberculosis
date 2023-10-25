@@ -12,7 +12,7 @@ from make_model import make_model
 
 def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
-    M = make_model(p, r, i, s, gps_born)
+    #M = make_model(p, r, i, s, gps_born)
     
     # initialise out vector used in odeint
     out = np.zeros((len(insert), 1))

@@ -6,13 +6,10 @@
 """
 
 import numpy as np
-from setup_model import gps_born
-from make_model import make_model
-
 
 def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
-    M = make_model(p, r, i, s, gps_born)
+    #M = make_model(p, r, i, s, gps_born)
     
     # initialise out vector used in odeint
     out = np.zeros((len(insert), 1))
@@ -55,8 +52,10 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     # aux
     
+    # incidence
     out[i['aux']['inc']] = agg['inc'] @ (sel['inc'] * allmat) @ invec
     
+    # incidence sources
     out[i['aux']['sources'][0]] = np.sum((sel['Lf2I'] * allmat) @ invec)
     
     out[i['aux']['sources'][1]] = np.sum((sel['Pf2I'] * allmat) @ invec)
@@ -67,6 +66,12 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     out[i['aux']['sources'][4]] = np.sum((sel['R2I'] * allmat) @ invec)
     
+    # migrant TPT uptake
+    out[i['aux']['migrtpt'][0]] = np.sum((sel['Lf2Pf'] * allmat) @ invec)
+    
+    out[i['aux']['migrtpt'][1]] = np.sum((sel['Ls2Ps'] * allmat) @ invec)
+
+    # mortality
     out[-1] = np.sum(morts[:, 1])
     
     return out

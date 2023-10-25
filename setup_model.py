@@ -18,12 +18,12 @@ gps_born = ['dom', 'for'] # where they are born
 
 i, s, d, lim = get_addresses([states, gps_born])
 s['everyI'] = np.concatenate((s['I'], s['I2']))
-
-
+s['migrL'] = [s['Lf'][1], s['Ls'][1]]
+s['migrP'] = [s['Pf'][1], s['Ps'][1]]
 
 # ~~~~~~~~~~~~ auxillary time
-auxillaries = ['inc', 'sources', 'mort'] # set up to add to end of matrix
-lengths = [3, 5, 1]
+auxillaries = ['inc', 'sources', 'migrtpt', 'mort'] # set up to add to end of matrix
+lengths = [3, 5, 2, 1]
 lim=i['nstates']
 i['aux'] = {} # initialise auxes to end of i
 
@@ -96,6 +96,19 @@ for i_idx in s['everyI']:
     for j_idx in [s['R'], s['Rlo'], s['Rhi']]:
         tmp[i_idx, j_idx] = 1
 sel['R2I'] = tmp - np.diag(np.diag(tmp))
+
+
+#~~~~~~~~~migrant TPT uptake
+
+# From Lf to Pf
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[s['migrL'][0], s['migrP'][0]] = 1
+sel['Lf2Pf'] = tmp - np.diag(np.diag(tmp))
+
+# From Ls to Ps
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[s['migrL'][1], s['migrP'][1]] = 1
+sel['Ls2Ps'] = tmp - np.diag(np.diag(tmp))
 
 
 # ~~~~~~~~~~~ Natural history params
