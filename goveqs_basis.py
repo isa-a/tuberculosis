@@ -50,8 +50,7 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     out[s['for']] += vec.reshape(-1, 1)
     
     
-    # aux
-    
+    # auxillaries    
     # incidence
     out[i['aux']['inc']] = agg['inc'] @ (sel['inc'] * allmat) @ invec
     
@@ -66,7 +65,7 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     
     out[i['aux']['sources'][4]] = np.sum((sel['R2I'] * allmat) @ invec)
     
-    # migrant TPT uptake
+    # migrant TPT initiation sources
     out[i['aux']['migrtpt'][0]] = np.sum((sel['Lf2Pf'] * allmat) @ invec)
     
     out[i['aux']['migrtpt'][1]] = np.sum((sel['Ls2Ps'] * allmat) @ invec)
