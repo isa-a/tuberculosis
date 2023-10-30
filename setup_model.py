@@ -12,18 +12,21 @@ from get_dist2 import get_dist2
 
 # combining states and born will be used as groups in get_addresses
 states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R'] # states
-gps_born = ['dom', 'for'] # where they are born
+gps_born = ['dom', 'mig_recent', 'migr_long'] # where they are born
 
 
 
 i, s, d, lim = get_addresses([states, gps_born])
 s['everyI'] = np.concatenate((s['I'], s['I2']))
-s['migrL'] = [s['Lf'][1], s['Ls'][1]]
-s['migrP'] = [s['Pf'][1], s['Ps'][1]]
+s['migr'] = np.concatenate((s['mig_recent'], s['migr_long']))
+s['migrstates'] = [i['U', 'mig_recent'], i['Lf','mig_recent'], i['Ls','mig_recent'], i['Pf','mig_recent'], i['Ps','mig_recent']]
+
+# s['migrL'] = [s['Lf'][1], s['Ls'][1]]
+# s['migrP'] = [s['Pf'][1], s['Ps'][1]]
 
 # ~~~~~~~~~~~~ auxillary time
-auxillaries = ['inc', 'sources', 'migrtpt', 'mort'] # set up to add to end of matrix
-lengths = [3, 5, 2, 1]
+auxillaries = ['inc', 'sources', 'mort', 'nTPT'] # set up to add to end of matrix
+lengths = [3, 15, 1, 1]
 lim=i['nstates']
 i['aux'] = {} # initialise auxes to end of i
 
@@ -49,6 +52,26 @@ agg = {}
 
 
 # --- Incidence
+# --- Incidence
+tmp = np.zeros((3, i['nstates']))
+tmp[0, s['everyI']] = 1
+tmp[1, np.intersect1d(s['everyI'], s['dom'])] = 1
+tmp[2, np.intersect1d(s['everyI'], s['migr'])] = 1
+agg['inc'] = tmp
+
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[s['everyI'], :] = 1
+# Remove transitions due to changing migrant status
+tmp[s['mig_recent'], s['migr_long']] = 0
+tmp[s['migr_long'], s['mig_recent']] = 0
+
+# Subtracting the diagonal
+sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
+
+
+
+
+
 tmp = np.zeros((3, i['nstates']))
 tmp[0, s['everyI']] = 1
 tmp[1, np.intersect1d(s['everyI'], s['dom'])] = 1
