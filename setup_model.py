@@ -69,20 +69,13 @@ tmp[s['migr_long'], s['mig_recent']] = 0
 sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
 
 
-
-
+# --- Sources of incidence 
 
 tmp = np.zeros((3, i['nstates']))
-tmp[0, s['everyI']] = 1
-tmp[1, np.intersect1d(s['everyI'], s['dom'])] = 1
-tmp[2, np.intersect1d(s['everyI'], s['for'])] = 1
-agg['inc'] = csr_matrix(tmp).toarray()
-
-tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[s['everyI'], :] = 1
-sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
-
-
+tmp[0, np.intersect1d([s['I'], s['I2']], s['dom'])] = 1
+tmp[1, np.intersect1d([s['I'], s['I2']], s['mig_recent'])] = 1
+tmp[2, np.intersect1d([s['I'], s['I2']], s['migr_long'])] = 1
+agg['incsources'] = tmp
 #~~~~~~~~~incidence sources
 
 # From recent infection
@@ -120,18 +113,11 @@ for i_idx in s['everyI']:
         tmp[i_idx, j_idx] = 1
 sel['R2I'] = tmp - np.diag(np.diag(tmp))
 
-
+# --- People starting TPT
+tmp = np.zeros((i['nstates'], i['nstates']))
+tmp[s['Pf'] + s['Ps'], s['Lf'] + s['Ls']] = 1
+sel['nTPT'] = tmp - np.diag(np.diag(tmp))
 #~~~~~~~~~migrant TPT uptake
-
-# From Lf to Pf
-tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[s['migrP'][0], s['migrL'][0]] = 1
-sel['Lf2Pf'] = tmp - np.diag(np.diag(tmp))
-
-# From Ls to Ps
-tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[s['migrP'][1], s['migrL'][1]] = 1
-sel['Ls2Ps'] = tmp - np.diag(np.diag(tmp))
 
 
 # ~~~~~~~~~~~ Natural history params
@@ -156,16 +142,16 @@ p = {
 
 
 
-r['TPT']          = [0,0]
-r['ACF']          = [0, 0]
-r['ACF2']         = [0, 0]
+r['TPT']          = [0,0,0]
+r['ACF']          = [0, 0,0]
+r['ACF2']         = [0, 0,0]
 
 
 
 #~~~~~~~~~~~~~~~~~ parameters
 
-free_params = ['beta', 'betadec', 'gamma', 'p_birth', 'p_kLf', 'TPT']
-param_lengths = [1,         1,         1,       1,          1,         1]
+free_params = ['beta', 'betadec', 'gamma', 'r_TPT2020rec', 'p_relrate', 'r_migr', 'p_LTBI_in_migr']
+param_lengths = [1,         1,         2,       1,          1,         1,               1]
 
 
 # give indices to parameters for later allocation
@@ -190,9 +176,10 @@ prm['bounds'] = {
     'beta': [0, 40],
     'betadec': [0, 0.15],
     'gamma': [0, 50],
-    'p_birth': [0, 1],
-    'p_kLf': [1, 200],
-    'TPT': [0, 0.5]}
+    'r_TPT2020rec': [0, 0.01],
+    'p_relrate': [1, 20],
+    'r_migr': [0, 1],
+    'p_LTBI_in_migr': [0, 0.5]}
 
 prm['p'] = p
 prm['r'] = r
@@ -215,7 +202,7 @@ data = {
     'p_migrTB': [0.744, 0.764, 0.784],
     'p_migrpopn': [0.138, 0.168, 0.198],
     'p_LTBI': [0.15, 0.2, 0.25],
-    'p_tpt2019': [1.237347e-05, 0.0000137483, 1.512313e-05]
+    'nTPT2019': [1.3*x for x in [0.9, 1, 1.1]]
 }
 
 f1a = get_dist2(data['incd2010'], 'lognorm')
@@ -224,7 +211,7 @@ f2 = get_dist2(data['mort'], 'lognorm')
 f3 = get_dist2(data['p_migrTB'], 'beta')
 f4 = get_dist2(data['p_migrpopn'], 'beta')
 f5 = get_dist2(data['p_LTBI'], 'beta')
-f6 = get_dist2(data['p_tpt2019'], 'lognorm')
+f6 = get_dist2(data['nTPT2019'], 'lognorm')
 
 # Define the likelihood function
 def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_tpt2019):
@@ -247,5 +234,5 @@ def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, 
 # p_migrpopn = [0.138, 0.168, 0.198]
 # p_LTBI = [0.15, 0.2, 0.25]
 
-likelihood = likelihood_function(data['incd2010'], data['incd2020'], data['mort'], data['p_migrTB'], data['p_migrpopn'], data['p_LTBI'], data['p_tpt2019'])
+likelihood = likelihood_function(data['incd2010'], data['incd2020'], data['mort'], data['p_migrTB'], data['p_migrpopn'], data['p_LTBI'], data['nTPT2019'])
 print(likelihood)
