@@ -54,22 +54,22 @@ def get_objective(x, ref, prm, gps, calfn):
         init[i[('U', 'dom')]] = 1 - seed
         init[i[('I', 'dom')]] = seed
         
-        def r_TPT_linear_increase(t, r_migrTPT2019):
-            if t < 2015:
-                return 0
-            elif 2015 <= t <= 2019:
-                return (r_migrTPT2019 / (2019 - 2014)) * (t - 2014)
-            else:
-                return r_migrTPT2019
+        # def r_TPT_linear_increase(t, r_migrTPT2019):
+        #     if t < 2015:
+        #         return 0
+        #     elif 2015 <= t <= 2019:
+        #         return (r_migrTPT2019 / (2019 - 2014)) * (t - 2014)
+        #     else:
+        #         return r_migrTPT2019
         
-        def geq(t, in_):
-            r['TPT'][1] = r_TPT_linear_increase(t, 0.3)
-            return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
+        # def geq(t, in_):
+        #     r['TPT'][1] = r_TPT_linear_increase(t, 0.3)
+        #     return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
 
         
         # wrapper for gov eqs basis taking only insert and time
-        # def geq(t, in_):
-        #     return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
+        def geq(t, in_):
+            return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
         
         # time range for solving equation until
         t0 = np.arange(2020)
@@ -101,7 +101,9 @@ def get_objective(x, ref, prm, gps, calfn):
         p_migrpopn = np.sum(sfin[s['for']]) / np.sum(sfin[:i['nstates']])
         
         # number of tpt
-        n_tpt2019 = sfin[s['Pf']] + sfin[s['Ps']] * 1e5
+        #n_tpt2019 = sfin[s['Pf']] + sfin[s['Ps']] * 1e5
+        n_tpt2019 = (soln0[np.where(t0 == 2019)[0][0], s['Pf']] - soln0[np.where(t0 == 2018)[0][0], s['Pf']]) + \
+            (soln0[np.where(t0 == 2019)[0][0], s['Ps']] - soln0[np.where(t0 == 2018)[0][0], s['Ps']]) * 1e5
         
         if np.any(incd > 0.1):
             #out = calfn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)

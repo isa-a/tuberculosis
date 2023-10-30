@@ -70,7 +70,7 @@ obj2 = lambda x: get_objective(x, ref, prm, gps_born,likelihood)
 
 cov0 = np.eye(len(x0))
 # Perform MCMC
-xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 1000, 1, cov0)
+xsto, outsto, history, accept_rate = MCMC_adaptive(obj, x0, 100, 1, cov0)
  
 
 # Find the parameter set with the maximum log-posterior density
