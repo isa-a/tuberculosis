@@ -102,12 +102,12 @@ sel['R2I'] = tmp - np.diag(np.diag(tmp))
 
 # From Lf to Pf
 tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[s['migrL'][0], s['migrP'][0]] = 1
+tmp[s['migrP'][0], s['migrL'][0]] = 1
 sel['Lf2Pf'] = tmp - np.diag(np.diag(tmp))
 
 # From Ls to Ps
 tmp = np.zeros((i['nstates'], i['nstates']))
-tmp[s['migrL'][1], s['migrP'][1]] = 1
+tmp[s['migrP'][1], s['migrL'][1]] = 1
 sel['Ls2Ps'] = tmp - np.diag(np.diag(tmp))
 
 
@@ -141,7 +141,7 @@ r['ACF2']         = [0, 0]
 
 #~~~~~~~~~~~~~~~~~ parameters
 
-free_params = ['beta', 'betadec', 'gamma', 'p_birth', 'p_kLf', 'r_TPT19']
+free_params = ['beta', 'betadec', 'gamma', 'p_birth', 'p_kLf', 'TPT']
 param_lengths = [1,         1,         1,       1,          1,         1]
 
 
@@ -189,10 +189,10 @@ data = {
     'incd2010': [14.1, 14.6, 15.1],
     'incd2020': [6.5, 7, 7.5],
     'mort': [0.28, 0.3, 0.32],
-    'p_migrTB': [0.708, 0.728, 0.748],
+    'p_migrTB': [0.744, 0.764, 0.784],
     'p_migrpopn': [0.138, 0.168, 0.198],
     'p_LTBI': [0.15, 0.2, 0.25],
-    'p_tpt2019': [0.406, 0.451, 0.496]
+    'p_tpt2019': [1.237347e-05, 0.0000137483, 1.512313e-05]
 }
 
 f1a = get_dist2(data['incd2010'], 'lognorm')

@@ -101,7 +101,7 @@ def get_objective(x, ref, prm, gps, calfn):
         p_migrpopn = np.sum(sfin[s['for']]) / np.sum(sfin[:i['nstates']])
         
         # number of tpt
-        n_tpt2019 = sfin[s['Pf']] + sfin[s['Ps']]
+        n_tpt2019 = sfin[s['Pf']] + sfin[s['Ps']] * 1e5
         
         if np.any(incd > 0.1):
             #out = calfn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
@@ -116,7 +116,7 @@ def get_objective(x, ref, prm, gps, calfn):
                 'p_migrTB': p_migrTB,
                 'p_migrpopn': p_migrpopn,
                 'p_LTBI': p_LTBI,
-                'n_tpt2019': n_tpt2019
+                'n_tpt2019': n_tpt2019* 1e5
             }
         else:
             out = -np.inf

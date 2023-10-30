@@ -5,7 +5,7 @@ Created on Sun Sep 24 13:29:40 2023
 @author: ISA
 """
 
-from setup_model import p,r,xi
+#from setup_model import p,r,xi
 
 
 
@@ -15,6 +15,6 @@ def allocate_parameters(x, p, r, xi):
     r['gamma'] = x[xi['gamma'][0]]
     p['birth'] = x[xi['p_birth'][0]]
     p['p_kLf'] = x[xi['p_kLf'][0]]
-    r['r_TPT19'] = x[xi['r_TPT19'][0]]
+    r['TPT'][1] = x[xi['TPT'][0]]
     
     return p, r
