@@ -8,9 +8,7 @@
 import numpy as np
 
 def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
-    
-    #M = make_model(p, r, i, s, gps_born)
-    
+        
     # initialise out vector used in odeint
     out = np.zeros((len(insert), 1))
     # select just the compartments, no aggregators or selectors
@@ -33,45 +31,36 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     # substract mortality from the states
     out[:i['nstates']] -= np.sum(morts, axis=1).reshape(-1, 1)
     
-    # and births
-    allmorts = np.sum(morts)
-    births = p['birth'] * allmorts
-    # add births to uninfected compartment
-    out[i[('U', 'dom')]] += births
+    # and births into UK pop
+    dom_morts = np.sum(morts[s['dom'], :])
+    out[i[('U', 'dom')]] += dom_morts
     
-    # subset of state vec selecting all domestic
-    vec = invec[s['dom']]
-    # 1 - migrant tpt
-    vec[1:3] = vec[1:3] * p['p_kLf'] * (1 - p['migrTPT'])
-    # migrant tpt
-    vec[3:5] = vec[3:5] * p['p_kLf'] * p['migrTPT']
-    # 1- p.birth * allmorts
-    vec = vec / sum(vec) * (1 - p['birth']) * allmorts
-    out[s['for']] += vec.reshape(-1, 1)
+    
+    # migration out of the UK
+    out[s['migr']] = out[s['migr']] - r['migr'] * invec[s['migr']] / np.sum(invec[s['migr']])
+    
+    # migration in
+    inmigr = np.sum(morts[s['migr'], :]) + r['migr']
+    vec = np.array([
+        1 - p['LTBI_in_migr'],
+        (1 - p['migrTPT']) * p['LTBI_in_migr'] * 0.02,
+        (1 - p['migrTPT']) * p['LTBI_in_migr'] * 0.98,
+        p['migrTPT'] * p['LTBI_in_migr'] * 0.02,
+        p['migrTPT'] * p['LTBI_in_migr'] * 0.98
+    ])
+    out[s['migrstates']] = out[s['migrstates']] + inmigr * vec
     
     
     # auxillaries    
-    # incidence
-    out[i['aux']['inc']] = agg['inc'] @ (sel['inc'] * allmat) @ invec
-    
-    # incidence sources
-    out[i['aux']['sources'][0]] = np.sum((sel['Lf2I'] * allmat) @ invec)
-    
-    out[i['aux']['sources'][1]] = np.sum((sel['Pf2I'] * allmat) @ invec)
-    
-    out[i['aux']['sources'][2]] = np.sum((sel['Ls2I'] * allmat) @ invec)
-    
-    out[i['aux']['sources'][3]] = np.sum((sel['Ps2I'] * allmat) @ invec)
-    
-    out[i['aux']['sources'][4]] = np.sum((sel['R2I'] * allmat) @ invec)
-    
-    # migrant TPT initiation sources
-    out[i['aux']['migrtpt'][0]] = np.sum((sel['Lf2Pf'] * allmat) @ invec)
-    
-    out[i['aux']['migrtpt'][1]] = np.sum((sel['Ls2Ps'] * allmat) @ invec)
-
-    # mortality
-    out[-1] = np.sum(morts[:, 1])
+    out[i['aux']['inc']] = agg['inc'].dot(sel['inc'] * allmat).dot(invec)
+    tmp1 = agg['incsources'].dot((sel['Lf2I'] * allmat).dot(invec))
+    tmp2 = agg['incsources'].dot((sel['Pf2I'] * allmat).dot(invec))
+    tmp3 = agg['incsources'].dot((sel['Ls2I'] * allmat).dot(invec))
+    tmp4 = agg['incsources'].dot((sel['Ps2I'] * allmat).dot(invec))
+    tmp5 = agg['incsources'].dot((sel['R2I'] * allmat).dot(invec))
+    out[i['aux']['incsources']] = np.concatenate([tmp1, tmp2, tmp3, tmp4, tmp5])
+    out[i['aux']['mort']] = np.sum(morts[:, 1])
+    out[i['aux']['nTPT']] = np.sum((sel['nTPT'] * allmat).dot(invec))
     
     return out
 

@@ -12,9 +12,11 @@ Created on Sun Sep 24 13:29:40 2023
 def allocate_parameters(x, p, r, xi):
     r['beta'] = x[xi['beta'][0]]
     p['betadec'] = x[xi['betadec'][0]]
-    r['gamma'] = x[xi['gamma'][0]]
-    p['birth'] = x[xi['p_birth'][0]]
-    p['p_kLf'] = x[xi['p_kLf'][0]]
-    r['TPT'][1] = x[xi['TPT'][0]]
-    
+    r['gamma_2015'] = x[xi['gamma'][0]]
+    r['gamma_2020'] = x[xi['gamma'][1]]
+    r['TPT2020rec'] = x[xi['r_TPT2020rec']]
+    r['progression'] = [val * r['progression0'] for val in [1, x[xi['p_relrate']], 1]]
+    r['reactivation'] = [val * r['reactivation0'] for val in [1, x[xi['p_relrate']], 1]]
+    r['migr'] = x[xi['r_migr'][0]]
+    p['LTBI_in_migr'] = x[xi['p_LTBI_in_migr'][0]]
     return p, r

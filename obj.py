@@ -51,7 +51,7 @@ def get_objective(x, ref, prm, gps, calfn):
         # (initial state vector with aux and selectors on end)
         init = np.zeros(i['nx'])
         seed = 1e-5
-        init[i[('U', 'dom')]] = 1 - seed
+        init[i[('U', 'dom')]] = 1 - 0.168 seed
         init[i[('I', 'dom')]] = seed
         
         # def r_TPT_linear_increase(t, r_migrTPT2019):
