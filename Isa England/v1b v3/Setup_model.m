@@ -98,18 +98,20 @@ p.imm          = 0.8;                                                      % Red
 p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
 p.TPTeff       = 0.6;                                                      % Effectiveness of TPT
 r.TPT          = [0 0 0];                                                  % Uptake of TPT amongst: 1.domestic, 2.recent migrants, 3.long-term migrants
+r.TPT2020rec   = 0.004;
 r.ACF          = [0 0 0];
 r.ACF2         = [0 0 0];
+
 
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
 % names = {'beta','betadec','gamma', 'p_birth','p_kLf','r_TPT2020rec','p_relrate','r_migr'};      
 % lgths =      [1,        1,      1,         1,      1,             1,          1,       1];
-
-names = {'beta','betadec','gamma','r_TPT2020rec','p_relrate','r_migr','p_LTBI_in_migr'};      
-lgths =      [1,        1,      2,             1,          1,       1,               1];
-
+% names = {'beta','betadec','gamma','r_TPT2020rec','p_relrate','r_migr','p_LTBI_in_migr'};      
+% lgths =      [1,        1,      2,             1,          1,       1,               1];
+names = {'beta','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr'};      
+lgths =      [1,        1,      2,          1,       1,               1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -125,7 +127,7 @@ bds(xi.betadec,:)        = [0 0.15];
 bds(xi.gamma,:)          = repmat([0 10],2,1);
 % bds(xi.p_birth,:)      = [0 1];
 % bds(xi.p_kLf,:)        = [1 30];
-bds(xi.r_TPT2020rec,:)   = [0 0.01];
+% bds(xi.r_TPT2020rec,:)   = [0 0.01];
 bds(xi.p_relrate,:)      = [1 20];
 bds(xi.r_migr,:)         = [0 1];
 bds(xi.p_LTBI_in_migr,:) = [0 0.5];
@@ -137,8 +139,9 @@ prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 % -------------------------------------------------------------------------
 % --- Specify --------------------------------------------------------
 
-data.incd2010   = [14.1 14.6 15.1];
-data.incd2020   = [7.3 7.8 8.3];                                             
+% data.incd2010   = [14.1 14.6 15.1];
+data.incd2010   = [12 14.6 17];                                            % With broader uncertainty intervals
+data.incd2020   = [6.5 7 7.5];                                             
 data.mort       = [0.28 0.3 0.32];                                         % UK TB mortality, 2020
 data.p_migrTB   = [0.708 0.728 0.748];                                     % Proportion contribution of migrants to UK incidence
 data.p_migrpopn = [0.138 0.168 0.198];                                     % Proportion of UK population that is migrants
@@ -155,7 +158,8 @@ f5  = get_distribution_fns(data.p_LTBI,     'beta',    show);
 f6  = get_distribution_fns(data.nTPT2019,   'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
+% lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 
 save Model_setup;
 
