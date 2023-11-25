@@ -53,7 +53,7 @@ for ii = 1:size(xs,1)
     M4 = make_model(p4,r4,i,s,gps);
     
     %models = {M0, M2, M3, M4};
-    models = {M0, M1, M2, M3, M4};    
+    models = {M0, M1, M2, M3};    
     
     for mi = 1:length(models)
         
@@ -84,7 +84,7 @@ mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
 % -------------------------------------------------------------------------
 % --- Plot figure of incidence and mortality impacts ----------------------
 
-ff=figure; lw = 1.5; fs = 14;
+ff=figure; lw = 3; fs = 18;
 allmat = cat(4,incmat,mrtmat);
 
 cols = linspecer(size(allmat,3));
@@ -115,7 +115,11 @@ ylabel('Rate per 100,000 population');
 % -------------------------------------------------------------------------
 % --- Plot figure of incidence components as of 2030 ----------------------
 
-tmp1 = reshape(props(:,:,end),3,5);                                        % Dims: 1.Dom/migr_rect/migr_long, 2.Lf,Pf,Ls,Ps,R
+props_pct = prctile(props,[2.5,50,97.5],1);
+tmp = props_pct(2,:,end);
+props_ext = tmp/sum(tmp);
+
+tmp1 = reshape(props_ext,3,5);                                             % Dims: 1.Dom/migr_rect/migr_long, 2.Lf,Pf,Ls,Ps,R
 tmp2 = [tmp1(1,:); sum([tmp1(2,:); tmp1(3,:)],1)];                         % Dims: 1.Dom/all migr, 2.Lf,Pf,Ls,Ps,R
 tmp3 = [sum(tmp2(:,[1,3]),2), sum(tmp2(:,[2,4]),2), tmp2(:,end)];          % Dims: 1.Dom/all migr, 2.All L, All P, R
 tmp4 = [tmp3(1,:), tmp3(2,:)];
