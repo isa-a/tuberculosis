@@ -1,5 +1,5 @@
-clear all; 
-load calibration_res.mat;
+clear all; % load calibration_res.mat; 
+load bestguess.mat;
 load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
@@ -41,11 +41,11 @@ for ii = 1:size(xs,1)
     M1 = make_model(p1,r1,i,s,gps);
     
     p2 = p1; r2 = r1;
-    p2.migrTPT = 0.75;
+    r2.ACF = 0.69*[1 1 1];
     M2 = make_model(p2,r2,i,s,gps);
     
     p3 = p2; r3 = r2;
-    r3.ACF = 0.69*[1 1 1];
+    p3.migrTPT = 0.75;
     M3 = make_model(p3,r3,i,s,gps);
     
     p4 = p3; r4 = r3;
@@ -76,10 +76,10 @@ for ii = 1:size(xs,1)
     
     for mi = 1:length(models)
         
-        if mi<3
+        if mi<4
             geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, p1, [2022 2025], agg, sel, r0);
         else
-            geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, p2, [2022 2025], agg, sel, r0);
+            geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, p3, [2022 2025], agg, sel, r0);
         end
         [t,soln] = ode15s(geq, [2022:2036], init);
         
@@ -99,55 +99,40 @@ fprintf('\n');
 incmat = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);
 mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
 
-figure; lw = 1.5; fs = 14;
 
-%incidence-----------------------------------------------------------------
-cols = linspecer(size(incmat,3));
-subplot(1,2,1);
+% -------------------------------------------------------------------------
+% --- Plot figure of incidence and mortality impacts ----------------------
 
+ff=figure; lw = 1.5; fs = 14;
+allmat = cat(4,incmat,mrtmat);
+
+cols = linspecer(size(allmat,3));
 xx = [2022:2035];
-for ii = 1:size(incmat,3)
-   plt = incmat(:,:,ii);
-   lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-   jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
-   yline(1.05,'k--');
+
+tis = {'Incidence','Mortality'};
+for is = 1:2
+    subplot(1,2,is); hold on;
+    
+    for ii = 1:size(allmat,3)
+        plt = allmat(:,:,ii,is);
+        lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
+        jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
+    end
+    yl = ylim; yl(1) = 0; ylim(yl);
+    xlim([2022 2035]);
+    set(gca,'fontsize',fs);
+    
+    title(tis{is});
 end
-yl = ylim; yl(1) = 0; ylim(yl);
-xlim([2022 2035])
-set(gca,'fontsize',fs);
-
-%legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','location','SouthWest');
-legend(lg, 'Baseline','TPT, recent migrants','TPT, migrants on entry','+ ACF','+ TPT, domestic', 'Elimination target','location','SouthWest');
+subplot(1,2,1);
+yline(1.05,'k--');
+legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
 ylabel('Rate per 100,000 population');
-title('Incidence')
 
 
-%mortality-----------------------------------------------------------------
-cols = linspecer(size(mrtmat,3));
-subplot(1,2,2);
 
-for ii = 1:size(mrtmat,3)
-   plt = mrtmat(:,:,ii);
-   lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-   jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
-end
-yl = ylim; yl(1) = 0; ylim(yl);
-set(gca,'fontsize',fs);
-
-%legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','location','SouthWest');
-%legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','+ Monthly followup post TPT or Tx','location','SouthWest');
-ylabel('Rate per 100,000 population');
-title('Mortality')
-
-% % Show the proportions from different sources
-% tmp1 = prctile(props,[2.5,50,97.5],1);
-% tmp2 = squeeze(tmp1(2,:,end));
-% mm = [sum(tmp2([1,3])), sum(tmp2([2,4])), tmp2(5)];
-% figure; pie(mm);
-% labels = {'People developing TB without history of TPT or active TB treatment', 'People developing TB after TPT', 'Relapse after active TB treatment'};
-% legend(labels,'Location','NorthWest','Orientation','vertical');
-% title('Sources of incidence in 2035 with all interventions combined')
-
+% -------------------------------------------------------------------------
+% --- Plot figure of incidence components as of 2030 ----------------------
 
 tmp1 = reshape(props(:,:,end),3,5);                                        % Dims: 1.Dom/migr_rect/migr_long, 2.Lf,Pf,Ls,Ps,R
 tmp2 = [tmp1(1,:); sum([tmp1(2,:); tmp1(3,:)],1)];                         % Dims: 1.Dom/all migr, 2.Lf,Pf,Ls,Ps,R
@@ -157,4 +142,5 @@ labels = {'UK-born without treatment history', 'UK-born after TPT', 'UK-born aft
 figure; pie(tmp4);
 legend(labels,'Location','NorthWest','Orientation','vertical');
 title('Sources of incidence in 2035 with all interventions combined')
+
 

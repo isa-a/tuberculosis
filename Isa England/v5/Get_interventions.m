@@ -1,4 +1,4 @@
-clear all; 
+clear all; % load calibration_res.mat; 
 load calibration_res.mat;
 load Model_setup.mat;
 
@@ -117,7 +117,7 @@ xlim([2022 2035])
 set(gca,'fontsize',fs);
 
 %legend(lg, 'Baseline','ACF','ACF + domestic TPT','ACF + domestic AND migrant TPT','location','SouthWest');
-legend(lg, 'Baseline','TPT, recent migrants','TPT, migrants on entry','+ ACF','+ TPT, domestic', 'Elimination target','location','SouthWest');
+legend(lg, 'Baseline','TPT, recent migrants','+ TPT, migrants on entry','+ Case-finding','+ TPT, domestic', 'Elimination target','location','SouthWest');
 ylabel('Rate per 100,000 population');
 title('Incidence')
 

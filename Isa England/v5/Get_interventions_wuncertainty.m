@@ -1,5 +1,5 @@
 clear all; 
-load calibration_res3.mat;
+load calibration_res.mat; 
 load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
@@ -37,7 +37,7 @@ for ii = 1:size(xs,1)
     % --- Model intervention
     
     p1 = p0; r1 = r0;
-    r1.TPT = 0.2876*[0 1 0];
+    r1.TPT = 1.4*[0 1 0];
     M1 = make_model(p1,r1,i,s,gps);
     
     p2 = p1; r2 = r1;
@@ -49,11 +49,11 @@ for ii = 1:size(xs,1)
     M3 = make_model(p3,r3,i,s,gps);
     
     p4 = p3; r4 = r3;
-    r4.TPT = 0.2876*[0 1 0];
+    r4.TPT = 1.4*[1 1 0];
     M4 = make_model(p4,r4,i,s,gps);
     
     %models = {M0, M2, M3, M4};
-    models = {M0, M1, M2, M4};    
+    models = {M0, M1, M2, M3, M4};    
     
     for mi = 1:length(models)
         
@@ -84,7 +84,7 @@ mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
 % -------------------------------------------------------------------------
 % --- Plot figure of incidence and mortality impacts ----------------------
 
-ff=figure; lw = 3; fs = 18;
+ff=figure; lw = 1.5; fs = 14;
 allmat = cat(4,incmat,mrtmat);
 
 cols = linspecer(size(allmat,3));
@@ -107,7 +107,7 @@ for is = 1:2
 end
 subplot(1,2,1);
 yline(1.05,'k--');
-legend(lg, 'Baseline','TPT, recent migrants','+ Reducing diagnostic delay','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
+legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
 ylabel('Rate per 100,000 population');
 
 

@@ -34,7 +34,7 @@ xord = xsam(ord,:);
 x0 = fminsearch(nobj,xord(1,:),optimset('Display','iter'));
 
 % Perform MCMC
-[xsto, outsto] = MCMC_adaptive33(obj, x0, 5e4, 1, [], [], [], 1);
+[xsto, outsto] = MCMC_adaptive(obj, x0, 5e4, 1, [], [], [], 1);
 
 inds = find(outsto==max(outsto));
 x0 = xsto(inds(1),:);
@@ -45,7 +45,7 @@ sum(sfin(intersect(s.migr,[s.Lf,s.Ls])))/sum(sfin(s.migr))
 
 
 cov0 = cov(xsto);
-[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e4, 1, [], [], cov0, 1);
+[xsto, outsto] = MCMC_adaptive(obj, x0, 1e4, 1, [], [], cov0, 1);
 
 
 nreps = 4;
@@ -54,7 +54,7 @@ for ii = 1:nreps
     inds = find(outsto==max(outsto));
     x0 = xsto(inds(1),:);
     cov0 = cov(xsto);
-    [xsto, outsto] = MCMC_adaptive33(obj, x0, niter(ii), 1, [], [], cov0, 1);
+    [xsto, outsto] = MCMC_adaptive(obj, x0, niter(ii), 1, [], [], cov0, 1);
 end
 
 
@@ -68,7 +68,7 @@ return;
 
 x2 = xsto2(end,:);
 cov0 = cov(xsto2);
-[xsto2, outsto2] = MCMC_adaptive33(obj, x2, 5e4, 1, [], [], cov0, 1);
+[xsto2, outsto2] = MCMC_adaptive(obj, x2, 5e4, 1, [], [], cov0, 1);
 fprintf('\n');
 
 

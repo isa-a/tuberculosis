@@ -1,64 +1,85 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 30 14:33:33 2023
+Created on Wed Jan 31 13:46:57 2024
 
 @author: ISA
 """
 
-import matplotlib.pyplot as plt
-
-# Data
-years = [2017, 2018, 2019, 2020, 2021]
-values = [8.4, 7.6, 7.7, 7.3, 7.8]
-
-# Additional data
-additional_years = [2010, 2011, 2012, 2013, 2014, 2015, 2016]
-additional_values = [13.4, 14.1, 13.7, 12.3, 10.9, 9.6, 9.3]
-
-# Combine old and new data
-all_years = additional_years + years
-all_values = additional_values + values
-
-# High-resolution figure
-plt.figure(figsize=(12,7), dpi=150)
-plt.plot(all_years, all_values, marker='o', linestyle='-', color='blue')
-
-plt.title('Incidence (cases per 100,000)')
-plt.xlabel('Year')
-plt.ylabel('Value')
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.xticks(all_years)  # Display all years on x-axis
-plt.ylim(0, max(all_values) + 1)
-plt.tight_layout()
-
-# Show plot
-plt.show()
-
-
-
-#############
-
 import pandas as pd
 
-# Load the uploaded CSV file
-data = pd.read_csv('Book1.csv')
-# Convert the 'UK Born number of notifications' and 'Non-UK Born number of notifications' columns to integers
-data['UK Born number of notifications'] = data['UK Born number of notifications'].str.replace(',', '').astype(int)
-data['Non-UK Born number of notifications'] = data['Non-UK Born number of notifications'].str.replace(',', '').astype(int)
+# Load the data from the Excel file
+file_path = 'Book1.xlsx'
+data = pd.read_excel(file_path)
 
-# Plotting the data
-plt.figure(figsize=(12,7), dpi=150)
-plt.plot(data['Year'], data['UK Born number of notifications'], marker='o', linestyle='-', color='blue', label='UK Born')
-plt.plot(data['Year'], data['Non-UK Born number of notifications'], marker='o', linestyle='-', color='red', label='Non-UK Born')
+# Display the first few rows of the dataframe to understand its structure
+data.head()
 
-plt.title('TB Notifications by Place of Birth')
-plt.xlabel('Year')
-plt.ylabel('Number of Notifications')
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.xticks(data['Year'])  # Display all years on x-axis
-plt.ylim(0, max(data['Non-UK Born number of notifications'].max(), data['UK Born number of notifications'].max()) + 1000)
-plt.legend()
-plt.tight_layout()
+import matplotlib.pyplot as plt
 
-# Show plot
+# Remove the 'Total' row for the plot
+data_plot = data.iloc[:-1]
+
+# Set the index to the time period column for better plotting
+data_plot.set_index('Unnamed: 0', inplace=True)
+# Adjust the plotting to include a small gap between each group of three bars corresponding to each year
+
+# Calculate the positions for the groups of bars
+group_positions = [x for x in range(len(data_plot))]
+
+# Plot each column with a small gap between the bars within each group
+fig, ax = plt.subplots(figsize=(10, 6))
+bar_width = 0.2  # Smaller bar width to accommodate gaps within groups
+gap = 0.05  # Gap between bars in a group
+
+# Generate positions for each bar within the groups
+for i, column in enumerate(data_plot.columns):
+    bar_positions = [x + (bar_width + gap) * i for x in group_positions]
+    ax.bar(bar_positions, data_plot[column], width=bar_width, label=column)
+
+# Create the bar plot with a grid and demonstrate how to change the bar colors
+
+# Define custom colors for the bars
+colors = ['#DA70D6', '#5D3FD3', '#ffd7b7']
+
+# Create the bar plot again without the grid
+
+# Create the bar plot again with a faint horizontal and vertical grid
+
+# Create the bar plot with a high DPI for ultra HD quality
+
+fig, ax = plt.subplots(figsize=(10, 6), dpi=300)  # Set the DPI for the figure
+
+for i, (column, color) in enumerate(zip(data_plot.columns, colors)):
+    bar_positions = [x + (bar_width + gap) * i for x in group_positions]
+    bars = ax.bar(bar_positions, data_plot[column], width=bar_width, label=column, color=color)
+    # Add counts above the bars
+    for bar in bars:
+        height = bar.get_height()
+        ax.annotate(f'{height}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
+# Set plot title and labels
+ax.set_title('Access and Completion of Treatment Over Time')
+ax.set_xlabel('Time Period')
+ax.set_ylabel('Number of People')
+
+# Set x-ticks to be in the middle of the grouped bars
+ax.set_xticks([x + bar_width + gap for x in group_positions])
+ax.set_xticklabels(data_plot.index)
+
+# Add a faint grid to the background
+ax.set_axisbelow(True)
+ax.yaxis.grid(True, color='#EEEEEE')
+ax.xaxis.grid(True, color='#EEEEEE')
+
+# Place a legend outside of the plot area
+ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+# Make space for the legend
+plt.tight_layout(rect=[0, 0, 0.85, 1])
+
+# Show the plot
 plt.show()
