@@ -137,7 +137,7 @@ ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 % -------------------------------------------------------------------------
-% --- Specify --------------------------------------------------------
+% --- Specify calib targets --------------------------------------------------------
 
 % data.incd2010   = [14.1 14.6 15.1];
 data.incd2010   = [12 14.6 17];                                            % With broader uncertainty intervals

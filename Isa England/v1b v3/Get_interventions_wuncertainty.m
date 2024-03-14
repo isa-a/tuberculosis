@@ -37,7 +37,7 @@ for ii = 1:size(xs,1)
     % --- Model intervention
     
     p1 = p0; r1 = r0;
-    r1.TPT = 0.2876*[0 1 0];
+    r1.TPT = 1.4*[0 1 0];
     M1 = make_model(p1,r1,i,s,gps);
     
     p2 = p1; r2 = r1;
@@ -45,7 +45,7 @@ for ii = 1:size(xs,1)
     M2 = make_model(p2,r2,i,s,gps);
     
     p3 = p2; r3 = r2;
-    p3.migrTPT = 0.75;
+    p3.migrTPT = 0.25;
     M3 = make_model(p3,r3,i,s,gps);
     
     p4 = p3; r4 = r3;
@@ -53,7 +53,7 @@ for ii = 1:size(xs,1)
     M4 = make_model(p4,r4,i,s,gps);
     
     %models = {M0, M2, M3, M4};
-    models = {M0, M1, M2, M4};    
+    models = {M0, M1, M2, M3};    
     
     for mi = 1:length(models)
         
@@ -106,7 +106,7 @@ for is = 1:2
     title(tis{is});
 end
 subplot(1,2,1);
-yline(1.05,'k--');
+yline(1.05,'k--','LineWidth', 2);
 legend(lg, 'Baseline','TPT, recent migrants','+ Reducing diagnostic delay','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
 ylabel('Rate per 100,000 population');
 
@@ -127,5 +127,6 @@ labels = {'UK-born without treatment history', 'UK-born after TPT', 'UK-born aft
 figure; pie(tmp4);
 legend(labels,'Location','NorthWest','Orientation','vertical');
 title('Sources of incidence in 2035 with all interventions combined')
+
 
 
