@@ -89,8 +89,8 @@ r.default       = 0.01;
 
 r.self_cure    = 1/6;
 r.relapse      = [0.032 0.14 0.0015];
-% r.relapse      = [0 0 0];
-% r.mu           = 1/66;                                                   % natural mortality
+% % r.relapse      = [0 0 0];
+% % r.mu           = 1/66;                                                   % natural mortality
 r.muTB         = 1/6;                                                      % TB related mortality
 p.imm          = 0.8;                                                      % Reduced susceptibility conferred by previous infection
 
@@ -113,12 +113,16 @@ r.ACF2         = [0 0 0];
 names = {'beta','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr'};      
 lgths =      [1,        1,      2,          1,       1,               1];
 
+names = [names, 'LTBI_stabil',  'Tx', 'default', 'self_cure', 'relapse', 'muTB', 'imm'];      
+lgths = [lgths,       1,          1,       1,          1,          3,         1,  1];
+
 lim = 0; xi = [];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     xi.(names{ii}) = inds;
     lim = inds(end);
 end
+
 
 % Set their boundaries
 bds = [];
@@ -131,6 +135,18 @@ bds(xi.gamma,:)          = repmat([0 10],2,1);
 bds(xi.p_relrate,:)      = [1 20];
 bds(xi.r_migr,:)         = [0 1];
 bds(xi.p_LTBI_in_migr,:) = [0 0.5];
+
+  
+bds(xi.LTBI_stabil,:)  = [0.654 1.09];    
+bds(xi.Tx,:) = [1.5 2.5];   
+bds(xi.default,:)  = [0.0075 0.0125];    
+bds(xi.self_cure,:) = [0.1250 0.2084]; 
+bds(xi.relapse(1), :) = [0.0240 0.04];   
+bds(xi.relapse(2), :) = [0.1050 0.1750];     
+bds(xi.relapse(3), :) = [0.0011 0.0019];  
+bds(xi.muTB,:)  = [0.12525 0.20875];    
+bds(xi.imm,:) = [0.6 1]; 
+
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
