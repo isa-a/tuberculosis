@@ -1,5 +1,9 @@
 clear all; 
+<<<<<<< HEAD
 load calibration_res3.mat;
+=======
+load calibration_res.mat;
+>>>>>>> 8c164f14d6b171722915f5c68aa35da7a4954ae9
 load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
@@ -126,4 +130,11 @@ tmp4 = [tmp3(1,:), tmp3(2,:)];
 labels = {'UK-born without treatment history', 'UK-born after TPT', 'UK-born after TB Rx', 'Migrants without treatment history', 'Migrants after TPT', 'Migrants after TB Rx'};
 figure; pie(tmp4);
 legend(labels,'Location','NorthWest','Orientation','vertical');
+<<<<<<< HEAD
 title('Sources of incidence in 2035 with all interventions combined')
+=======
+title('Sources of incidence in 2035 with all interventions combined')
+
+
+
+>>>>>>> 8c164f14d6b171722915f5c68aa35da7a4954ae9

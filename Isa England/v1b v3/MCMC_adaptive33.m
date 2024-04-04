@@ -56,8 +56,14 @@ for t = 2:n
         covmat = (covmat+covmat.')/2;
         
         % to make sure the matrix is positive semi def
+<<<<<<< HEAD
         regterm = 1e-6;  % the small regularization term
         covmat = covmat + regterm * eye(d);
+=======
+        regterm = max(1e-6, -min(eig(covmat)) + 1e-6);
+        covmat = covmat + regterm * eye(d);
+
+>>>>>>> 8c164f14d6b171722915f5c68aa35da7a4954ae9
         
         % Precaution to make sure values don't get negative
         Y = max((1-b)*mvnrnd(X,sd*covmat) + b*Y0,0);
