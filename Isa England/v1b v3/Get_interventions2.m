@@ -1,5 +1,6 @@
-clear all; % load calibration_res.mat; 
-load bestguess.mat;
+clear all; 
+load calibration_res.mat; 
+%load bestguess.mat;
 load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
@@ -72,7 +73,7 @@ for ii = 1:size(xs,1)
 %     M5 = make_model(p5,r5,i,s,gps);
     
     %models = {M0, M2, M3, M4};
-    models = {M0, M1, M2, M3, M4};    
+    models = {M0, M1, M2, M3};    
     
     for mi = 1:length(models)
         

@@ -1,5 +1,5 @@
-clear all; % load calibration_res.mat; 
-load bestguess.mat;
+clear all; 
+load calibration_res.mat;
 load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);

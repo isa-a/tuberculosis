@@ -1,5 +1,5 @@
 clear all; 
-load calibration_res.mat; 
+load calibration_res3.mat;
 load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
@@ -45,15 +45,15 @@ for ii = 1:size(xs,1)
     M2 = make_model(p2,r2,i,s,gps);
     
     p3 = p2; r3 = r2;
-    p3.migrTPT = 0.75;
+    p3.migrTPT = 0.25;
     M3 = make_model(p3,r3,i,s,gps);
     
     p4 = p3; r4 = r3;
-    r4.TPT = 1.4*[1 1 0];
+    r4.TPT = 0.2876*[0 1 0];
     M4 = make_model(p4,r4,i,s,gps);
     
     %models = {M0, M2, M3, M4};
-    models = {M0, M1, M2, M3, M4};    
+    models = {M0, M1, M2, M3};    
     
     for mi = 1:length(models)
         
@@ -84,7 +84,7 @@ mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
 % -------------------------------------------------------------------------
 % --- Plot figure of incidence and mortality impacts ----------------------
 
-ff=figure; lw = 1.5; fs = 14;
+ff=figure; lw = 3; fs = 18;
 allmat = cat(4,incmat,mrtmat);
 
 cols = linspecer(size(allmat,3));
@@ -106,8 +106,8 @@ for is = 1:2
     title(tis{is});
 end
 subplot(1,2,1);
-yline(1.05,'k--');
-legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
+yline(1.05,'k--','LineWidth', 2);
+legend(lg, 'Baseline','TPT, recent migrants','+ Reducing diagnostic delay','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
 ylabel('Rate per 100,000 population');
 
 
@@ -115,7 +115,11 @@ ylabel('Rate per 100,000 population');
 % -------------------------------------------------------------------------
 % --- Plot figure of incidence components as of 2030 ----------------------
 
-tmp1 = reshape(props(:,:,end),3,5);                                        % Dims: 1.Dom/migr_rect/migr_long, 2.Lf,Pf,Ls,Ps,R
+props_pct = prctile(props,[2.5,50,97.5],1);
+tmp = props_pct(2,:,end);
+props_ext = tmp/sum(tmp);
+
+tmp1 = reshape(props_ext,3,5);                                             % Dims: 1.Dom/migr_rect/migr_long, 2.Lf,Pf,Ls,Ps,R
 tmp2 = [tmp1(1,:); sum([tmp1(2,:); tmp1(3,:)],1)];                         % Dims: 1.Dom/all migr, 2.Lf,Pf,Ls,Ps,R
 tmp3 = [sum(tmp2(:,[1,3]),2), sum(tmp2(:,[2,4]),2), tmp2(:,end)];          % Dims: 1.Dom/all migr, 2.All L, All P, R
 tmp4 = [tmp3(1,:), tmp3(2,:)];
@@ -123,5 +127,3 @@ labels = {'UK-born without treatment history', 'UK-born after TPT', 'UK-born aft
 figure; pie(tmp4);
 legend(labels,'Location','NorthWest','Orientation','vertical');
 title('Sources of incidence in 2035 with all interventions combined')
-
-
