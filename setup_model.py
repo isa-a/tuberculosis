@@ -57,7 +57,8 @@ tmp = np.zeros((3, i['nstates']))
 tmp[0, s['everyI']] = 1
 tmp[1, np.intersect1d(s['everyI'], s['dom'])] = 1
 tmp[2, np.intersect1d(s['everyI'], s['migr'])] = 1
-agg['inc'] = tmp
+agg['inc'] = csr_matrix(tmp)
+
 
 tmp = np.zeros((i['nstates'], i['nstates']))
 tmp[s['everyI'], :] = 1
@@ -69,14 +70,14 @@ tmp[s['migr_long'], s['mig_recent']] = 0
 sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
 
 
-# --- Sources of incidence 
+#~~~~~~~~~incidence sources
 
 tmp = np.zeros((3, i['nstates']))
 tmp[0, np.intersect1d([s['I'], s['I2']], s['dom'])] = 1
 tmp[1, np.intersect1d([s['I'], s['I2']], s['mig_recent'])] = 1
 tmp[2, np.intersect1d([s['I'], s['I2']], s['migr_long'])] = 1
-agg['incsources'] = tmp
-#~~~~~~~~~incidence sources
+agg['incsources'] = csr_matrix(tmp)
+
 
 # From recent infection
 tmp = np.zeros((i['nstates'], i['nstates']))
@@ -109,7 +110,7 @@ sel['Ps2I'] = tmp - np.diag(np.diag(tmp))
 # From relapse
 tmp = np.zeros((i['nstates'], i['nstates']))
 for i_idx in s['everyI']:
-    for j_idx in [s['R'], s['Rlo'], s['Rhi']]:
+    for j_idx in np.concatenate([s['R'], s['Rlo'], s['Rhi']]):
         tmp[i_idx, j_idx] = 1
 sel['R2I'] = tmp - np.diag(np.diag(tmp))
 
