@@ -64,7 +64,7 @@ def print_fun(x):
 x0 = fmin(nobj, xord[0, :], callback=print_fun, disp=1, xtol=1e-4, ftol=1e-4, maxiter=500)
 
 x0 = fmin(nobj, xord[0, :], disp=1)
-x0=[  21.2257  ,  0.1499 ,   5.0908  ,  0.7880  , 21.4930, 0.25]
+x0=[  1.4655  ,  0.1399 ,   0.0002  ,  3.8936 ,   4.6954  ,  0.0099  ,  0.1887]
 obj = lambda x: get_objective(x, ref, prm, gps_born,likelihood)[0]
 obj2 = lambda x: get_objective(x, ref, prm, gps_born,likelihood)
 

@@ -22,7 +22,7 @@ def get_states_for_born(i, born):
 def make_model(p, r, i, s, gps):
     M = {}
     m = np.zeros((i['nstates'], i['nstates'])) # construct matrix
-    for born in gps_born:
+    for ib, born in enumerate(gps_born):
         state_values = get_states_for_born(i, born)
         
         # Access the state values for the current 'born'
@@ -41,12 +41,12 @@ def make_model(p, r, i, s, gps):
         # Progression from 'fast' latent
         source = Lf
         destin = I
-        rate = r['progression']  # Replace with a random number
+        rate = r['progression'][ib]  # Replace with a random number
         m[destin, source] += rate
     
         source = Pf
         destin = I2
-        rate = r['progression'] * (1 - p['TPTeff'])  # Replace with a random number
+        rate = r['progression'][ib] * (1 - p['TPTeff'])  # Replace with a random number
         m[destin, source] += rate
     
         # Stabilization of 'fast' to 'slow' latent
@@ -63,12 +63,12 @@ def make_model(p, r, i, s, gps):
         # Reactivation of 'slow' latent
         source = Ls
         destin = I
-        rate = r['reactivation']  # Replace with a random number
+        rate = r['reactivation'][ib]  # Replace with a random number
         m[destin, source] += rate
     
         source = Ps
         destin = I
-        rate = r['reactivation']*(1 - p['TPTeff'])  # Replace with a random number
+        rate = r['reactivation'][ib] * (1 - p['TPTeff'])  # Replace with a random number
         m[destin, source] += rate
     
         # Initiation of treatment
@@ -108,15 +108,24 @@ def make_model(p, r, i, s, gps):
         rate = r['TPT'][gps_born.index(born)]
         for src, dst in [(Ls, Ps)]:
            m[dst, src] += rate
-        
+           
+        # Case-finding       
         rate = r['ACF'][gps_born.index(born)]
-        for src, dst in [(I, I2)]:
-           m[dst, src] += rate
+        for src in [I, I2]:  # Iterate over each source state individually
+           m[Tx, src] += rate
     
-        # # Case-finding        
         rate = r['ACF2'][gps_born.index(born)]
         for src, dst in [(I2, Tx)]:
            m[dst, src] += rate
+           
+           
+    # Transition from recent to long-term migrant status (over 5-year period)
+    sources = s['migr_rect']
+    destinations = s['migr_long']
+    # No direct sub2ind needed, use broadcasting to index directly with arrays
+    for srcs, dstn in zip(sources, destinations):
+        m[dstn, srcs] += 1/5
+
         
     # ~~~~~~~~~~~~~~~~ LINEAR COMPONENT
     col_sums = np.sum(m, axis=0)  # sum up each column
@@ -140,10 +149,9 @@ def make_model(p, r, i, s, gps):
     for born in gps_born: # iterate over where they are born e.g. dom and for
         # find indices of specified states in s that intersect with 'born'
         # Find the indices of susceptible states that intersect with 'born'
-        susinds = np.intersect1d([s[state] for state in ['U', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
+        susinds = np.intersect1d([s[state] for state in ['U', 'Lf', 'Ls', 'Rlo', 'Rhi', 'R']], s[born])
         # calculate intersection between two sets: the states in s, and where they're born
         # born in s
-
         # initialise those elements in the matrix with a 1
         # use indices in i as the row index and susinds as the column indices
         m[i[('Lf', born)], susinds] = 1 

@@ -7,7 +7,7 @@
 
 import numpy as np
 
-def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
+def goveqs_basis3(t, insert, i, s, M, agg, sel, r, p):
         
     # initialise out vector used in odeint
     out = np.zeros((len(insert), 1))
@@ -20,7 +20,7 @@ def goveqs_basis2(t, insert, i, s, M, agg, sel, r, p):
     lam = M['lam'] @ (invec) / np.sum(invec) * (1 - p['betadec']) ** np.maximum((t - 2010), 0)
     
     # full specification of the model
-    # allmat is 22x22, invec.T is 22x1
+    # allmat is 33x33, invec.T is 33x1
     allmat = M['lin'] + (lam * M['nlin'])
     # again just the compartments of the model
     # full model times state vec gives 22x1

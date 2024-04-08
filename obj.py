@@ -10,7 +10,8 @@ from scipy.integrate import odeint
 from make_model import make_model
 from allocate import allocate_parameters
 from setup_model import likelihood_function
-from goveqs_basis import goveqs_basis2
+from goveqs_basis import goveqs_basis3
+from gov_eqs_scaleup import goveqs_scaleup
 
 def get_objective(x, ref, prm, gps, calfn):
     
@@ -32,8 +33,16 @@ def get_objective(x, ref, prm, gps, calfn):
     first_values = [prm['bounds'][key][0] for key in prm['bounds']]
     second_values = [prm['bounds'][key][1] for key in prm['bounds']]
     
-    tmp1 = np.array([first_values, second_values])
-    tmp1 = np.vstack((tmp1, x))
+    # tmp1 = np.vstack([list(prm['bounds'].values()), x])  # Assuming 'prm.bounds' and 'x' are compatible
+    # tmp2 = np.diff(tmp1[[0,2,1], :], axis=0)
+    # cond1 = np.min(tmp2) < 0
+    
+    tmp1 = np.array([first_values, second_values], dtype=object)
+    x_reshaped = np.array([x])  # Reshape x to a 2D array for stacking
+    print(tmp1.shape)
+    print(x_reshaped.shape)
+
+    tmp1 = np.vstack((tmp1, x_reshaped))
     # Calculate differences between consecutive rows for columns 0, 2, and 1 (assuming 0-based indexing)
     tmp2 = np.diff(tmp1[[0, 2, 1], :], axis=0)
     
@@ -51,74 +60,85 @@ def get_objective(x, ref, prm, gps, calfn):
         # (initial state vector with aux and selectors on end)
         init = np.zeros(i['nx'])
         seed = 1e-5
-        init[i[('U', 'dom')]] = 1 - 0.168 seed
+        init[i[('U', 'dom')]] = 1 - 0.168 - seed
+        init[i[('U', 'migr_rect')]] = 0.168
         init[i[('I', 'dom')]] = seed
         
-        # def r_TPT_linear_increase(t, r_migrTPT2019):
-        #     if t < 2015:
-        #         return 0
-        #     elif 2015 <= t <= 2019:
-        #         return (r_migrTPT2019 / (2019 - 2014)) * (t - 2014)
-        #     else:
-        #         return r_migrTPT2019
+        # Adjust parameters as needed
+        p0 = p.copy(); r0 = r.copy()
+        p0['betadec'] = 0
+        r0['gamma'] = r0['gamma_2015']
+        M0 = make_model(p0, r0, i, s, gps)
         
-        # def geq(t, in_):
-        #     r['TPT'][1] = r_TPT_linear_increase(t, 0.3)
-        #     return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
+        def geq0(y, t, i, s, M0, agg, sel, r0, p0):
+            return goveqs_basis2(t, y, i, s, M0, agg, sel, r0, p0)
+        
+        t0 = np.linspace(0, 5e3, 500)  # Time vector, adjust granularity as needed
+        soln0 = odeint(geq0, init, t0, args=(i, s, M0, agg, sel, r0, p0))
 
+        # For subsequent periods
+        p1 = p0.copy(); r1 = r0.copy()
+        r1['TPT'] = [0, r['TPT2020rec'], 0]
+        M1 = make_model(p1, r1, i, s, gps)
+    
+        p2 = p.copy(); r2 = r.copy()
+        r2['gamma'] = r1['gamma_2020']
+        M2 = make_model(p2, r2, i, s, gps)
         
-        # wrapper for gov eqs basis taking only insert and time
-        def geq(t, in_):
-            return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
-        
-        # time range for solving equation until
-        t0 = np.arange(2020)
-        soln0 = odeint(geq, init, t0, tfirst=True)
-        #soln0 = solve_ivp(geq, (t0[0], t0[-1]), init, t_eval=t0, vectorized=True)
-        #soln0=soln0.y.T
+        def geq1(y, t, M0, M1, M2, timeline, i, s, p2, r2, prm, sel, agg):
+            
+            return goveqs_scaleup(t, y, M0, M1, M2, timeline, i, s, p2, r2, prm, sel, agg)
 
+        t1 = np.linspace(2010, 2020, 100)  # Adjust as needed for granularity
+        soln1 = odeint(geq1, soln0[-1], t1, args=(M0, M1, M2, [2015, 2020, 2010, 2020], i, s, p2, r2, prm, sel, agg))
         
-        # calculates the differences between rows of soln0
-        dsol = np.diff(soln0, axis=0)
-        # filters rows of dsol, the t0 index select rows where the corresponding 
-        # time point in t0 is equal to 2010 
-        # aux index is position of incidence
-        incd2010 = dsol[t0[:-1] == 2010, i['aux']['inc'][0]] * 1e5
-        # final position in row of dsol gives 2020, and aux index for incidence
+        # Calculate the derivative of the solution with respect to time
+        dsol = np.diff(soln1.y, axis=1)  # Assuming soln1.y for solve_ivp; adjust if using odeint
+        sfin = soln1.y[:, -1]  # Final state
+        
+        # Indexing for year 2010 might require finding the closest time point in t1 to 2010
+        # This is straightforward if t1 contains 2010 exactly; otherwise, you might need to find the nearest value
+        index_2010 = np.where(t1 == 2010)[0][0]  # Adjust accordingly if t1 is not an exact match
+        index_2020 = np.where(t1 == 2020)[0][0]  # Assuming 2020 is directly in t1
+        
+        # Assuming i.aux.inc and i.aux.mort are previously defined, pointing to the right indices
+        # For the sake of demonstration, let's say they are defined as:
+        # i = {'aux': {'inc': [index_for_inc], 'mort': index_for_mort}}
+        
+        incd2010 = dsol[index_2010, i['aux']['inc'][0]] * 1e5
         incd2020 = dsol[-1, i['aux']['inc'][0]] * 1e5
-        # incidence in all positions of the aux for 2020
-        incd = dsol[-1, i['aux']['inc']] * 1e5
-        # final mortality (2020) and its index at end of aux
-        mort = dsol[-1, -1] * 1e5
+        incd = dsol[-1, i['aux']['inc']] * 1e5  # Assuming i['aux']['inc'] is a list of indices
+        mort = dsol[-1, i['aux']['mort']] * 1e5
+        
+        # Calculating proportions, assume 'p' and 's' contain necessary info
+        # For p_LTBI, directly using the parameter as no calculation shown
+        p_LTBI = p['LTBI_in_migr']
+        
+        # For p_migrpopn, you need total in migrant states vs. total in all states
+        # Assuming s['migr'] contains indices for migrant states and using sfin for final state distribution
+        p_migrpopn = np.sum(sfin[s['migr']]) / np.sum(sfin[:i['nstates']])
         p_migrTB = incd[2] / incd[0]
-        
-        # extract final row of soln0, which has the solutions at the last time point
-        # (selecting last row 2020, and all 31 columns)
-        sfin = soln0[-1, :]
-        # within this subset, look for latent foreign states, to get proportion of latent
-        p_LTBI = np.sum(sfin[np.intersect1d(s['for'], [s['Lf'], s['Ls']])]) / np.sum(sfin[s['for']])
-        # proportion of migrants is all foreign compartments over total pop
-        p_migrpopn = np.sum(sfin[s['for']]) / np.sum(sfin[:i['nstates']])
-        
-        # number of tpt
-        #n_tpt2019 = sfin[s['Pf']] + sfin[s['Ps']] * 1e5
-        n_tpt2019 = (soln0[np.where(t0 == 2019)[0][0], s['Pf']] - soln0[np.where(t0 == 2018)[0][0], s['Pf']]) + \
-            (soln0[np.where(t0 == 2019)[0][0], s['Ps']] - soln0[np.where(t0 == 2018)[0][0], s['Ps']]) * 1e5
+
+        # Number initiating TPT in 2019
+        # Again, this assumes that dsol, i.aux.nTPT, etc. are appropriately defined
+        n_TPT2019 = dsol[-1, i['aux']['nTPT']] * 1e5
+
         
         if np.any(incd > 0.1):
             #out = calfn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
-            out = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, n_tpt2019)
+            out = likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
             # add to the auxillaries with calculated values
             aux = {
-                'soln': soln0,
-                'incd': dsol[np.where(t0 == 2010)[0][0]:, i['aux']['inc'][0]] * 1e5,
+                'soln': soln1,
+                'incd': dsol[np.where(t1 == 2010)[0][0]:, i['aux']['inc'][0]] * 1e5,
                 'incd2010': incd2010,
                 'incd2020': incd2020,
                 'mort': mort,
                 'p_migrTB': p_migrTB,
                 'p_migrpopn': p_migrpopn,
                 'p_LTBI': p_LTBI,
-                'n_tpt2019': n_tpt2019* 1e5
+                'p_migrect': np.sum(sfin[s['migr_rect']]) / np.sum(sfin[:i['nstates']]),
+                'n_tpt2019': n_TPT2019
             }
         else:
             out = -np.inf
@@ -127,3 +147,39 @@ def get_objective(x, ref, prm, gps, calfn):
     return out, aux
 
 
+        # # wrapper for gov eqs basis taking only insert and time
+        # # def geq(t, in_):
+        # #     return goveqs_basis2(t, in_, i, s, M, agg, sel, r, p).flatten()
+        
+        # # time range for solving equation until
+        # t0 = np.arange(2020)
+        # soln0 = odeint(geq, init, t0, tfirst=True)
+        # #soln0 = solve_ivp(geq, (t0[0], t0[-1]), init, t_eval=t0, vectorized=True)
+        # #soln0=soln0.y.T
+
+        
+        # # calculates the differences between rows of soln0
+        # dsol = np.diff(soln0, axis=0)
+        # # filters rows of dsol, the t0 index select rows where the corresponding 
+        # # time point in t0 is equal to 2010 
+        # # aux index is position of incidence
+        # incd2010 = dsol[t0[:-1] == 2010, i['aux']['inc'][0]] * 1e5
+        # # final position in row of dsol gives 2020, and aux index for incidence
+        # incd2020 = dsol[-1, i['aux']['inc'][0]] * 1e5
+        # # incidence in all positions of the aux for 2020
+        # incd = dsol[-1, i['aux']['inc']] * 1e5
+        # # final mortality (2020) and its index at end of aux
+        # mort = dsol[-1, -1] * 1e5
+        
+        # # extract final row of soln0, which has the solutions at the last time point
+        # # (selecting last row 2020, and all 31 columns)
+        # sfin = soln0[-1, :]
+        # # within this subset, look for latent foreign states, to get proportion of latent
+        # p_LTBI = np.sum(sfin[np.intersect1d(s['for'], [s['Lf'], s['Ls']])]) / np.sum(sfin[s['for']])
+        # # proportion of migrants is all foreign compartments over total pop
+        # p_migrpopn = np.sum(sfin[s['for']]) / np.sum(sfin[:i['nstates']])
+        
+        # # number of tpt
+        # #n_tpt2019 = sfin[s['Pf']] + sfin[s['Ps']] * 1e5
+        # n_tpt2019 = (soln0[np.where(t0 == 2019)[0][0], s['Pf']] - soln0[np.where(t0 == 2018)[0][0], s['Pf']]) + \
+        #     (soln0[np.where(t0 == 2019)[0][0], s['Ps']] - soln0[np.where(t0 == 2018)[0][0], s['Ps']]) * 1e5
