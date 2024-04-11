@@ -78,9 +78,10 @@ tmp = zeros(i.nstates);
 tmp([s.Pf, s.Ps],[s.Lf, s.Ls]) = 1;
 sel.nTPT = tmp - diag(diag(tmp));
 
+LTBIdec = 0;
 
 % -- Natural history parameters -------------------------------------------
-r.progression0  = 0.0826;
+r.progression0  = 0.072;
 r.LTBI_stabil   = 0.872;
 r.reactivation0 = 0.0006;
 
