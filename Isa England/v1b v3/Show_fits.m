@@ -50,7 +50,7 @@ yl = ylim; yl(1) = 0; ylim(yl);
 % Plot posterior densities
 figure;
 fnms = fieldnames(xi);
-for ii = 1:7
+for ii = 1:16
    subplot(3,3,ii); 
    histogram(xsto(:,ii));
    title(fnms{ii});

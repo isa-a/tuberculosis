@@ -138,15 +138,15 @@ bds(xi.r_migr,:)         = [0 1];
 bds(xi.p_LTBI_in_migr,:) = [0 0.5];
 
   
-bds(xi.LTBI_stabil,:)  = [0.654 1.09];    
-bds(xi.Tx,:) = [1.5 2.5];   
-bds(xi.default,:)  = [0.0075 0.0125];    
-bds(xi.self_cure,:) = [0.1250 0.2084]; 
-bds(xi.relapse(1), :) = [0.0240 0.04];   
-bds(xi.relapse(2), :) = [0.1050 0.1750];     
-bds(xi.relapse(3), :) = [0.0011 0.0019];  
-bds(xi.muTB,:)  = [0.12525 0.20875];    
-bds(xi.imm,:) = [0.6 1]; 
+bds(xi.LTBI_stabil,:)  = [0 1.09];    
+bds(xi.Tx,:) = [1 2.5];   
+bds(xi.default,:)  = [0 0.0125];    
+bds(xi.self_cure,:) = [0 0.2084]; 
+bds(xi.relapse(1), :) = [0 0.04];   
+bds(xi.relapse(2), :) = [0 0.1750];     
+bds(xi.relapse(3), :) = [0 0.0019];  
+bds(xi.muTB,:)  = [0 0.20875];    
+bds(xi.imm,:) = [0 1]; 
 
 prm.bounds = bds';
 
