@@ -157,7 +157,7 @@ prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 % --- Specify calib targets --------------------------------------------------------
 
 % data.incd2010   = [14.1 14.6 15.1];
-data.incd2010   = [12 14.6 17];                                            % With broader uncertainty intervals
+data.incd2010   = [13.6 14.6 15.6];                                            % With broader uncertainty intervals
 data.incd2020   = [6.5 7 7.5];                                             
 data.mort       = [0.28 0.3 0.32];                                         % UK TB mortality, 2020
 data.p_migrTB   = [0.708 0.728 0.748];                                     % Proportion contribution of migrants to UK incidence

@@ -51,7 +51,9 @@ yl = ylim; yl(1) = 0; ylim(yl);
 figure;
 fnms = fieldnames(xi);
 for ii = 1:16
-   subplot(3,3,ii); 
+   subplot(4,4,ii); 
    histogram(xsto(:,ii));
    title(fnms{ii});
 end
+
+
