@@ -92,5 +92,5 @@ tmp2 = squeeze(tmp1(2,:,end));
 tmp3 = reshape(tmp2,2,length(tmp2)/2);
 tmp4 = sum(tmp3);
 % Also add all relapses
-tmp5 = [sum(tmp4(1:2)), sum(tmp4(3:4)), sum(tmp4(5:7))]
-% figure; pie(tmp5);
+tmp5 = [sum(tmp4(1:2)), sum(tmp4(3:4)), sum(tmp4(5:7))];
+figure; pie(tmp5);
