@@ -111,7 +111,7 @@ r.ACF2         = [0 0 0];
 % lgths =      [1,        1,      1,         1,      1,             1,          1,       1];
 % names = {'beta','betadec','gamma','r_TPT2020rec','p_relrate','r_migr','p_LTBI_in_migr'};      
 % lgths =      [1,        1,      2,             1,          1,       1,               1];
-names = {'beta','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr','rf_progression'};      
+names = {'beta','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr','rf_progression', 'rf_reactivation'};      
 lgths =      [1,        1,      2,          1,       1,               1,               1];
 
 names = [names, 'LTBI_stabil',  'Tx', 'default', 'self_cure', 'relapse', 'muTB', 'imm'];      
@@ -136,7 +136,8 @@ bds(xi.gamma,:)          = repmat([0 10],2,1);
 bds(xi.p_relrate,:)      = [1 20];
 bds(xi.r_migr,:)         = [0 1];
 bds(xi.p_LTBI_in_migr,:) = [0 0.5];
-
+bds(xi.rf_progression,:) = [0.5 1.5];
+bds(xi.rf_reactivation,:) = [0.5 1.5];
   
 bds(xi.LTBI_stabil,:)  = [0 1.09];    
 bds(xi.Tx,:) = [1 2.5];   
@@ -147,7 +148,7 @@ bds(xi.relapse(2), :) = [0 0.1750];
 bds(xi.relapse(3), :) = [0 0.0019];  
 bds(xi.muTB,:)  = [0 0.20875];    
 bds(xi.imm,:) = [0 1]; 
-bds(xi.rf_progression,:) = [0.5 1.5];
+
 
 prm.bounds = bds';
 
