@@ -30,18 +30,37 @@ def get_objective(x, ref, prm, gps, calfn):
     # assign parameters to p and r dicts
     p, r = allocate_parameters(x, p, r, xi)
     
-    first_values = [prm['bounds'][key][0] for key in prm['bounds']]
-    second_values = [prm['bounds'][key][1] for key in prm['bounds']]
+    # Initialize lists for first and second values
+    first_values = []
+    second_values = []
     
-    # tmp1 = np.vstack([list(prm['bounds'].values()), x])  # Assuming 'prm.bounds' and 'x' are compatible
-    # tmp2 = np.diff(tmp1[[0,2,1], :], axis=0)
-    # cond1 = np.min(tmp2) < 0
+    # Iterate through each key in bounds
+    for key, bounds in prm['bounds'].items():
+        if isinstance(bounds[0], list):
+            # Extend lists if bounds are lists (e.g., gamma)
+            first_values.extend([b[0] for b in bounds])
+            second_values.extend([b[1] for b in bounds])
+        else:
+            # Append normally if not lists
+            first_values.append(bounds[0])
+            second_values.append(bounds[1])
     
-    tmp1 = np.array([first_values, second_values], dtype=object)
-    x_reshaped = np.array([x])  # Reshape x to a 2D array for stacking
-    print(tmp1.shape)
-    print(x_reshaped.shape)
-
+    # Convert to numpy arrays and ensure dtype is set to float for calculations
+    first_values = np.array(first_values, dtype=float)
+    second_values = np.array(second_values, dtype=float)
+    
+    # Reconstruct tmp1 with proper dimensions
+    tmp1 = np.array([first_values, second_values])
+    
+    # Ensure x is reshaped correctly and matches the length of bounds
+    x_reshaped = np.array([x])  # x must be the correct length to match tmp1
+    
+    # Print dimensions for debugging
+    print("Final check before stacking:")
+    print("tmp1 shape:", tmp1.shape)
+    print("x_reshaped shape:", x_reshaped.shape)
+    
+    # Attempt the stacking
     tmp1 = np.vstack((tmp1, x_reshaped))
     # Calculate differences between consecutive rows for columns 0, 2, and 1 (assuming 0-based indexing)
     tmp2 = np.diff(tmp1[[0, 2, 1], :], axis=0)
