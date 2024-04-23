@@ -99,7 +99,7 @@ p.imm          = 0.8;                                                      % Red
 p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
 p.TPTeff       = 0.6;                                                      % Effectiveness of TPT
 r.TPT          = [0 0 0];                                                  % Uptake of TPT amongst: 1.domestic, 2.recent migrants, 3.long-term migrants
-r.TPT2020rec   = 0.004;
+r.TPT2020rec   = 0.001;
 r.ACF          = [0 0 0];
 r.ACF2         = [0 0 0];
 
@@ -112,7 +112,7 @@ r.ACF2         = [0 0 0];
 % names = {'beta','betadec','gamma','r_TPT2020rec','p_relrate','r_migr','p_LTBI_in_migr'};      
 % lgths =      [1,        1,      2,             1,          1,       1,               1];
 names = {'beta','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr','rf_progression', 'rf_reactivation'};      
-lgths =      [1,        1,      2,          1,       1,               1,               1];
+lgths =      [1,        1,      2,          1,       1,               1,               1,               1];
 
 names = [names, 'LTBI_stabil',  'Tx', 'default', 'self_cure', 'relapse', 'muTB', 'imm'];      
 lgths = [lgths,       1,          1,       1,          1,          3,         1,  1];
