@@ -12,13 +12,13 @@ from get_dist2 import get_dist2
 
 # combining states and born will be used as groups in get_addresses
 states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R'] # states
-gps_born = ['dom', 'mig_recent', 'migr_long'] # where they are born
+gps_born = ['dom', 'mig_recent', 'mig_long'] # where they are born
 
 
 
 i, s, d, lim = get_addresses([states, gps_born])
 s['everyI'] = np.concatenate((s['I'], s['I2']))
-s['migr'] = np.concatenate((s['mig_recent'], s['migr_long']))
+s['migr'] = np.concatenate((s['mig_recent'], s['mig_long']))
 s['migrstates'] = [i['U', 'mig_recent'], i['Lf','mig_recent'], i['Ls','mig_recent'], i['Pf','mig_recent'], i['Ps','mig_recent']]
 
 # s['migrL'] = [s['Lf'][1], s['Ls'][1]]
@@ -63,8 +63,8 @@ agg['inc'] = tmp
 tmp = np.zeros((i['nstates'], i['nstates']))
 tmp[s['everyI'], :] = 1
 # Remove transitions due to changing migrant status
-tmp[s['mig_recent'], s['migr_long']] = 0
-tmp[s['migr_long'], s['mig_recent']] = 0
+tmp[s['mig_recent'], s['mig_long']] = 0
+tmp[s['mig_long'], s['mig_recent']] = 0
 
 # Subtracting the diagonal
 sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms arent counted
@@ -75,8 +75,8 @@ sel['inc'] = tmp - np.diag(np.diag(tmp)) # so that diagonal self to self terms a
 tmp = np.zeros((3, i['nstates']))
 tmp[0, np.intersect1d([s['I'], s['I2']], s['dom'])] = 1
 tmp[1, np.intersect1d([s['I'], s['I2']], s['mig_recent'])] = 1
-tmp[2, np.intersect1d([s['I'], s['I2']], s['migr_long'])] = 1
-agg['incsources'] = tmp
+tmp[2, np.intersect1d([s['I'], s['I2']], s['mig_long'])] = 1
+agg['sources'] = tmp
 
 
 # From recent infection
@@ -126,6 +126,7 @@ sel['nTPT'] = tmp - np.diag(np.diag(tmp))
 # ~~~~~~~~~~~ Natural history params
 # all rates
 r = {
+     'gamma': 0.1,
     'progression0': 0.0826,
     'LTBI_stabil': 0.872,
     'reactivation0': 0.0006,

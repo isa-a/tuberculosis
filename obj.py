@@ -80,7 +80,7 @@ def get_objective(x, ref, prm, gps, calfn):
         init = np.zeros(i['nx'])
         seed = 1e-5
         init[i[('U', 'dom')]] = 1 - 0.168 - seed
-        init[i[('U', 'migr_rect')]] = 0.168
+        init[i[('U', 'mig_recent')]] = 0.168
         init[i[('I', 'dom')]] = seed
         
         # Adjust parameters as needed
@@ -90,7 +90,7 @@ def get_objective(x, ref, prm, gps, calfn):
         M0 = make_model(p0, r0, i, s, gps)
         
         def geq0(y, t, i, s, M0, agg, sel, r0, p0):
-            return goveqs_basis2(t, y, i, s, M0, agg, sel, r0, p0)
+            return goveqs_basis3(t, y, i, s, M0, agg, sel, r0, p0)
         
         t0 = np.linspace(0, 5e3, 500)  # Time vector, adjust granularity as needed
         soln0 = odeint(geq0, init, t0, args=(i, s, M0, agg, sel, r0, p0))
@@ -156,7 +156,7 @@ def get_objective(x, ref, prm, gps, calfn):
                 'p_migrTB': p_migrTB,
                 'p_migrpopn': p_migrpopn,
                 'p_LTBI': p_LTBI,
-                'p_migrect': np.sum(sfin[s['migr_rect']]) / np.sum(sfin[:i['nstates']]),
+                'p_migrect': np.sum(sfin[s['mig_recent']]) / np.sum(sfin[:i['nstates']]),
                 'n_tpt2019': n_TPT2019
             }
         else:

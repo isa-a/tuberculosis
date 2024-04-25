@@ -120,8 +120,8 @@ def make_model(p, r, i, s, gps):
            
            
     # Transition from recent to long-term migrant status (over 5-year period)
-    sources = s['migr_rect']
-    destinations = s['migr_long']
+    sources = s['mig_recent']
+    destinations = s['mig_long']
     # No direct sub2ind needed, use broadcasting to index directly with arrays
     for srcs, dstn in zip(sources, destinations):
         m[dstn, srcs] += 1/5

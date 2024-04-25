@@ -78,7 +78,7 @@ tmp = zeros(i.nstates);
 tmp([s.Pf, s.Ps],[s.Lf, s.Ls]) = 1;
 sel.nTPT = tmp - diag(diag(tmp));
 
-LTBIdec = 0;
+
 
 % -- Natural history parameters -------------------------------------------
 r.progression0  = 0.072;
@@ -91,7 +91,7 @@ r.default       = 0.01;
 r.self_cure    = 1/6;
 r.relapse      = [0.032 0.14 0.0015];
 % % r.relapse      = [0 0 0];
-% % r.mu           = 1/66;                                                   % natural mortality
+% % r.mu           = 1/80;                                                 % natural mortality
 r.muTB         = 1/6;                                                      % TB related mortality
 p.imm          = 0.8;                                                      % Reduced susceptibility conferred by previous infection
 
@@ -174,7 +174,7 @@ f2  = get_distribution_fns(data.mort,       'lognorm', show);
 f3  = get_distribution_fns(data.p_migrTB,   'beta',    show);
 f4  = get_distribution_fns(data.p_migrpopn, 'beta',    show);
 f5  = get_distribution_fns(data.p_LTBI,     'beta',    show);
-f6  = get_distribution_fns(data.nTPT2019,   'lognorm', show);
+%f6  = get_distribution_fns(data.nTPT2019,   'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);

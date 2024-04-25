@@ -143,8 +143,8 @@ M.lam = sparse(m);
 % --- Mortality -----------------------------------------------------------
 
 m = zeros(i.nstates,2);
-m(:,1)   = 1/83;
-m(s.allI,2) = r.muTB;
+m(:,1)   = 1/80;
+m(s.allI,2) = r.muTB + 1/80;
 M.mort   = sparse(m);
 
 

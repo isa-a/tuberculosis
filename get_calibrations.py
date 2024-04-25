@@ -11,11 +11,11 @@ from obj import get_objective
 from pyDOE2 import lhs
 from mcmc2 import MCMC_adaptive
 from tqdm import tqdm
-np.random.seed(42)
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats.qmc import LatinHypercube
 from scipy.stats import qmc
+np.random.seed(42)
 
 def obj(x):
     return get_objective(x, ref, prm, gps_born, likelihood)
