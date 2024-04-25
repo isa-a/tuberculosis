@@ -157,7 +157,7 @@ def get_objective(x, ref, prm, gps, calfn):
                 'p_migrpopn': p_migrpopn,
                 'p_LTBI': p_LTBI,
                 'p_migrect': np.sum(sfin[s['mig_recent']]) / np.sum(sfin[:i['nstates']]),
-                'n_tpt2019': n_TPT2019
+                'nTPT': n_TPT2019
             }
         else:
             out = -np.inf
