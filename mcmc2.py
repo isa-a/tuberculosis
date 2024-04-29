@@ -19,7 +19,9 @@ def MCMC_adaptive(F, x0, n, sigma, cov0, displ=True):
     # Checks on the initial covariance matrix
     if cov0 is None:
         cov0 = np.eye(d)
-
+        
+    n = int(n)  # Convert n to an integer
+    #xsto = np.zeros((n, d))
     xsto = np.zeros((n, d))
     outsto = np.zeros(n)
     history = np.zeros((n, d + 1))

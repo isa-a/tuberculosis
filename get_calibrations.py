@@ -1,12 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Apr  6 04:49:23 2024
-
-@author: ISA
-"""
-
 import numpy as np
-from setup_model import s,ref,prm,gps_born,likelihood
+from setup_model import s, ref, prm, gps_born, likelihood
 from obj import get_objective
 from pyDOE2 import lhs
 from mcmc2 import MCMC_adaptive
@@ -18,7 +11,9 @@ from scipy.stats import qmc
 np.random.seed(42)
 
 def obj(x):
-    return get_objective(x, ref, prm, gps_born, likelihood)
+    result = get_objective(x, ref, prm, gps_born, likelihood)
+    print("Objective function result:", result)  # Add this line for debugging
+    return result
 
 def nobj(x):
     return -obj(x)
@@ -36,21 +31,87 @@ for key, bounds in prm['bounds'].items():
 lower_bounds, upper_bounds = zip(*flat_bounds)
 
 # Generating samples with Latin Hypercube Sampling
-nsam = 1000
-sampler = LatinHypercube(d=len(flat_bounds))
-sample = sampler.random(n=nsam)
-scaled_sample = qmc.scale(sample, lower_bounds, upper_bounds)
+# Generating samples with Latin Hypercube Sampling
+nsam = 1000  # Reduced to 10 for debugging
+print("Total number of samples:", nsam)  # Debugging
+with tqdm(total=nsam, desc="Evaluating Objective") as pbar:
+    sampler = LatinHypercube(d=len(flat_bounds))
+    sample = sampler.random(n=nsam)
+    scaled_sample = qmc.scale(sample, lower_bounds, upper_bounds)
 
-# Evaluating the objective function for each sample
-outs = np.array([obj(x) for x in scaled_sample])
+    # Debugging
+    print("Length of scaled_sample:", len(scaled_sample))
 
+    # Evaluating the objective function for each sample
+    outs = np.zeros(nsam)
+    for i, x in enumerate(scaled_sample[:nsam]):  # Limiting the loop to iterate over only 10 samples
+        print("Current index:", i)  # Debugging
+        try:
+            outs[i] = obj(x)
+        except Exception as e:
+            print(f"Error at index {i}: {e}")
+        pbar.update(1)        
 # Sorting samples by the objective function values to find the best starting point
 ord_indices = np.argsort(-outs)  # Negate for descending order
 best_sample = scaled_sample[ord_indices][0]
 
 # Optimization starting from the best sample
-res = minimize(nobj, best_sample, method='Nelder-Mead', options={'disp': True})
+with tqdm(total=len(best_sample), desc="Optimizing") as pbar:
+    res = minimize(nobj, best_sample, method='Nelder-Mead', callback=lambda x: pbar.update(1))
 
 # Print the optimized parameters and the objective function value
 print("Optimized Parameters:", res.x)
 print("Objective Function Value:", -res.fun)
+
+# Optimizing starting from the best sample
+x0 = res.x  # Use the best sample from previous optimization
+res_xord_1 = res.x  # Store the first element of xord (xord[0]) to use as x0
+
+x0_length = len(x0)  # Obtain the length of x0
+xsto, outsto = MCMC_adaptive(obj, x0, 1e2, 1, np.eye(x0_length))
+
+# Perform MCMC
+#xsto, outsto = MCMC_adaptive(obj, x0, 1e2, 1, np.eye(len(x0)))
+
+# Find the index of the maximum value in outsto
+inds = np.where(outsto == np.max(outsto))[0]
+x0 = xsto[inds[0], :]
+
+# Call obj with x0
+out, aux = obj(x0)
+sfin = aux.soln[-1, :]
+migr_indices = np.intersect1d(s.migr, [s.Lf, s.Ls])
+migr_sum = np.sum(sfin[migr_indices]) / np.sum(sfin[s.migr])
+
+cov0 = np.cov(xsto.T)
+xsto, outsto = MCMC_adaptive(obj, x0, 1e4, 1, cov0=cov0)
+
+nreps = 4
+niter = [1, 1, 1, 5] * int(1e4)
+for ii in range(nreps):
+    inds = np.where(outsto == np.max(outsto))[0]
+    x0 = xsto[inds[0], :]
+    cov0 = np.cov(xsto.T)
+    xsto, outsto = MCMC_adaptive(obj, x0, niter[ii], 1, cov0=cov0)
+
+# Save calibration_res
+np.savez('calibration_res.npz', xsto=xsto, outsto=outsto)
+
+# Additional part
+x2 = xsto[-1, :]
+cov0 = np.cov(xsto.T)
+xsto2, outsto2 = MCMC_adaptive(obj, x2, 5e4, 1, cov0=cov0)
+
+nx = 200
+ix0 = len(xsto) // 2
+dx = len(xsto) // (2 * nx)
+xs = xsto[ix0::dx]
+
+for ii in range(len(xs)):
+    if (ii + 1) % (len(xs) // 24) == 0:
+        print(f"{(ii + 1) / (len(xs) // 24)} ", end="")
+    out, aux = obj(xs[ii])
+    sim = np.array([aux.incd, aux.mort, aux.p_migrTB, aux.p_migrpopn, aux.p_LTBI])
+
+# Save calibration_res again
+np.savez('calibration_res.npz', xsto=xsto, outsto=outsto, xsto2=xsto2, outsto2=outsto2)

@@ -55,10 +55,6 @@ def get_objective(x, ref, prm, gps, calfn):
     # Ensure x is reshaped correctly and matches the length of bounds
     x_reshaped = np.array([x])  # x must be the correct length to match tmp1
     
-    # Print dimensions for debugging
-    print("Final check before stacking:")
-    print("tmp1 shape:", tmp1.shape)
-    print("x_reshaped shape:", x_reshaped.shape)
     
     # Attempt the stacking
     tmp1 = np.vstack((tmp1, x_reshaped))
@@ -94,6 +90,7 @@ def get_objective(x, ref, prm, gps, calfn):
         
         t0 = np.linspace(0, 5e3, 500)  # Time vector, adjust granularity as needed
         soln0 = odeint(geq0, init, t0, args=(i, s, M0, agg, sel, r0, p0))
+       
 
         # For subsequent periods
         p1 = p0.copy(); r1 = r0.copy()
@@ -110,10 +107,11 @@ def get_objective(x, ref, prm, gps, calfn):
 
         t1 = np.linspace(2010, 2020, 100)  # Adjust as needed for granularity
         soln1 = odeint(geq1, soln0[-1], t1, args=(M0, M1, M2, [2015, 2020, 2010, 2020], i, s, p2, r2, prm, sel, agg))
+        #soln1 = odeint(geq1, soln0[-1], t1, args=(M0, M1, M2, [2015, 2020, 2010, 2020], i, s, p2, r2, prm, sel, agg))
         
         # Calculate the derivative of the solution with respect to time
-        dsol = np.diff(soln1.y, axis=1)  # Assuming soln1.y for solve_ivp; adjust if using odeint
-        sfin = soln1.y[:, -1]  # Final state
+        dsol = np.diff(soln1, axis=0)  # Assuming soln1.y for solve_ivp; adjust if using odeint
+        sfin = soln1[-1, :]  # Final state
         
         # Indexing for year 2010 might require finding the closest time point in t1 to 2010
         # This is straightforward if t1 contains 2010 exactly; otherwise, you might need to find the nearest value
@@ -140,8 +138,17 @@ def get_objective(x, ref, prm, gps, calfn):
 
         # Number initiating TPT in 2019
         # Again, this assumes that dsol, i.aux.nTPT, etc. are appropriately defined
-        n_TPT2019 = dsol[-1, i['aux']['nTPT']] * 1e5
-
+        #n_TPT2019 = dsol[-1, i['aux']['nTPT']] * 1e5
+    # Iterate over each index in 'nTPT' and calculate the sum
+        n_TPT_sum = 0
+        for nTPT_index in i['aux']['nTPT']:
+            # Adjust index for zero-based Python indexing
+            nTPT_index -= 1
+            if 0 <= nTPT_index < dsol.shape[1]:
+                n_TPT_sum += dsol[-1, nTPT_index] * 1e5
+            else:
+                raise IndexError(f"Index {nTPT_index} is out of bounds for 'dsol' with shape {dsol.shape}")
+    
         
         if np.any(incd > 0.1):
             #out = calfn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI)
@@ -157,13 +164,13 @@ def get_objective(x, ref, prm, gps, calfn):
                 'p_migrpopn': p_migrpopn,
                 'p_LTBI': p_LTBI,
                 'p_migrect': np.sum(sfin[s['mig_recent']]) / np.sum(sfin[:i['nstates']]),
-                'nTPT': n_TPT2019
+                'nTPT': n_TPT_sum
             }
         else:
             out = -np.inf
             aux = np.nan
         
-    return out, aux
+    return out
 
 
         # # wrapper for gov eqs basis taking only insert and time

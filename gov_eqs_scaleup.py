@@ -33,6 +33,7 @@ from goveqs_basis import goveqs_basis3
 def goveqs_scaleup(t, insert, M0, M1, M2, times, i, s, p, r, prm, sel, agg):
     # Calculate scale factors based on time t and given intervals in times
     # Ensuring no division by zero in the denominator
+    times = np.array(times).reshape((2, 2))
     scale = np.maximum((t - times[:, 0]) / np.maximum(times[:, 1] - times[:, 0], 1e-6), 0)
     scale[0] = min(scale[0], 1)
     
