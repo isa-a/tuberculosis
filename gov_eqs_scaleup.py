@@ -30,11 +30,21 @@ from goveqs_basis import goveqs_basis3
     
 #     return out
 
+
+
+
+
+
+
 def goveqs_scaleup(t, insert, M0, M1, M2, times, i, s, p, r, prm, sel, agg):
-    # Calculate scale factors based on time t and given intervals in times
-    # Ensuring no division by zero in the denominator
-    times = np.array(times).reshape((2, 2))
-    scale = np.maximum((t - times[:, 0]) / np.maximum(times[:, 1] - times[:, 0], 1e-6), 0)
+    if not isinstance(times, list) or len(times) != 2:
+        raise ValueError("Times should be a list containing two tuples [(start1, end1), (start2, end2)]")
+    
+    for interval in times:
+        if not isinstance(interval, tuple) or len(interval) != 2:
+            raise ValueError("Each interval in times should be a tuple (start, end)")
+    
+    scale = np.maximum((t - np.array([start for start, _ in times])) / np.maximum(np.array([end - start for start, end in times]), 1e-6), 0)
     scale[0] = min(scale[0], 1)
     
     # Creating a new dictionary to hold Mt
@@ -45,6 +55,40 @@ def goveqs_scaleup(t, insert, M0, M1, M2, times, i, s, p, r, prm, sel, agg):
     # Compute output using another function, assuming goveqs_basis3 is also translated to Python
     out = goveqs_basis3(t, insert, i, s, Mt, agg, sel, r, p)
     return out
+
+
+
+
+
+
+# def goveqs_scaleup(t, insert, M0, M1, M2, times, i, s, p, r, prm, sel, agg):
+#     # Calculate scale factors based on time t and given intervals in times
+#     # Ensuring no division by zero in the denominator
+#     times = np.array(times).reshape((2, 2))
+#     scale = np.maximum((t - times[:, 0]) / np.maximum(times[:, 1] - times[:, 0], 1e-6), 0)
+#     scale[0] = min(scale[0], 1)
+    
+#     # Creating a new dictionary to hold Mt
+#     Mt = M1.copy()  # Assuming M1, M0, and M2 are dictionaries with a 'lin' key
+#     # Updating 'lin' in Mt based on calculated scales
+#     Mt['lin'] = M0['lin'] + scale[0] * (M1['lin'] - M0['lin']) + scale[1] * (M2['lin'] - M0['lin'])
+    
+#     # Compute output using another function, assuming goveqs_basis3 is also translated to Python
+#     out = goveqs_basis3(t, insert, i, s, Mt, agg, sel, r, p)
+#     return out
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -241,3 +241,4 @@ def likelihood_function(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI):
 
 likelihood = likelihood_function(data['incd2010'], data['incd2020'], data['mort'], data['p_migrTB'], data['p_migrpopn'], data['p_LTBI'])
 #print(likelihood)
+

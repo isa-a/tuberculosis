@@ -170,7 +170,7 @@ def get_objective(x, ref, prm, gps, calfn):
             out = -np.inf
             aux = np.nan
         
-    return out
+    return out, aux
 
 
         # # wrapper for gov eqs basis taking only insert and time
