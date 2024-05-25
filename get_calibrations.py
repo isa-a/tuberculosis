@@ -66,7 +66,7 @@ x0 = res.x  # Use the best sample from previous optimization
 res_xord_1 = res.x  # Store the first element of xord (xord[0]) to use as x0
 
 x0_length = len(x0)  # Obtain the length of x0
-result = MCMC_adaptive(obj, x0, 1e3, 1, np.eye(x0_length))
+result = MCMC_adaptive(obj, x0, 1e4, 1, np.eye(x0_length))
 xsto, outsto = result[0], result[1]
 
 # Perform MCMC
@@ -84,12 +84,12 @@ migr_sum = np.sum(sfin[migr_indices]) / np.sum(sfin[s['migr']])
 
 
 cov0 = np.cov(xsto.T)
-result = MCMC_adaptive(obj, x0, 1e2, 1, cov0=cov0)
+result = MCMC_adaptive(obj, x0, 1e4, 1, cov0=cov0)
 xsto, outsto = result[0], result[1]
 
 
 
-niter = [1, 1, 1, 5] * int(100)
+niter = [1, 1, 1, 5] * int(1e3)
 
 for ii in range(len(niter)):
     inds = np.where(outsto == np.max(outsto))[0]
