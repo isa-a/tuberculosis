@@ -71,7 +71,7 @@ fprintf('\n');
 mat = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);
 
 cols = linspecer(size(mat,3));
-figure; lw = 1.5; fs = 14;
+figure; lw = 3; fs = 14;
 
 xx = [2022:2030];
 for ii = 1:size(mat,3)
