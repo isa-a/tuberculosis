@@ -1,4 +1,4 @@
-clear all; load calibration_res.mat; load Model_setup.mat;
+clear all; load calibration_res3.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
 
@@ -36,26 +36,26 @@ for ii = 1:size(xs,1)
     
     p2 = p0; r2 = r0;
     p2.migrTPT = 1;
-    r2.ACF = 0.69*[1 1];
+    r2.ACF = 3.91202*[1 1];
     M2 = make_model(p2,r2,i,s,gps);
 
     p3 = p0; r3 = r0;
     p3.migrTPT = 1;
-    r3.ACF = 0.69*[1 1];
-    r3.TPT = 0.69*[1 0];
+    r3.ACF = 3.91202*[1 1];
+    r3.TPT = 3.91202*[1 0];
     M3 = make_model(p3,r3,i,s,gps);
     
     p4 = p0; r4 = r0;
     p4.migrTPT = 1;
-    r4.TPT = 0.69*[1 1];
-    r4.ACF = 0.69*[1 1];
+    r4.TPT = 3.91202*[1 1];
+    r4.ACF = 3.91202*[1 1];
     M4 = make_model(p4,r4,i,s,gps);
     
     models = {M0, M2, M3, M4};
     
     for mi = 1:length(models)
         geq = @(t,in) goveqs_scaleup(t, in, i, M0, models{mi}, [2022 2025], agg, sel, r, p0);
-        [t,soln] = ode15s(geq, [2022:2031], init);
+        [t,soln] = ode15s(geq, [2024:2037], init);
         
         sdiff = diff(soln,[],1);
         incsto(:,ii,mi) = sdiff(:,i.aux.inc(1))*1e5;
@@ -73,24 +73,26 @@ mat = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);
 cols = linspecer(size(mat,3));
 figure; lw = 3; fs = 14;
 
-xx = [2022:2030];
+xx = [2024:2036];
 for ii = 1:size(mat,3)
    plt = mat(:,:,ii);
    lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
    jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
 end
 yl = ylim; yl(1) = 0; ylim(yl);
+yline(0.1,'k--','LineWidth', 2);
 set(gca,'fontsize',fs);
 ylabel('Incidence per 100,000 population');
+xlabel('Year');
 
-legend(lg, 'Baseline','ACF','ACF + YA TPT','ACF + YA AND elderly TPT','location','SouthWest');
+legend(lg, 'Baseline incidence','Active case finding','Active case finding & TPT in young adults','Active case finding & TPT in young adults and the elderly','location','SouthWest');
 
 % Show the proportions from different sources
-tmp1 = prctile(props,[2.5,50,97.5],1);
-tmp2 = squeeze(tmp1(2,:,end));
+%tmp1 = prctile(props,[2.5,50,97.5],1);
+%tmp2 = squeeze(tmp1(2,:,end));
 % Now aggregate over age groups
-tmp3 = reshape(tmp2,2,length(tmp2)/2);
-tmp4 = sum(tmp3);
+%tmp3 = reshape(tmp2,2,length(tmp2)/2);
+%tmp4 = sum(tmp3);
 % Also add all relapses
-tmp5 = [sum(tmp4(1:2)), sum(tmp4(3:4)), sum(tmp4(5:7))];
-figure; pie(tmp5);
+%tmp5 = [sum(tmp4(1:2)), sum(tmp4(3:4)), sum(tmp4(5:7))];
+%figure; pie(tmp5);

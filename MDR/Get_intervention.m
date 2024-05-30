@@ -10,7 +10,7 @@ x = x1;
 y = [0.8 0.25];     % Proportion of private sector engaged, and proportion reduction in patient delay
 
 
-r.beta = x(1);
+r.beta = x(1:2);
 r.careseeking = x(2);
 
 

@@ -60,7 +60,7 @@ sel.inc_R = sparse(tmp-diag(diag(tmp)));
 
 
 % -- Natural history parameters -------------------------------------------
-r.progression0  = 0.0826;
+r.progression0  = 0.072;
 r.LTBI_stabil   = 0.872;
 r.reactivation0 = 0.0006;
 
@@ -74,7 +74,7 @@ r.relapse      = [0.032 0.14 0.0015];
 r.muTB         = 1/6;                                                         % TB related mortality
 p.imm          = 0.8;                                                         % Reduced susceptibility conferred by previous infection
 r.TPT          = [0 0];
-p.TPTeff       = 0.4;
+p.TPTeff       = 0.6;
 r.ACF          = [0 0];
 
 % -------------------------------------------------------------------------
