@@ -1,7 +1,7 @@
 clear all;
 
 states  = {'U','Lf','Ls','Pf','Ps','I','Tx','Rlo','Rhi','R'};
-gps.age = {'ad','el'};
+gps.age = {'ch','ad'};
 
 [i, s, d, lim] = get_addresses({states, gps.age}, [], [], [], 0);
 d = char(d);
@@ -18,13 +18,13 @@ s.prevalent  = [s.infectious, s.Tx];
 % Selectors for the incidence
 tmp = zeros(2,i.nstates); 
 tmp(1,s.I) = 1;
-tmp(2,intersect(s.I,s.ad)) = 1;
-tmp(3,intersect(s.I,s.el)) = 1;
+tmp(2,intersect(s.I,s.ch)) = 1;
+tmp(3,intersect(s.I,s.ad)) = 1;
 agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);
 tmp(s.I,[s.Lf,s.Ls]) = 1;
-tmp(s.el, s.ad) = 0;
+tmp(s.ad, s.ch) = 0;
 sel.inc = tmp - diag(diag(tmp));
 
 % Sources of incidence
@@ -80,7 +80,7 @@ r.ACF          = [0 0];
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
-names = {'beta','betadec','gamma','relrisk','ad_mort'};
+names = {'beta','betadec','gamma','relrisk','ch_mort'};
 lgths =      [1,        1,      1,        1,        1];
 
 lim = 0; xi = [];
@@ -96,7 +96,7 @@ bds(xi.beta,:)    = [0 30];
 bds(xi.betadec,:) = [0 0.2];
 bds(xi.gamma,:)   = [0 6];
 bds(xi.relrisk,:) = [0.5 25];
-bds(xi.ad_mort,:) = [0, 0.01];
+bds(xi.ch_mort,:) = [0, 0.01];
 prm.bounds = bds';
 
 
@@ -109,17 +109,17 @@ prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 data.incd2010  = [6.9 8.5 10];
 data.incd2020  = [5.4 6.3 7.4];
 data.mort      = [0.43 0.48 0.53];
-data.p_eldTB   = [0.10 0.13 0.16];
-data.p_eldpopn = [0.14 0.16 0.18];
+data.p_adTB   = [0.10 0.13 0.16];
+data.p_adpopn = [0.14 0.16 0.18];
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010, 'lognorm', show);
 f1b = get_distribution_fns(data.incd2020, 'lognorm', show);
 f2  = get_distribution_fns(data.mort, 'lognorm', show);
-f3  = get_distribution_fns(data.p_eldTB, 'beta', show);
-f4  = get_distribution_fns(data.p_eldpopn, 'beta', show);
+f3  = get_distribution_fns(data.p_adTB, 'beta', show);
+f4  = get_distribution_fns(data.p_adpopn, 'beta', show);
 
-lhd.fn = @(incd2010, incd2020, mort, p_eldTB, p_eldpopn) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_eldTB) + f4(p_eldpopn);
+lhd.fn = @(incd2010, incd2020, mort, p_adTB, p_adpopn) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_adTB) + f4(p_adpopn);
 
 save Model_setup;
 
