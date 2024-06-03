@@ -83,10 +83,10 @@ for ia = 1:length(gps.age)
 end
 
 % --- Ageing process
-sources = s.ch;
-destins = s.ad;
+sources = s.ad;
+destins = s.el;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
-m(inds) = m(inds) + 1/15;
+m(inds) = m(inds) + 1/65;
 
 M.lin = sparse(m - diag(sum(m,1)));
 
@@ -114,7 +114,7 @@ M.lam = sparse(m);
 % --- Mortality -----------------------------------------------------------
 
 m = zeros(i.nstates,2);
-m(s.ch,1) = r.ch_mort;
-m(s.ad,1) = 1/58;                % CUBA: Additional life expectancy after 15 years
+m(s.ad,1) = r.ad_mort;
+m(s.el,1) = 1/17;                % Additional life expectancy after 65 years
 m(s.I,2)  = r.muTB;
 M.mort = sparse(m);

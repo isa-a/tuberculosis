@@ -13,7 +13,7 @@ out(1:i.nstates) = allmat*invec;
 % Mortality and births
 morts = M.mort.*invec;
 out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
-out(i.U.ch) = out(i.U.ch) + sum(morts(:));
+out(i.U.ad) = out(i.U.ad) + sum(morts(:));
 
 % Auxiliaries
 out(i.aux.inc)  = agg.inc*(sel.inc.*allmat)*invec;
