@@ -1,4 +1,4 @@
-clear all; load calibration_res.mat; load Model_setup.mat;
+clear all; load calibration_res2.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
 
@@ -83,7 +83,7 @@ yl = ylim; yl(1) = 0; ylim(yl);
 set(gca,'fontsize',fs);
 ylabel('Incidence per 100,000 population');
 
-legend(lg, 'Baseline','ACF','ACF + YA TPT','ACF + YA AND elderly TPT','location','SouthWest');
+legend(lg, 'Baseline','ACF in everyone','ACF + children TPT','ACF + TPT in everyone','location','SouthWest');
 
 % Show the proportions from different sources
 tmp1 = prctile(props,[2.5,50,97.5],1);

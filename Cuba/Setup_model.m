@@ -60,7 +60,7 @@ sel.inc_R = sparse(tmp-diag(diag(tmp)));
 
 
 % -- Natural history parameters -------------------------------------------
-r.progression0  = 0.0826;
+r.progression0  = 0.072;
 r.LTBI_stabil   = 0.872;
 r.reactivation0 = 0.0006;
 
@@ -74,14 +74,14 @@ r.relapse      = [0.032 0.14 0.0015];
 r.muTB         = 1/6;                                                         % TB related mortality
 p.imm          = 0.8;                                                         % Reduced susceptibility conferred by previous infection
 r.TPT          = [0 0];
-p.TPTeff       = 0.4;
+p.TPTeff       = 0.6;
 r.ACF          = [0 0];
 
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
 names = {'beta','betadec','gamma','relrisk','ch_mort'};
-lgths =      [1,        1,      1,        1,        1];
+lgths =   [1,        1,      1,        1,        1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -107,10 +107,10 @@ prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 % --- Specify data --------------------------------------------------------
 
 data.incd2010  = [6.9 8.5 10];
-data.incd2020  = [5.4 6.3 7.4];
-data.mort      = [0.43 0.48 0.53];
-data.p_adTB   = [0.10 0.13 0.16];
-data.p_adpopn = [0.14 0.16 0.18];
+data.incd2020  = [5.4 6.4 7.2];
+data.mort      = [0.43 0.49 0.54];
+data.p_adTB   = [0.95 0.97 0.99];
+data.p_adpopn = [0.82 0.84 0.86];
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010, 'lognorm', show);
