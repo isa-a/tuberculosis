@@ -1,4 +1,4 @@
-clear all; load calibration_res2.mat; load Model_setup.mat;
+clear all; load calibration_res3.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
 
@@ -54,8 +54,8 @@ for ii = 1:size(xs,1)
     models = {M0, M2, M3, M4};
     
     for mi = 1:length(models)
-        geq = @(t,in) goveqs_scaleup(t, in, i, M0, models{mi}, [2022 2025], agg, sel, r, p0);
-        [t,soln] = ode15s(geq, [2022:2031], init);
+        geq = @(t,in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
+        [t,soln] = ode15s(geq, [2022:2041], init);
         
         sdiff = diff(soln,[],1);
         incsto(:,ii,mi) = sdiff(:,i.aux.inc(1))*1e5;
@@ -71,9 +71,9 @@ fprintf('\n');
 mat = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);
 
 cols = linspecer(size(mat,3));
-figure; lw = 1.5; fs = 14;
+figure; lw = 3; fs = 14;
 
-xx = [2022:2030];
+xx = [2022:2040];
 for ii = 1:size(mat,3)
    plt = mat(:,:,ii);
    lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
@@ -82,6 +82,8 @@ end
 yl = ylim; yl(1) = 0; ylim(yl);
 set(gca,'fontsize',fs);
 ylabel('Incidence per 100,000 population');
+yline(0.1,'k--','LineWidth', 2);
+yline(1,'k--','LineWidth', 2);
 
 legend(lg, 'Baseline','ACF in everyone','ACF + children TPT','ACF + TPT in everyone','location','SouthWest');
 
