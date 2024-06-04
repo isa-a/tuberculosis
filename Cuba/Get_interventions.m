@@ -5,6 +5,7 @@ obj = @(x) get_objective2(x, ref, prm, gps, lhd);
 ix0 = round(size(xsto,1)/2);
 dx  = round(size(xsto,1)/2/150);
 xs  = xsto(ix0:dx:end,:);
+paramset = xsto(5000, :);
 
 mk = round(size(xs,1)/25);
 for ii = 1:size(xs,1)
@@ -85,15 +86,101 @@ ylabel('Incidence per 100,000 population');
 xlabel('Year');
 yline(0.1,'k--','LineWidth', 2);
 yline(1,'k--','LineWidth', 2);
+title('Sampled params');
 
 legend(lg, 'Baseline','ACF in everyone','ACF + adults TPT','ACF + TPT in everyone','location','SouthWest');
 
-% Show the proportions from different sources
-tmp1 = prctile(props,[2.5,50,97.5],1);
-tmp2 = squeeze(tmp1(2,:,end));
-% Now aggregate over age groups
-tmp3 = reshape(tmp2,2,length(tmp2)/2);
-tmp4 = sum(tmp3);
-% Also add all relapses
-tmp5 = [sum(tmp4(1:2)), sum(tmp4(3:4)), sum(tmp4(5:7))]
-% figure; pie(tmp5);
+
+
+%
+
+
+
+% Extract the 5000th row
+paramset = xsto(6209, :);
+
+% Define the objective function
+obj = @(x) get_objective2(x, ref, prm, gps, lhd);
+
+% Calculate initial values
+[out, aux] = obj(paramset);
+init = aux.soln(end, :);
+
+[p0, r0] = allocate_parameters(paramset, p, r, xi);
+M0 = make_model(p0, r0, i, s, gps);
+
+% ---------------------------------------------------------------------
+% --- Model baseline
+% geq = @(t, in) goveqs_basis2(t, in, i, s, M0, agg, sel, r0, p0);
+% [t, soln] = ode15s(geq, [2022:2031], init);
+% sdiff = diff(soln, [], 1);
+% incsto(:, 1, 1) = sdiff(:, i.aux.inc(1)) * 1e5;
+
+% ---------------------------------------------------------------------
+% --- Model intervention
+
+p1 = p0; r1 = r0;
+p1.migrTPT = 1;
+M1 = make_model(p1, r1, i, s, gps);
+
+p2 = p0; r2 = r0;
+p2.migrTPT = 1;
+r2.ACF = 0.69 * [1 1];
+M2 = make_model(p2, r2, i, s, gps); % ACF in everyone
+
+p3 = p0; r3 = r0;
+p3.migrTPT = 1;
+r3.ACF = 0.69 * [1 1];
+r3.TPT = 0.69 * [0 1];
+M3 = make_model(p3, r3, i, s, gps); % TPT in adults
+
+p4 = p0; r4 = r0;
+p4.migrTPT = 1;
+r4.TPT = 0.69 * [1 1];
+r4.ACF = 0.69 * [1 1];
+M4 = make_model(p4, r4, i, s, gps); % ACF and TPT in everyone
+
+models = {M0, M2, M3, M4};
+
+incsto = zeros(2041 - 2022, 1, length(models)); % Preallocate incsto array
+props = zeros(1, length(i.aux.incsources), length(models)); % Preallocate props array
+
+for mi = 1:length(models)
+    geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
+    [t, soln] = ode15s(geq, [2022:2041], init);
+
+    sdiff = diff(soln, [], 1);
+    incsto(:, 1, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
+
+    % Get proportions from different sources
+    vec = sdiff(end, i.aux.incsources) * 1e5;
+    props(1, :, mi) = vec / sum(vec);
+end
+
+cols = linspecer(length(models));
+figure; lw = 3; fs = 14;
+
+xx = 2022:2040;
+for ii = 1:length(models)
+    plt = incsto(:, 1, ii);
+    lg(ii, :) = plot(xx, plt, 'Color', cols(ii, :), 'linewidth', lw); hold on;
+end
+
+yl = ylim; yl(1) = 0; ylim(yl);
+set(gca, 'fontsize', fs);
+ylabel('Incidence per 100,000 population');
+xlabel('Year');
+yline(0.1, 'k--', 'LineWidth', 2);
+yline(1, 'k--', 'LineWidth', 2);
+
+legend(lg, 'Baseline', 'ACF in everyone', 'ACF + adults TPT', 'ACF + TPT in everyone', 'location', 'SouthWest');
+title('Single parameter set');
+
+
+
+
+%
+
+
+
+

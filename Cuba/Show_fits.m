@@ -1,4 +1,4 @@
-clear all; load calibration_res;
+clear all; load calibration_res3;
 
 ix0 = size(xsto,1)/2;
 nx  = 200;
