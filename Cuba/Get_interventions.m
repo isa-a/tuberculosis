@@ -37,19 +37,19 @@ for ii = 1:size(xs,1)
     p2 = p0; r2 = r0;
     p2.migrTPT = 1;
     r2.ACF = 0.69*[1 1];
-    M2 = make_model(p2,r2,i,s,gps);
+    M2 = make_model(p2,r2,i,s,gps); %acf in every1
 
     p3 = p0; r3 = r0;
     p3.migrTPT = 1;
     r3.ACF = 0.69*[1 1];
-    r3.TPT = 0.69*[1 0];
-    M3 = make_model(p3,r3,i,s,gps);
+    r3.TPT = 0.69*[0 1];
+    M3 = make_model(p3,r3,i,s,gps); % tpt in adults
     
     p4 = p0; r4 = r0;
     p4.migrTPT = 1;
     r4.TPT = 0.69*[1 1];
     r4.ACF = 0.69*[1 1];
-    M4 = make_model(p4,r4,i,s,gps);
+    M4 = make_model(p4,r4,i,s,gps); % acf and tpt in every1
     
     models = {M0, M2, M3, M4};
     
@@ -82,10 +82,11 @@ end
 yl = ylim; yl(1) = 0; ylim(yl);
 set(gca,'fontsize',fs);
 ylabel('Incidence per 100,000 population');
+xlabel('Year');
 yline(0.1,'k--','LineWidth', 2);
 yline(1,'k--','LineWidth', 2);
 
-legend(lg, 'Baseline','ACF in everyone','ACF + children TPT','ACF + TPT in everyone','location','SouthWest');
+legend(lg, 'Baseline','ACF in everyone','ACF + adults TPT','ACF + TPT in everyone','location','SouthWest');
 
 % Show the proportions from different sources
 tmp1 = prctile(props,[2.5,50,97.5],1);

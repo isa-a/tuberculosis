@@ -7,10 +7,10 @@ xs  = xsto(ix0:dx:end,:);
 
 for ii = 1:size(xs,1)
     [out, aux] = obj(xs(ii,:));
-    sims(ii,:) = [aux.incd2010, aux.incd2020, aux.mort, aux.p_eldTB, aux.p_eldpopn];   
+    sims(ii,:) = [aux.incd2010, aux.incd2020, aux.mort, aux.p_adTB, aux.p_adpopn];   
 end
 
-alldat  = [data.incd2010; data.incd2020; data.mort; data.p_eldTB; data.p_eldpopn]';
+alldat  = [data.incd2010; data.incd2020; data.mort; data.p_adTB; data.p_adpopn]';
 sim_pct = prctile(sims,[2.5,50,97.5],1)./alldat(2,:);
 alldat  = alldat./alldat(2,:);
 
