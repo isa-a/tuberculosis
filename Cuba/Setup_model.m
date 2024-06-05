@@ -76,12 +76,15 @@ p.imm          = 0.8;                                                         % 
 r.TPT          = [0 0];
 p.TPTeff       = 0.6;
 r.ACF          = [0 0];
+p.crossinf     = 0.2;
+
+% mixmat = [1 0.2; 0.2 1];
 
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
-names = {'beta','betadec','gamma','relrisk','ch_mort'};
-lgths =   [1,        1,      1,        1,        1];
+names = {'beta','betadec','gamma','relrisk','ch_mort','r_ageing'};
+lgths =      [1,        1,      1,        1,        1,         1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -92,11 +95,13 @@ end
 
 % Set their boundaries
 bds = [];
-bds(xi.beta,:)    = [0 30];
-bds(xi.betadec,:) = [0 0.2];
-bds(xi.gamma,:)   = [0 6];
-bds(xi.relrisk,:) = [0.5 25];
-bds(xi.ch_mort,:) = [0, 0.01];
+bds(xi.beta,:)     = [0 30];
+bds(xi.betadec,:)  = [0 0.2];
+bds(xi.gamma,:)    = [0 6];
+bds(xi.relrisk,:)  = [0.5 25];
+bds(xi.ch_mort,:)  = [0, 0.01];
+bds(xi.r_ageing,:) = [0.02 0.3];
+
 prm.bounds = bds';
 
 
@@ -109,7 +114,7 @@ prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 data.incd2010  = [6.9 8.5 10];
 data.incd2020  = [5.4 6.4 7.2];
 data.mort      = [0.43 0.49 0.54];
-data.p_adTB   = [0.95 0.97 0.99];
+data.p_adTB   = [0.84 0.87 0.90];
 data.p_adpopn = [0.82 0.84 0.86];
 
 show = 0;

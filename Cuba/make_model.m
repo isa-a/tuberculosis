@@ -86,30 +86,36 @@ end
 sources = s.ch;
 destins = s.ad;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
-m(inds) = m(inds) + 1/15;
+m(inds) = m(inds) + r.ageing;
 
 M.lin = sparse(m - diag(sum(m,1)));
 
 
 % --- Nonlinear component -------------------------------------------------
 
-m = zeros(i.nstates);
 for ia = 1:length(gps.age)
     age = gps.age{ia};
+    m = zeros(i.nstates);
     susinds = intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age));
     m(i.Lf.(age), susinds) = 1;
+    imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
+    m(:,imminds) = m(:,imminds)*(1-p.imm);
+    M.nlin.(age) = sparse(m - diag(sum(m,1)));
 end
-imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
-m(:,imminds) = m(:,imminds)*(1-p.imm);
-M.nlin = sparse(m - diag(sum(m,1)));
 
 
 % --- Force of infection --------------------------------------------------
 
-m = zeros(1,i.nstates);
-m(s.I) = r.beta;
+m = zeros(2,i.nstates);
+m(:,s.infectious) = r.beta;
+m(1,intersect(s.infectious, s.ad)) = m(1,intersect(s.infectious, s.ad))*p.crossinf;
+m(2,intersect(s.infectious, s.ch)) = m(2,intersect(s.infectious, s.ch))*p.crossinf;
 M.lam = sparse(m);
 
+m = zeros(2,i.nstates);
+m(1,s.ch) = 1;
+m(2,s.ad) = 1;
+M.popnum = sparse(m);
 
 % --- Mortality -----------------------------------------------------------
 

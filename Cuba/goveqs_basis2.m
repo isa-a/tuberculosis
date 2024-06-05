@@ -3,11 +3,15 @@ function out = goveqs_basis2(t, in, i, M, agg, sel, r, p)
 out = zeros(length(in),1);
 invec = in(1:i.nstates);
 
-% New infections
-lam = M.lam*invec/sum(invec)*(1-p.betadec)^(max((t-2010),0));
+% Find populations of children and adults, for dividing lambda by
+pops = M.popnum*invec;
+den = pops(1)*(M.popnum(1,:)) + pops(2)*(M.popnum(2,:));
+den(den==0) = 1;
+% Calculate lambdas
+lam = M.lam*invec./den*(1-p.betadec)^(max((t-2010),0));
 
 % Full model
-allmat = M.lin + lam*M.nlin;
+allmat = M.lin + lam(1)*M.nlin.ch + lam(2)*M.nlin.ad;
 out(1:i.nstates) = allmat*invec;
 
 % Mortality and births
