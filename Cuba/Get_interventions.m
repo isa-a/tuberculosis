@@ -6,27 +6,27 @@ obj = @(x) get_objective2(x, ref, prm, gps, lhd);
 [~, maxIndex] = max(outsto);
 bestFitParameters = xsto(maxIndex, :);
 
-numValidSamples = 200; % Number of valid samples required
-validSamples = []; % Initialize an empty matrix for valid samples
-numParams = length(bestFitParameters); % Number of parameters
+numValidSamples = 200; 
+validSamples = []; 
+numParams = length(bestFitParameters);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
 figure;
 
 while size(validSamples, 1) < numValidSamples
-    distributions = zeros(numValidSamples, numParams); % Temporary storage for distributions
+    distributions = zeros(numValidSamples, numParams); % temp storage for dists
 
-    % Loop through list of params to generate new samples
+    % go through list of params to generate new samples
     for jj = 1:numParams
         centralValue = bestFitParameters(jj);
         lowerBound = centralValue * 0.5;
         upperBound = centralValue * 1.5;
 
-        % Generate samples
+        % formula r = a + (b-a).*rand(N,1)
         samples = lowerBound + (upperBound - lowerBound) * rand(numValidSamples, 1);
         
-        % Assign samples to the jj-th column of distributions matrix
+        % assign samples to the matrix
         distributions(:, jj) = samples;
 
         % Plot
@@ -39,21 +39,21 @@ while size(validSamples, 1) < numValidSamples
     end
     sgtitle(' ±50% Variation');
 
-    % Loop through each set of parameters in distributions
+    % go through each set of parameters 
     for ii = 1:numValidSamples
-        % Get the parameter set from distributions
+        % get the param set from 
         xx = distributions(ii, :);
 
-        % Existing calculations and model evaluations
+        % calculate
         [out, aux] = obj(xx);
 
-        % Check if the results are valid
+        % check out and aux exist + dont have nan/inf
         if isstruct(aux) && isfield(aux, 'soln') && all(~isnan(aux.soln(:))) && all(~isinf(aux.soln(:)))
-            % Append the valid sample to the list
+            % add valid sample to list
             validSamples = [validSamples; xx];
         end
 
-        % Check if we have enough valid samples
+        % check enough valids
         if size(validSamples, 1) >= numValidSamples
             break;
         end
@@ -62,6 +62,8 @@ end
 
 fprintf('\n');
 
+
+timereached = NaN(size(validSamples, 1), 1); % empty for time reached
 
 
 mk = round(size(validSamples, 1) / 25);
@@ -85,22 +87,30 @@ for ii = 1:size(validSamples, 1)
     r4.ACF = 0.69 * [1 1];
     M4 = make_model(p4, r4, i, s, gps); % ACF and TPT in everyone
     
-    models = {M0, M4};
+    models = {M4};
     
     for mi = 1:length(models)
         geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
-        [t, soln] = ode15s(geq, [2022:2041], init, opts);
+        [t, soln] = ode15s(geq, [2022:2200], init, opts);
         
         sdiff = diff(soln, [], 1);
-        incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
-        
-        % Get proportions from different sources
-        vec = sdiff(end, i.aux.incsources) * 1e5;  
-        props(ii, :, mi) = vec / sum(vec);
+
+        % find  year when inc reaches 1 per mill
+        idx = find(sdiff(:, i.aux.inc(1)) * 1e5 <= 0.1, 1); % 1 per million = 0.1 per 100,000
+        if ~isempty(idx)
+            timereached(ii, mi) = t(idx);
+        end
     end
 end
+
 fprintf('\n');
 
+disp('Time to reach 1 per million:');
+disp(timereached);
+
+samplescell = mat2cell(validSamples, ones(size(validSamples, 1), 1), size(validSamples, 2));
+resultstable = table(samplescell, timereached, 'VariableNames', {'Parameter Set', 'Year reached'});
+disp(resultstable);
 
 
 
@@ -221,10 +231,10 @@ paramset = xsto(6209, :);
 
 
 
-[out, aux] = obj(paramset);
+[out, aux] = obj([11.7900 0.0077 1.5471 0.4046 5.1640e-04 0.0923]);
 init = aux.soln(end, :);
 
-[p0, r0] = allocate_parameters(paramset, p, r, xi);
+[p0, r0] = allocate_parameters([11.7900 0.0077 1.5471 0.4046 5.1640e-04 0.0923], p, r, xi);
 M0 = make_model(p0, r0, i, s, gps);
 
 % ---------------------------------------------------------------------
@@ -262,12 +272,12 @@ models = {M0, M4};
 
 opts = odeset('RelTol',1e-14,'AbsTol',1e-14);
 
-incsto = zeros(2041 - 2022, 1, length(models)); 
+incsto = zeros(2200 - 2022, 1, length(models)); 
 props = zeros(1, length(i.aux.incsources), length(models));
 
 for mi = 1:length(models)
     geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
-    [t, soln] = ode15s(geq, [2022:2041], init, opts);
+    [t, soln] = ode15s(geq, [2022:2200], init, opts);
 
     sdiff = diff(soln, [], 1);
     incsto(:, 1, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
@@ -280,7 +290,7 @@ end
 cols = linspecer(length(models));
 figure; lw = 3; fs = 14;
 
-xx = 2022:2040;
+xx = 2022:2200-1;
 for ii = 1:length(models)
     plt = incsto(:, 1, ii);
     lg(ii, :) = plot(xx, plt, 'Color', cols(ii, :), 'linewidth', lw); hold on;
