@@ -98,7 +98,7 @@ bds = [];
 bds(xi.beta,:)     = [0 30];
 bds(xi.betadec,:)  = [0 0.2];
 bds(xi.gamma,:)    = [0 6];
-bds(xi.relrisk,:)  = [0.5 25];
+bds(xi.relrisk,:)  = [0.1 25];
 bds(xi.ch_mort,:)  = [0, 0.01];
 bds(xi.r_ageing,:) = [0.02 0.3];
 

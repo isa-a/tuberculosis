@@ -49,6 +49,32 @@ while size(validSamples, 1) < numValidSamples
 
         % Check if the results are valid
         if isstruct(aux) && isfield(aux, 'soln') && all(~isnan(aux.soln(:))) && all(~isinf(aux.soln(:)))
+            init = aux.soln(end, :);
+
+            [p0, r0] = allocate_parameters(xx, p, r, xi);
+            M0 = make_model(p0, r0, i, s, gps);
+
+            % Model intervention setups
+            p4 = p0; r4 = r0;
+            p4.migrTPT = 1;
+            r4.TPT = 0.69 * [1 1];
+            r4.ACF = 0.69 * [1 1];
+            M4 = make_model(p4, r4, i, s, gps);
+
+            models = {M0, M4};
+
+            for mi = 1:length(models)
+                geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
+                [t, soln] = ode15s(geq, [2022:2041], init, opts);
+
+                sdiff = diff(soln, [], 1);
+                incsto(:, size(validSamples, 1) + 1, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
+
+                % Get proportions from different sources
+                vec = sdiff(end, i.aux.incsources) * 1e5;
+                props(size(validSamples, 1) + 1, :, mi) = vec / sum(vec);
+            end
+
             % Append the valid sample to the list
             validSamples = [validSamples; xx];
         end
@@ -62,9 +88,185 @@ end
 
 fprintf('\n');
 
+% Now validSamples contains 200 valid parameter sets
+% You can proceed with further analysis or plotting
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[~, maxIndex] = max(outsto);
+bestFitParameters = xsto(maxIndex, :);
+
+numSamples = 200;
+
+%  empty matrix to store distributions
+distributions = zeros(numSamples, length(bestFitParameters));
+
+figure;
+
+% loop through list of params
+for jj = 1:length(bestFitParameters)
+ 
+    centralValue = bestFitParameters(jj);
+    
+    lowerBound = centralValue * 0.5;
+    upperBound = centralValue * 1.5;
+    
+    % generate samples
+    samples = lowerBound + (upperBound - lowerBound) * rand(numSamples, 1);
+    
+    % Assign samples to the o-th column of distributions matrix
+    distributions(:, jj) = samples;
+    
+    % plot
+    subplot(2, 3, jj); 
+    histogram(samples, 'Normalization', 'pdf');
+    title(sprintf('Parameter %d: Uniform distribution', jj));
+    xlabel('Value');
+    ylabel('Probability Density');
+    xlim([lowerBound upperBound]);
+end
+sgtitle(' ±50% Variation');
+
+opts = odeset('RelTol',1e-50,'AbsTol',1e-50);
+
+numSets = size(distributions, 1); % number of parameter sets is 200
+mk = round(numSets/25);
+
+% Loop through each set of parameters in distributions
+for ii = 1:numSets
+    
+    if mod(ii, mk) == 0
+        fprintf('%0.5g ', ii / mk); 
+    end
+    
+    % Get the parameter set from distributions
+    xx = distributions(ii, :);
+    
+    % Existing calculations and model evaluations
+    [out, aux] = obj(xx);
+    
+    init = aux.soln(end, :);
+
+    [p0, r0] = allocate_parameters(xx, p, r, xi);
+    M0 = make_model(p0, r0, i, s, gps);
+
+    % Model intervention setups
+    p4 = p0; r4 = r0;
+    p4.migrTPT = 1;
+    r4.TPT = 0.69 * [1 1];
+    r4.ACF = 0.69 * [1 1];
+    M4 = make_model(p4, r4, i, s, gps);
+
+    models = {M0, M4};
+
+    for mi = 1:length(models)
+        geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
+        [t, soln] = ode15s(geq, [2022:2041], init, opts);
+
+        sdiff = diff(soln, [], 1);
+        incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
+
+        % Get proportions from different sources
+        vec = sdiff(end, i.aux.incsources) * 1e5;  
+        props(ii, :, mi) = vec / sum(vec);
+    end
+end
+
+fprintf('\n');
 
 mk = round(size(validSamples, 1) / 25);
+numModels = 1; % Adjust based on the number of models you have
+numYears = 2041 - 2022 + 1; % Number of years from 2022 to 2041
+incsto = zeros(numYears, size(validSamples, 1), numModels);
+props = zeros(size(validSamples, 1), 6, numModels); % Adjust the second dimension based on your data
+
 for ii = 1:size(validSamples, 1)
     
     if mod(ii, mk) == 0
@@ -79,6 +281,12 @@ for ii = 1:size(validSamples, 1)
     [p0, r0] = allocate_parameters(xx, p, r, xi);
     M0 = make_model(p0, r0, i, s, gps);
 
+    % ---------------------------------------------------------------------
+    % --- Model baseline
+    
+    % ---------------------------------------------------------------------
+    % --- Model intervention
+    
     p4 = p0; r4 = r0;
     p4.migrTPT = 1;
     r4.TPT = 0.69 * [1 1];
@@ -101,11 +309,27 @@ for ii = 1:size(validSamples, 1)
 end
 fprintf('\n');
 
+% Plotting
+mat = permute(prctile(incsto, [2.5, 50, 97.5], 2), [2, 1, 3]);
 
+cols = linspecer(size(mat, 3));
+figure; lw = 3; fs = 14;
 
+xx = [2022:2040];
+for ii = 1:size(mat, 3)
+   plt = mat(:, :, ii);
+   lg(ii, :) = plot(xx, plt(2, :), 'Color', cols(ii, :), 'linewidth', lw); hold on;
+   jbfill(xx, plt(3, :), plt(1, :), cols(ii, :), 'None', 1, 0.1); hold on;
+end
+yl = ylim; yl(1) = 0; ylim(yl);
+set(gca, 'fontsize', fs);
+ylabel('Incidence per 100,000 population');
+xlabel('Year');
+yline(0.1, 'k--', 'LineWidth', 2);
+yline(1, 'k--', 'LineWidth', 2);
+title('Sampled params');
 
-
-
+legend(lg, 'Baseline', 'ACF in everyone', '
 
 
 
