@@ -223,7 +223,7 @@ yline(0.1,'k--','LineWidth', 2);
 yline(1,'k--','LineWidth', 2);
 title('Sampled params');
 
-legend(lg, 'Baseline','ACF in everyone','ACF + adults TPT','ACF + TPT in everyone','location','SouthWest');
+legend(lg, 'Baseline','ACF + TPT in everyone','location','SouthWest');
 
 
 return;
@@ -236,10 +236,10 @@ paramset = xsto(6209, :);
 
 
 
-[out, aux] = obj([11.7900 0.0077 1.5471 0.4046 5.1640e-04 0.0923]);
+[out, aux] = obj(bestFitParameters);
 init = aux.soln(end, :);
 
-[p0, r0] = allocate_parameters([11.7900 0.0077 1.5471 0.4046 5.1640e-04 0.0923], p, r, xi);
+[p0, r0] = allocate_parameters(bestFitParameters, p, r, xi);
 M0 = make_model(p0, r0, i, s, gps);
 
 % ---------------------------------------------------------------------
