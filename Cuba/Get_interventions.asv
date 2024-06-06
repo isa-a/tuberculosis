@@ -114,14 +114,10 @@ samplescell = mat2cell(validSamples, ones(size(validSamples, 1), 1), size(validS
 resultstable = table(samplescell, timereached, 'VariableNames', {'Parameter Set', 'Year reached'});
 disp(resultstable);
 
-incsto = incsto*1e5;
 
-figure;
-subplot(1,2,1);
-plot(2022:2199, squeeze(incsto(:,1,:)))
 
-subplot(1,2,2);
-plot(2022:2199, squeeze(incsto(:,2,:)))
+
+
 
 
 

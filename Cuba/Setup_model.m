@@ -16,7 +16,7 @@ s.infectious = [s.I];
 s.prevalent  = [s.infectious, s.Tx];
 
 % Selectors for the incidence
-tmp = zeros(2,i.nstates); 
+tmp = zeros(3,i.nstates); 
 tmp(1,s.I) = 1;
 tmp(2,intersect(s.I,s.ch)) = 1;
 tmp(3,intersect(s.I,s.ad)) = 1;
@@ -83,8 +83,8 @@ p.crossinf     = 0.2;
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
-names = {'beta','betadec','gamma','relrisk','ch_mort','r_ageing'};
-lgths =      [1,        1,      1,        1,        1,         1];
+names = {'beta','betadec','gamma','relrisk','ch_mort','r_ageing','p_relbeta_ch','p_offdiag'};
+lgths =      [1,        1,      1,        1,        1,         1,             1,          1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -95,12 +95,14 @@ end
 
 % Set their boundaries
 bds = [];
-bds(xi.beta,:)     = [0 30];
-bds(xi.betadec,:)  = [0 0.2];
-bds(xi.gamma,:)    = [0 6];
-bds(xi.relrisk,:)  = [0.1 25];
-bds(xi.ch_mort,:)  = [0, 0.01];
-bds(xi.r_ageing,:) = [0.02 0.3];
+bds(xi.beta,:)         = [0 30];
+bds(xi.betadec,:)      = [0 0.2];
+bds(xi.gamma,:)        = [0 6];
+bds(xi.relrisk,:)      = [0.1 25];
+bds(xi.ch_mort,:)      = [0, 0.01];
+bds(xi.r_ageing,:)     = [0.02 0.3];
+bds(xi.p_relbeta_ch,:) = [0.2 0.8];
+bds(xi.p_offdiag,:)    = [0.01 0.4];
 
 prm.bounds = bds';
 

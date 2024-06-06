@@ -7,3 +7,5 @@ r.ch_mort      = x(xi.ch_mort);
 r.progression  = r.progression0*[1, x(xi.relrisk)];
 r.reactivation = r.reactivation0*[1, x(xi.relrisk)];
 r.ageing       = x(xi.r_ageing);
+p.relbeta_ch   = x(xi.p_relbeta_ch);
+p.offdiag      = x(xi.p_offdiag);

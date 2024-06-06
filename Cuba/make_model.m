@@ -108,8 +108,9 @@ end
 
 m = zeros(2,i.nstates);
 m(:,s.infectious) = r.beta;
-m(1,intersect(s.infectious, s.ad)) = m(1,intersect(s.infectious, s.ad))*p.crossinf;
-m(2,intersect(s.infectious, s.ch)) = m(2,intersect(s.infectious, s.ch))*p.crossinf;
+m(1,intersect(s.infectious, s.ad)) = m(1,intersect(s.infectious, s.ad))*p.offdiag;
+m(2,intersect(s.infectious, s.ch)) = m(2,intersect(s.infectious, s.ch))*p.offdiag;
+m(:,intersect(s.infectious,s.ch))  = m(:,intersect(s.infectious,s.ch))*p.relbeta_ch;
 M.lam = sparse(m);
 
 m = zeros(2,i.nstates);
