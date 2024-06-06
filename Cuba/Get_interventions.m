@@ -10,6 +10,7 @@ opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
 
 timereached = NaN(size(xs, 1), 1); % empty for time reached
+ch_inc = NaN(size(xs, 1), 1); % 
 
 
 mk = round(size(xs, 1) / 25);
@@ -29,8 +30,8 @@ for ii = 1:size(xs, 1)
 
     p4 = p0; r4 = r0;
     p4.migrTPT = 1;
-    r4.TPT = 0.69 * [1 1];
-    r4.ACF = 0.69 * [1 1];
+    r4.TPT = 3.91202 * [1 1];
+    r4.ACF = 3.91202 * [1 1];
     M4 = make_model(p4, r4, i, s, gps); % ACF and TPT in everyone
     
     models = {M0, M4};
@@ -42,11 +43,17 @@ for ii = 1:size(xs, 1)
         sdiff = diff(soln, [], 1);
         
         incsto(:,ii,mi) = sdiff(:,i.aux.inc(1));
+        incsto2(:,ii,mi) = sdiff(:,i.aux.inc(2));
+        incsto3(:,ii,mi) = sdiff(:,i.aux.inc(3));
 
         % find  year when inc reaches 1 per mill
         idx = find(sdiff(:, i.aux.inc(1)) * 1e5 <= 0.1, 1); % 1 per million = 0.1 per 100,000
         if ~isempty(idx)
             timereached(ii, mi) = t(idx);
+            if mi == 2 % Assuming model 4 is the second model in the list
+                ch_inc(ii, 1) = soln(idx, i.aux.inc(2)); 
+            end
+
         else
             timereached(ii, mi) = NaN; % Set to NaN if threshold is never reached
         end
@@ -59,19 +66,26 @@ disp('Time to reach 1 per million:');
 disp(timereached);
 
 samplescell = mat2cell(xs, ones(size(xs, 1), 1), size(xs, 2));
-resultstable = table(samplescell, timereached, 'VariableNames', {'Parameter Set', 'Year reached'});
+resultstable = table(samplescell, timereached, ch_inc, 'VariableNames', {'Parameter Set', 'Year reached', 'Child incidence at reach'});
 disp(resultstable);
 
 incsto = incsto*1e5;
+incsto2 = incsto2*1e5;
+incsto3 = incsto3*1e5;
 
 figure;
-subplot(1,2,1);
+subplot(1,3,1);
+plot(2022:2199, squeeze(incsto2(:,1,:)))
+yline(0.1, 'k--', 'LineWidth', 2);
+
+subplot(1,3,2);
+plot(2022:2199, squeeze(incsto3(:,1,:)))
+yline(0.1, 'k--', 'LineWidth', 2);
+
+subplot(1,3,3);
 plot(2022:2199, squeeze(incsto(:,1,:)))
 yline(0.1, 'k--', 'LineWidth', 2);
 
-subplot(1,2,2);
-plot(2022:2199, squeeze(incsto(:,2,:)))
-yline(0.1, 'k--', 'LineWidth', 2);
 
 
 
