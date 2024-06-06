@@ -1,4 +1,4 @@
-clear all; load calibration_res4.mat; load Model_setup.mat;
+clear all; load calibration_res5.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
 
@@ -136,8 +136,9 @@ plot(2022:2199, squeeze(incsto(:,2,:)))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
-
+ix0 = round(size(xsto,1)/2);
+dx  = round(size(xsto,1)/2/150);
+xs  = xsto(ix0:dx:end,:);
 
 opts = odeset('RelTol',1e-9,'AbsTol',1e-9);
 
