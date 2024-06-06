@@ -38,7 +38,7 @@ for ii = 1:size(xs, 1)
     
     for mi = 1:length(models)
         geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
-        [t, soln] = ode15s(geq, [2022:2200], init, opts);
+        [t, soln] = ode15s(geq, [2022:2100], init, opts);
         
         sdiff = diff(soln, [], 1);
         
@@ -51,7 +51,7 @@ for ii = 1:size(xs, 1)
         if ~isempty(idx)
             timereached(ii, mi) = t(idx);
             if mi == 2 %  model 4 is second model in the list
-                ch_inc(ii, 1) = soln(idx, i.aux.inc(2) * 1e5); 
+                ch_inc(ii, 1) = soln(idx, i.aux.inc(2)); 
             end
 
         else
@@ -75,28 +75,44 @@ incsto3 = incsto3*1e5;
 
 figure;
 subplot(1,3,1);
-plot(2022:2199, squeeze(incsto2(:,5,:)))
+plot(2022:2099, squeeze(incsto2(:,88,:)))
 yline(0.1, 'k--', 'LineWidth', 2);
 
 subplot(1,3,2);
-plot(2022:2199, squeeze(incsto3(:,5,:)))
+plot(2022:2099, squeeze(incsto3(:,88,:)))
 yline(0.1, 'k--', 'LineWidth', 2);
 
 subplot(1,3,3);
-plot(2022:2199, squeeze(incsto(:,5,:)))
+plot(2022:2099, squeeze(incsto(:,88,:)))
 yline(0.1, 'k--', 'LineWidth', 2);
 
 
 
+%  1st and last year of elimination
+[earliest_yr, earliest_idx] = min(timereached(:, 2));
+[latest_yr, latest_idx] = max(timereached(:, 2));
+% params
+earliest_params = xs(earliest_idx, :);
+latest_params = xs(latest_idx, :);
+
+disp('Earliest Year Parameter Set:');
+disp(earliest_params);
+disp(['Earliest Year: ', num2str(earliest_yr)]);
+
+disp('Latest Year Parameter Set:');
+disp(latest_params);
+disp(['Latest Year: ', num2str(latest_yr)]);
+
+% compare
+comp_tab = table(earliest_params', latest_params', 'VariableNames', {'Earliest Year Params', 'Latest Year Params'});
+disp('Comparison of Parameter Sets:');
+disp(comp_tab);
+
+return;
 
 
 
-
-
-
-
-
-
+%
 
 
 
@@ -205,14 +221,14 @@ return;
 
 
 
-paramset = xsto(6209, :);
+paramset = xs(88, :);
 
 
 
-[out, aux] = obj(bestFitParameters);
+[out, aux] = obj(paramset);
 init = aux.soln(end, :);
 
-[p0, r0] = allocate_parameters(bestFitParameters, p, r, xi);
+[p0, r0] = allocate_parameters(paramset, p, r, xi);
 M0 = make_model(p0, r0, i, s, gps);
 
 % ---------------------------------------------------------------------
@@ -250,12 +266,12 @@ models = {M0, M4};
 
 opts = odeset('RelTol',1e-14,'AbsTol',1e-14);
 
-incsto = zeros(2200 - 2022, 1, length(models)); 
-props = zeros(1, length(i.aux.incsources), length(models));
+%incsto = zeros(2200 - 2022, 1, length(models)); 
+%props = zeros(1, length(i.aux.incsources), length(models));
 
 for mi = 1:length(models)
     geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
-    [t, soln] = ode15s(geq, [2022:2200], init, opts);
+    [t, soln] = ode15s(geq, [2022:2100], init, opts);
 
     sdiff = diff(soln, [], 1);
     incsto(:, 1, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
@@ -268,7 +284,7 @@ end
 cols = linspecer(length(models));
 figure; lw = 3; fs = 14;
 
-xx = 2022:2200-1;
+xx = 2022:2100-1;
 for ii = 1:length(models)
     plt = incsto(:, 1, ii);
     lg(ii, :) = plot(xx, plt, 'Color', cols(ii, :), 'linewidth', lw); hold on;
