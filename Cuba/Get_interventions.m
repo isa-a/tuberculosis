@@ -50,8 +50,8 @@ for ii = 1:size(xs, 1)
         idx = find(sdiff(:, i.aux.inc(1)) * 1e5 <= 0.1, 1); % 1 per million = 0.1 per 100,000
         if ~isempty(idx)
             timereached(ii, mi) = t(idx);
-            if mi == 2 % Assuming model 4 is the second model in the list
-                ch_inc(ii, 1) = soln(idx, i.aux.inc(2)); 
+            if mi == 2 %  model 4 is second model in the list
+                ch_inc(ii, 1) = soln(idx, i.aux.inc(2) * 1e5); 
             end
 
         else
@@ -66,7 +66,7 @@ disp('Time to reach 1 per million:');
 disp(timereached);
 
 samplescell = mat2cell(xs, ones(size(xs, 1), 1), size(xs, 2));
-resultstable = table(samplescell, timereached, ch_inc, 'VariableNames', {'Parameter Set', 'Year reached', 'Child incidence at reach'});
+resultstable = table(samplescell, timereached, ch_inc, 'VariableNames', {'Parameter Set', 'Year reached', 'Child incidence at this point in time'});
 disp(resultstable);
 
 incsto = incsto*1e5;
@@ -75,15 +75,15 @@ incsto3 = incsto3*1e5;
 
 figure;
 subplot(1,3,1);
-plot(2022:2199, squeeze(incsto2(:,1,:)))
+plot(2022:2199, squeeze(incsto2(:,5,:)))
 yline(0.1, 'k--', 'LineWidth', 2);
 
 subplot(1,3,2);
-plot(2022:2199, squeeze(incsto3(:,1,:)))
+plot(2022:2199, squeeze(incsto3(:,5,:)))
 yline(0.1, 'k--', 'LineWidth', 2);
 
 subplot(1,3,3);
-plot(2022:2199, squeeze(incsto(:,1,:)))
+plot(2022:2199, squeeze(incsto(:,5,:)))
 yline(0.1, 'k--', 'LineWidth', 2);
 
 
