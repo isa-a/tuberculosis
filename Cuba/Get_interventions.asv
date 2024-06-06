@@ -1,79 +1,25 @@
-clear all; load calibration_res4.mat; load Model_setup.mat;
+clear all; load calibration_res5.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
-
-
-[~, maxIndex] = max(outsto);
-bestFitParameters = xsto(maxIndex, :);
-
-numValidSamples = 200; 
-validSamples = []; 
-numParams = length(bestFitParameters);
+ix0 = round(size(xsto,1)/2);
+dx  = round(size(xsto,1)/2/200);
+xs  = xsto(ix0:dx:end,:);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
-figure;
-
-while size(validSamples, 1) < numValidSamples
-    distributions = zeros(numValidSamples, numParams); % temp storage for dists
-
-    % go through list of params to generate new samples
-    for jj = 1:numParams
-        centralValue = bestFitParameters(jj);
-        lowerBound = centralValue * 0.5;
-        upperBound = centralValue * 1.5;
-
-        % formula r = a + (b-a).*rand(N,1)
-        samples = lowerBound + (upperBound - lowerBound) * rand(numValidSamples, 1);
-        
-        % assign samples to the matrix
-        distributions(:, jj) = samples;
-
-        % Plot
-        subplot(2, 3, jj); 
-        histogram(samples, 'Normalization', 'pdf');
-        title(sprintf('Parameter %d: Uniform distribution', jj));
-        xlabel('Value');
-        ylabel('Probability Density');
-        xlim([lowerBound upperBound]);
-    end
-    sgtitle(' ±50% Variation');
-
-    % go through each set of parameters 
-    for ii = 1:numValidSamples
-        % get the param set from 
-        xx = distributions(ii, :);
-
-        % calculate
-        [out, aux] = obj(xx);
-
-        % check out and aux exist + dont have nan/inf
-        if isstruct(aux) && isfield(aux, 'soln') && all(~isnan(aux.soln(:))) && all(~isinf(aux.soln(:)))
-            % add valid sample to list
-            validSamples = [validSamples; xx];
-        end
-
-        % check enough valids
-        if size(validSamples, 1) >= numValidSamples
-            break;
-        end
-    end
-end
-
-fprintf('\n');
 
 
-timereached = NaN(size(validSamples, 1), 1); % empty for time reached
+timereached = NaN(size(xs, 1), 1); % empty for time reached
 
 
-mk = round(size(validSamples, 1) / 25);
-for ii = 1:size(validSamples, 1)
+mk = round(size(xs, 1) / 25);
+for ii = 1:size(xs, 1)
     
     if mod(ii, mk) == 0
         fprintf('%0.5g ', ii / mk); 
     end
     
-    xx = validSamples(ii, :);
+    xx = xs(ii, :);
     [out, aux] = obj(xx);
     
     init = aux.soln(end, :);
@@ -87,7 +33,7 @@ for ii = 1:size(validSamples, 1)
     r4.ACF = 0.69 * [1 1];
     M4 = make_model(p4, r4, i, s, gps); % ACF and TPT in everyone
     
-    models = {M0,M4};
+    models = {M0, M4};
     
     for mi = 1:length(models)
         geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
@@ -114,6 +60,14 @@ samplescell = mat2cell(validSamples, ones(size(validSamples, 1), 1), size(validS
 resultstable = table(samplescell, timereached, 'VariableNames', {'Parameter Set', 'Year reached'});
 disp(resultstable);
 
+incsto = incsto*1e5;
+
+figure;
+subplot(1,2,1);
+plot(2022:2199, squeeze(incsto(:,1,:)))
+
+subplot(1,2,2);
+plot(2022:2199, squeeze(incsto(:,2,:)))
 
 
 
@@ -129,13 +83,20 @@ disp(resultstable);
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
 
 
-opts = odeset('RelTol',1e-9,'AbsTol',1e-9);
+
+
+
+
+
+
+
+
+
 
 mk = round(size(xs,1)/25);
 for ii = 1:size(xs,1)
@@ -218,7 +179,7 @@ yline(0.1,'k--','LineWidth', 2);
 yline(1,'k--','LineWidth', 2);
 title('Sampled params');
 
-legend(lg, 'Baseline','ACF in everyone','ACF + adults TPT','ACF + TPT in everyone','location','SouthWest');
+legend(lg, 'Baseline','ACF + TPT in everyone','location','SouthWest');
 
 
 return;
@@ -231,10 +192,10 @@ paramset = xsto(6209, :);
 
 
 
-[out, aux] = obj([11.7900 0.0077 1.5471 0.4046 5.1640e-04 0.0923]);
+[out, aux] = obj(bestFitParameters);
 init = aux.soln(end, :);
 
-[p0, r0] = allocate_parameters([11.7900 0.0077 1.5471 0.4046 5.1640e-04 0.0923], p, r, xi);
+[p0, r0] = allocate_parameters(bestFitParameters, p, r, xi);
 M0 = make_model(p0, r0, i, s, gps);
 
 % ---------------------------------------------------------------------

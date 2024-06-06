@@ -1,79 +1,25 @@
 clear all; load calibration_res5.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
-
-
-[~, maxIndex] = max(outsto);
-bestFitParameters = xsto(maxIndex, :);
-
-numValidSamples = 200; 
-validSamples = []; 
-numParams = length(bestFitParameters);
+ix0 = round(size(xsto,1)/2);
+dx  = round(size(xsto,1)/2/200);
+xs  = xsto(ix0:dx:end,:);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
-figure;
-
-while size(validSamples, 1) < numValidSamples
-    distributions = zeros(numValidSamples, numParams); % temp storage for dists
-
-    % go through list of params to generate new samples
-    for jj = 1:numParams
-        centralValue = bestFitParameters(jj);
-        lowerBound = centralValue * 0.5;
-        upperBound = centralValue * 1.5;
-
-        % formula r = a + (b-a).*rand(N,1)
-        samples = lowerBound + (upperBound - lowerBound) * rand(numValidSamples, 1);
-        
-        % assign samples to the matrix
-        distributions(:, jj) = samples;
-
-        % Plot
-        subplot(2, 3, jj); 
-        histogram(samples, 'Normalization', 'pdf');
-        title(sprintf('Parameter %d: Uniform distribution', jj));
-        xlabel('Value');
-        ylabel('Probability Density');
-        xlim([lowerBound upperBound]);
-    end
-    sgtitle(' ±50% Variation');
-
-    % go through each set of parameters 
-    for ii = 1:numValidSamples
-        % get the param set from 
-        xx = distributions(ii, :);
-
-        % calculate
-        [out, aux] = obj(xx);
-
-        % check out and aux exist + dont have nan/inf
-        if isstruct(aux) && isfield(aux, 'soln') && all(~isnan(aux.soln(:))) && all(~isinf(aux.soln(:)))
-            % add valid sample to list
-            validSamples = [validSamples; xx];
-        end
-
-        % check enough valids
-        if size(validSamples, 1) >= numValidSamples
-            break;
-        end
-    end
-end
-
-fprintf('\n');
 
 
-timereached = NaN(size(validSamples, 1), 1); % empty for time reached
+timereached = NaN(size(xs, 1), 1); % empty for time reached
 
 
-mk = round(size(validSamples, 1) / 25);
-for ii = 1:size(validSamples, 1)
+mk = round(size(xs, 1) / 25);
+for ii = 1:size(xs, 1)
     
     if mod(ii, mk) == 0
         fprintf('%0.5g ', ii / mk); 
     end
     
-    xx = validSamples(ii, :);
+    xx = xs(ii, :);
     [out, aux] = obj(xx);
     
     init = aux.soln(end, :);
@@ -87,7 +33,7 @@ for ii = 1:size(validSamples, 1)
     r4.ACF = 0.69 * [1 1];
     M4 = make_model(p4, r4, i, s, gps); % ACF and TPT in everyone
     
-    models = {M0,M4};
+    models = {M0, M4};
     
     for mi = 1:length(models)
         geq = @(t, in) goveqs_scaleup(t, in, i, M0, models{mi}, [2024 2029], agg, sel, r, p0);
@@ -101,6 +47,8 @@ for ii = 1:size(validSamples, 1)
         idx = find(sdiff(:, i.aux.inc(1)) * 1e5 <= 0.1, 1); % 1 per million = 0.1 per 100,000
         if ~isempty(idx)
             timereached(ii, mi) = t(idx);
+        else
+            timereached(ii, mi) = NaN; % Set to NaN if threshold is never reached
         end
     end
 end
@@ -110,7 +58,7 @@ fprintf('\n');
 disp('Time to reach 1 per million:');
 disp(timereached);
 
-samplescell = mat2cell(validSamples, ones(size(validSamples, 1), 1), size(validSamples, 2));
+samplescell = mat2cell(xs, ones(size(xs, 1), 1), size(xs, 2));
 resultstable = table(samplescell, timereached, 'VariableNames', {'Parameter Set', 'Year reached'});
 disp(resultstable);
 
@@ -119,9 +67,11 @@ incsto = incsto*1e5;
 figure;
 subplot(1,2,1);
 plot(2022:2199, squeeze(incsto(:,1,:)))
+yline(0.1, 'k--', 'LineWidth', 2);
 
 subplot(1,2,2);
 plot(2022:2199, squeeze(incsto(:,2,:)))
+yline(0.1, 'k--', 'LineWidth', 2);
 
 
 
@@ -133,14 +83,23 @@ plot(2022:2199, squeeze(incsto(:,2,:)))
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-ix0 = round(size(xsto,1)/2);
-dx  = round(size(xsto,1)/2/150);
-xs  = xsto(ix0:dx:end,:);
 
-opts = odeset('RelTol',1e-9,'AbsTol',1e-9);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 mk = round(size(xs,1)/25);
 for ii = 1:size(xs,1)
