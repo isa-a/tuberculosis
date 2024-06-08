@@ -2,7 +2,7 @@ clear all; load calibration_res5.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
 ix0 = round(size(xsto,1)/2);
-dx  = round(size(xsto,1)/2/200);
+dx  = round(size(xsto,1)/2/1e3);
 xs  = xsto(ix0:dx:end,:);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
@@ -44,18 +44,33 @@ for ii = 1:size(xs, 1)
         incsto2(:,ii,mi) = sdiff(:,i.aux.inc(2));
         incsto3(:,ii,mi) = sdiff(:,i.aux.inc(3));
 
+        if mi == 1 % model M0 is the first model in the list
+            baseline_inc(ii, 1) = sdiff(end, i.aux.inc(1)); % *1e5 for per 100,000 population
+        end
+
         % find  year when inc reaches 1 per mill
         idx = find(sdiff(:, i.aux.inc(1)) * 1e5 <= 0.1, 1); % 1 per million = 0.1 per 100,000
         if ~isempty(idx)
             timereached(ii, mi) = t(idx);
             if mi == 2 %  model 4 is second model in the list
-                cincd = soln(idx, i.aux.inc(2));
+                cincd = sdiff(idx, i.aux.inc(2));
                 cpopn = sum(soln(idx, s.ch)); % another way to get child popn: 1 - aux.p_adpopn
                 ch_inc(ii, 1) = (cincd / cpopn) * 1e5; % *1e5 for per 100,000 children
             end
-
         else
-            timereached(ii, mi) = NaN; % Set to NaN if threshold is never reached
+            timereached(ii, mi) = NaN; % 
+        end
+
+        idx = find(sdiff(:, i.aux.inc(1)) * 1e5 <= 1, 1); % 1 per million = 0.1 per 100,000
+        if ~isempty(idx)
+            timereached2(ii, mi) = t(idx);
+            if mi == 2 %  model 4 is second model in the list
+                cincd = sdiff(idx, i.aux.inc(2));
+                cpopn = sum(soln(idx, s.ch)); % another way to get child popn: 1 - aux.p_adpopn
+                ch_inc2(ii, 1) = (cincd / cpopn) * 1e5; % *1e5 for per 100,000 children
+            end
+        else
+            timereached2(ii, mi) = NaN; % 
         end
     end
 end
@@ -68,7 +83,7 @@ disp(resultstable);
 
 
 % matrix with parameter sets and child incidence
-p_mat = [xs, ch_inc];
+p_mat = [xs, baseline_inc, ch_inc];
 
 %  partial correlation 
 % remove NaN occurenses
@@ -83,7 +98,7 @@ disp(pcm);
 
 
 parameterLabels = {'beta', 'betadec', 'gamma', 'ch\_mort', 'relrisk', ...
-                   'ageing', 'relbeta\_ch', 'offdiag', 'children incidence'};
+                   'ageing', 'relbeta\_ch', 'offdiag', 'baseline incidence', 'children incidence'};
 % vis
 figure;
 imagesc(pcm);
@@ -98,10 +113,44 @@ xticklabels(parameterLabels);
 yticklabels(parameterLabels);
 
 xtickangle(45);
-% Change the colormap (e.g., to 'jet')
 colormap(autumn);
 
+
+
+% REGRESSION WITH BASELINE AND CHILD INCD
+p_mat = [xs, baseline_inc, ch_inc];
+
+
+p_mat = p_mat(~any(isnan(p_mat), 2), :);
+y = p_mat(:, end); % ch incd
+X = p_mat(:, 1:end-1); % params and baseline
+
+mdl = fitlm(X, y);
+
+disp(mdl);
+disp('Linear regression model:');
+disp(mdl.Formula);
+disp('Estimated Coefficients:');
+disp(mdl.Coefficients);
+
+%threshold for child incd giving overall elimination
+threshold_child_incidence = quantile(ch_inc, 0.95); 
+fprintf('Threshold for elim: %f\n', threshold_child_incidence);
+
+
+figure; 
+xx = get(cdfplot(ch_inc),'XData');
+yy = get(cdfplot(ch_inc),'YData');
+xx2 = get(cdfplot(ch_inc2),'XData');
+yy2 = get(cdfplot(ch_inc2),'YData');
+
+close; 
+figure; hold on;
+plot(xx,1-yy);
+% plot(xx2,1-yy2);
+
 return;
+
 
 
 
