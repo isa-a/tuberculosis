@@ -67,63 +67,7 @@ resultstable = table(samplescell, timereached, ch_inc, 'VariableNames', {'Parame
 disp(resultstable);
 
 
-% matrix with parameter sets and child incidence
-p_mat = [xs, ch_inc];
 
-%  partial correlation 
-% remove NaN occurenses
-p_mat = p_mat(~any(isnan(p_mat), 2), :);
-[pcm, p_val] = partialcorr(p_mat);
-
-fprintf('\n');
-
-
-disp('Partial Correlation Matrix:');
-disp(pcm);
-
-
-parameterLabels = {'beta', 'betadec', 'gamma', 'ch\_mort', 'relrisk', ...
-                   'ageing', 'relbeta\_ch', 'offdiag', 'children incidence'};
-% vis
-figure;
-imagesc(pcm);
-colorbar;
-title('Correlation Matrix');
-xlabel('Parameters and Child Incidence');
-ylabel('Parameters and Child Incidence');
-
-xticks(1:length(parameterLabels));
-yticks(1:length(parameterLabels));
-xticklabels(parameterLabels);
-yticklabels(parameterLabels);
-
-xtickangle(45);
-% Change the colormap (e.g., to 'jet')
-colormap(autumn);
-
-return;
-
-
-
-
-incsto = incsto*1e5;
-incsto2 = incsto2*1e5;
-incsto3 = incsto3*1e5;
-
-
-%parameter set that gives latest elimination
-figure;
-subplot(1,3,1);
-plot(2022:2099, squeeze(incsto2(:,88,:)))
-yline(0.1, 'k--', 'LineWidth', 2); %children
-
-subplot(1,3,2);
-plot(2022:2099, squeeze(incsto3(:,88,:)))
-yline(0.1, 'k--', 'LineWidth', 2); %adults
-
-subplot(1,3,3);
-plot(2022:2099, squeeze(incsto(:,88,:)))
-yline(0.1, 'k--', 'LineWidth', 2); % all incidence
 
 %  1st and last year of elimination
 [earliest_yr, earliest_idx] = min(timereached(:, 2));
@@ -144,3 +88,42 @@ disp(['Latest Year: ', num2str(latest_yr)]);
 comp_tab = table(earliest_params', latest_params', 'VariableNames', {'Earliest Year Params', 'Latest Year Params'});
 disp('Comparison of Parameter Sets:');
 disp(comp_tab);
+
+
+% Create the matrix with parameter sets and child incidence
+p_mat = [xs, ch_inc];
+
+%  partial correlation 
+% remove NaN occurenses
+p_mat = p_mat(~any(isnan(p_mat), 2), :);
+[pcm, p_val] = partialcorr(p_mat);
+
+fprintf('\n');
+
+
+disp('Partial Correlation Matrix:');
+disp(pcm);
+
+% vis
+figure;
+imagesc(pcm);
+colorbar;
+title('Correlation Matrix');
+xlabel('Parameters and Child Incidence');
+ylabel('Parameters and Child Incidence');
+
+return;
+
+%parameter set that gives latest elimination
+figure;
+subplot(1,3,1);
+plot(2022:2099, squeeze(incsto2(:,88,:)))
+yline(0.1, 'k--', 'LineWidth', 2); %children
+
+subplot(1,3,2);
+plot(2022:2099, squeeze(incsto3(:,88,:)))
+yline(0.1, 'k--', 'LineWidth', 2); %adults
+
+subplot(1,3,3);
+plot(2022:2099, squeeze(incsto(:,88,:)))
+yline(0.1, 'k--', 'LineWidth', 2); % all incidence
