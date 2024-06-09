@@ -38,6 +38,12 @@ line([boundary_33, boundary_33], [0, 1], 'Color', 'k', 'LineStyle', '--', 'Handl
 fill([min(xx); xx(xx <= boundary_33); boundary_33], [0; 1-yy(xx <= boundary_33); 0], [1, 0.84, 0], 'FaceAlpha', 0.5, 'EdgeColor', 'none', 'DisplayName', 'Gold'); % Gold
 fill([boundary_33; xx(xx > boundary_33 & xx <= boundary_66); boundary_66], [0; 1-yy(xx > boundary_33 & xx <= boundary_66); 0], [0.75, 0.75, 0.75], 'FaceAlpha', 0.5, 'EdgeColor', 'none', 'DisplayName', 'Silver'); % Silver
 fill([boundary_66; xx(xx > boundary_66); max(xx)], [0; 1-yy(xx > boundary_66); 0], [0.8, 0.5, 0.2], 'FaceAlpha', 0.5, 'EdgeColor', 'none', 'DisplayName', 'Bronze'); % Bronze
+% Add horizontal lines at y = 0.66 and y = 0.33
+line([0, boundary_66], [1-0.66, 1-0.66], 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
+line([0, boundary_33], [1-0.33, 1-0.33], 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
+% Add filled circle dots where the lines meet
+plot(boundary_66, 1-0.66, 'ko', 'MarkerFaceColor', 'k');
+plot(boundary_33, 1-0.33, 'ko', 'MarkerSize', 8, 'LineWidth', 1.5); 
 
 
 xlim([0, 0.18]);
@@ -107,3 +113,38 @@ ylabel('Probability that country has reached elimination', 'FontSize', 14, 'Font
 title('Thresholds for reaching elimination vs pre-elimination', 'FontSize', 16, 'FontWeight', 'bold');
 
 hold off;
+
+
+%tornado plot
+
+
+vec = pcm(end, 1:end-1);
+
+
+param_names = {'Contact rate', 'Declining contact rate', 'Careseeking', 'Child mortality', 'Relapse risk', 'Ageing', 'Intergenerational mixing', 'Intergenerational mixing off diagonal', 'Baseline incidence'};
+
+
+[~, sorted_indices] = sort(abs(vec), 'descend');
+sorted_vec = vec(sorted_indices);
+
+
+sorted_param_names = param_names(sorted_indices);
+
+sorted_vec = flipud(sorted_vec);
+sorted_param_names = flipud(sorted_param_names);
+
+
+figure;
+barh(sorted_vec, 'red');
+
+
+set(gca, 'YDir', 'reverse');
+
+
+xlabel('Partial Correlation', 'FontSize', 14, 'FontWeight', 'bold');
+ylabel('Parameters', 'FontSize', 14, 'FontWeight', 'bold');
+title('Partial Correlation Ordered by Absolute Value', 'FontSize', 16, 'FontWeight', 'bold');
+set(gca, 'YTick', 1:length(sorted_param_names), 'YTickLabel', sorted_param_names);
+
+
+set(gca, 'FontWeight', 'bold');
