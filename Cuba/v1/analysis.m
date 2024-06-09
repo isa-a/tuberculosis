@@ -2,7 +2,7 @@ clear all; load calibration_res5.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, lhd);
 ix0 = round(size(xsto,1)/2);
-dx  = round(size(xsto,1)/2/1e3);
+dx  = round(size(xsto,1)/2/500);
 xs  = xsto(ix0:dx:end,:);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
@@ -148,6 +148,8 @@ close;
 figure; hold on;
 plot(xx,1-yy);
 % plot(xx2,1-yy2);
+
+save analysis_outputs;
 
 return;
 
