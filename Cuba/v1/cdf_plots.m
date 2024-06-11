@@ -189,3 +189,55 @@ ylabel('Probability that country has reached elimination', 'FontWeight', 'bold')
 legend('Location', 'best', 'FontWeight', 'bold');
 set(gca, 'FontWeight', 'bold');
 hold off;
+
+
+%%elim pre elim shaded
+[yy1, xx1] = ecdf(ch_inc);
+[yy2, xx2] = ecdf(ch_inc2);
+
+figure; hold on;
+
+% Plot the ECDF curves
+plot(xx1, 1-yy1, 'Color', [65/255, 80/255, 225/255], 'LineWidth', 2); % blue
+plot(xx2, 1-yy2, 'Color', [255/255, 0, 0], 'LineWidth', 2); % red
+
+% Fill the Bronze region (between blue and red curves)
+fill([xx2; flip(xx1)], [1-yy2; flip(1-yy1)], [205/255, 127/255, 50/255], 'FaceAlpha', 0.3, 'EdgeColor', 'none');
+
+% Define x-axis regions for silver and gold
+silver_x = linspace(0.025, 0.2, 100); % Region from 0.05 to 0.1
+gold_x = linspace(0, 0.025, 100); % Region from 0 to 0.05
+
+% Ensure unique x-values for interpolation
+[xx1_unique, idx1] = unique(xx1);
+
+% Interpolate to find y-values for the blue curve
+silver_y1 = interp1(xx1_unique, 1-yy1(idx1), silver_x, 'linear', 'extrap');
+gold_y1 = interp1(xx1_unique, 1-yy1(idx1), gold_x, 'linear', 'extrap');
+
+% Ensure that the lengths match for fill function
+if length(silver_x) == length(silver_y1)
+    % Fill the Silver region
+    fill([silver_x, flip(silver_x)], [zeros(size(silver_x)), flip(silver_y1)], [192/255, 192/255, 192/255], 'FaceAlpha', 0.5, 'EdgeColor', 'none');
+else
+    disp('Lengths of x and y vectors for the silver region do not match.');
+end
+
+if length(gold_x) == length(gold_y1)
+    % Fill the Gold region
+    fill([gold_x, flip(gold_x)], [zeros(size(gold_x)), flip(gold_y1)], [255/255, 215/255, 0], 'FaceAlpha', 0.5, 'EdgeColor', 'none');
+else
+    disp('Lengths of x and y vectors for the gold region do not match.');
+end
+
+% Set axis properties
+ax = gca;
+ax.FontSize = 14;
+ax.FontWeight = 'bold';
+ylim([0,1])
+xlabel('Incidence in children (cases per 100,000 children)', 'FontSize', 14, 'FontWeight', 'bold');
+ylabel('Probability that country has reached elimination', 'FontSize', 14, 'FontWeight', 'bold');
+title('Thresholds for reaching elimination vs pre-elimination', 'FontSize', 16, 'FontWeight', 'bold');
+
+hold off;
+
