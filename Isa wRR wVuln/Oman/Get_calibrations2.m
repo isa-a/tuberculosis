@@ -32,14 +32,15 @@ mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
 xord = xsam(ord,:);
 
-load calibration_res x0_init;
-x0 = x0_init;
+% load calibration_res x0_init;
+% x0 = x0_init;
 
-% x0 = fminsearch(nobj,xord(1,:),optimset('Display','iter'));
+x0 = fminsearch(nobj,xord(1,:),optimset('Display','iter'));
 x0 = fminsearch(nobj,x0,optimset('Display','iter'));
 x0 = fminsearch(nobj,x0,optimset('Display','iter'));
 
 x0_init = x0;
+save calibration_res_isa;
 
 return;
 

@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 5e3; 
+nsam = 1e3; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 % obj(xsam(1,:));
@@ -32,15 +32,16 @@ mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
 xord = xsam(ord,:);
 
-% load calibration_res x0_init;
-% x0 = x0_init;
+load calibration_res x0_init;
+x0 = x0_init;
 
-x0 = fminsearch(nobj,xord(1,:),optimset('Display','iter'));
+% x0 = fminsearch(nobj,xord(1,:),optimset('Display','iter'));
 x0 = fminsearch(nobj,x0,optimset('Display','iter'));
 x0 = fminsearch(nobj,x0,optimset('Display','iter'));
 
 x0_init = x0;
-save calibration_res;
+save calib_isa;
+
 
 return;
 

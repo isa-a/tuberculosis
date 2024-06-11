@@ -4,9 +4,8 @@ figure; histogram(ch_inc)
 ax = gca;
 ax.FontSize = 14; 
 ax.FontWeight = 'bold';
-xlabel('Incidence in children (cases per 100,000 of the population)', 'FontSize', 14, 'FontWeight', 'bold');
+xlabel('Incidence in children (per 100,000 children-years)', 'FontSize', 14, 'FontWeight', 'bold');
 ylabel('Frequency', 'FontSize', 14, 'FontWeight', 'bold');
-title('Childhood incidence at the point of elimination', 'FontSize', 16, 'FontWeight', 'bold');
 
 
 [yy, xx] = ecdf(ch_inc);
@@ -15,13 +14,12 @@ title('Childhood incidence at the point of elimination', 'FontSize', 16, 'FontWe
 
 figure; hold on;
 plot(xx, 1-yy, 'k', 'LineWidth', 2, 'HandleVisibility', 'off'); 
-xlim([0, 0.2]);
+xlim([min(xx), 0.2]);
 ylim([0, 1]);
 ax = gca;
 ax.FontSize = 14; 
 ax.FontWeight = 'bold';
-title('Children incidence CDF', 'FontWeight', 'bold');
-xlabel('Incidence in children (cases per 100,000 children)', 'FontWeight', 'bold');
+xlabel('Incidence in children (per 100,000 children-years)', 'FontWeight', 'bold');
 ylabel('Probability that country has reached elimination', 'FontWeight', 'bold');
 
 
@@ -46,9 +44,9 @@ plot(boundary_66, 1-0.66, 'ko', 'MarkerFaceColor', 'k');
 plot(boundary_33, 1-0.33, 'ko', 'MarkerSize', 8, 'LineWidth', 1.5); 
 
 
-xlim([0, 0.18]);
+xlim([min(xx), 0.18]);
 title('Children incidence CDF', 'FontWeight', 'bold');
-xlabel('Incidence in children (cases per 100,000 of the children)', 'FontWeight', 'bold');
+xlabel('Incidence in children (per 100,000 children-years)', 'FontWeight', 'bold');
 ylabel('Probability that country has reached elimination', 'FontWeight', 'bold');
 legend('Location', 'best', 'FontWeight', 'bold');
 set(gca, 'FontWeight', 'bold');
@@ -121,7 +119,7 @@ hold off;
 vec = pcm(end, 1:end-1);
 
 
-param_names = {'Contact rate', 'Declining contact rate', 'Careseeking', 'Child mortality', 'Relapse risk', 'Ageing', 'Intergenerational mixing', 'Intergenerational mixing off diagonal', 'Baseline incidence'};
+param_names = {'Contact rate', 'Secular trend in contact rate', 'Per-capita rate of treatment initiation', 'Child mortality', 'Relapse risk', 'Ageing', 'Relative infectivity, children vs adults', 'Intergenerational mixing', 'Baseline incidence'};
 
 
 [~, sorted_indices] = sort(abs(vec), 'descend');
@@ -148,3 +146,46 @@ set(gca, 'YTick', 1:length(sorted_param_names), 'YTickLabel', sorted_param_names
 
 
 set(gca, 'FontWeight', 'bold');
+
+
+
+
+%%%%%%
+
+% re do no shading with bounds
+
+
+
+
+[yy, xx] = ecdf(ch_inc);
+%[yy2, xx2] = ecdf(ch_inc2);
+
+figure; hold on;
+plot(xx, 1-yy, 'k', 'LineWidth', 2, 'HandleVisibility', 'off'); 
+xlim([min(xx), 0.2]);
+ylim([0, 1]);
+ax = gca;
+ax.FontSize = 14; 
+ax.FontWeight = 'bold';
+title('Children incidence CDF', 'FontWeight', 'bold');
+xlabel('Incidence in children (cases per 100,000 children)', 'FontWeight', 'bold');
+ylabel('Probability that country has reached elimination', 'FontWeight', 'bold');
+
+boundary_66 = xx(find(yy >= 0.66, 1));
+boundary_33 = xx(find(yy >= 0.33, 1));
+
+line([boundary_66, boundary_66], [0, 1-0.66], 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
+
+% Add horizontal lines at y = 0.66 and y = 0.33
+line([0, boundary_66], [1-0.66, 1-0.66], 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
+
+% Add filled circle dots where the lines meet
+plot(boundary_66, 1-0.66, 'ko', 'MarkerFaceColor', 'k');
+
+xlim([min(xx), 0.18]);
+title('Children incidence CDF', 'FontWeight', 'bold');
+xlabel('Incidence in children (per 100,000 children-years)', 'FontWeight', 'bold');
+ylabel('Probability that country has reached elimination', 'FontWeight', 'bold');
+legend('Location', 'best', 'FontWeight', 'bold');
+set(gca, 'FontWeight', 'bold');
+hold off;
