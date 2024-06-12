@@ -1,4 +1,4 @@
-clear all; load calibration_isa_uk.mat; 
+clear all; load calib_isa.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 
@@ -57,7 +57,7 @@ for ii = 1:size(xs,1)
     Mb2 = make_model(pb2,rb2,i,s,gps,prm.contmat);
 
     % TPT in vulnerables
-    rc = rb; pc = pb;
+    rc = rb2; pc = pb2;
     rc.TPT = TPTcov*[0 1 1 1];
     Mc = make_model(pc,rc,i,s,gps,prm.contmat);
 
@@ -120,7 +120,7 @@ allmat = cat(4,incmat,incmat2,incmatRR);
 cols = linspecer(size(allmat,3));
 xx = [2022:2040];
 
-lgs = {'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually'};
+lgs = {'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in contacts','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually'};
 
 
 plotopts = {'All incidence','RR incidence','Alternative incidence'};
@@ -148,12 +148,12 @@ if strcmp(plotopt, 'All incidence')
         %pause;
     end
     
-elseif strcmp(plotop, 'RR incidence')
+elseif strcmp(plotopt, 'RR incidence')
     
     % --- Incidence of RR-TB
     hold on;
     
-    selinds = [1,2,4,6]; %selinds = 1:size(allmat,3);
+    selinds = [1:3];
     allplt = squeeze(allmat(:,:,selinds,3));
     lgsel  = lgs(selinds);
     
@@ -196,7 +196,7 @@ elseif strcmp(plotop, 'Alternative incidence')
     ylim(ylims(1,:));
     
     % legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
-    legend(lg,'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually');
+    legend(lg,'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ Find and treat active TB in migrants and vulnerable', '+ TPT in general population, 50% annually');
     subplot(1,2,1);
     ylabel('Rate per 100,000 population');
 
@@ -283,5 +283,3 @@ labels = {'UK-born without treatment history', 'UK-born after TPT', 'UK-born aft
 figure; pie(tmp4);
 legend(labels,'Location','NorthWest','Orientation','vertical');
 title('Sources of incidence in 2035 with all interventions combined')
-
-

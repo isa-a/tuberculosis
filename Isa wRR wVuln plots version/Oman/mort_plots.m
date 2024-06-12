@@ -1,4 +1,4 @@
-clear all; load calibration_isa_uk.mat; 
+clear all; load calib_isa.mat; load Model_setup.mat;
 
 obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 
@@ -7,11 +7,8 @@ set2 = {'dom','migr','vuln'};
 set3 = {'L','P','R','T'};
 [inci, incs, incd, lim] = get_addresses({set3, set2, set1}, [], [], [], 0);
 
-
 midpt = true; 
 if midpt
-    % inds = find(outsto==max(outsto));
-    % xs = xsto(inds(1),:);
     xs = x0_init;
 else
     ix0 = size(xsto,1)/2;
@@ -37,8 +34,8 @@ for ii = 1:size(xs,1)
     % ---------------------------------------------------------------------
     % --- Model intervention
     
-    TPTcov = -log(0.5); %TPTcov = 100;
-    ACFcov = -log(0.5); %ACFcov = 100;
+    TPTcov = -log(0.5);
+    ACFcov = -log(0.5);
 
     % TPT in existing migrants
     ra = r0; pa = p0;
@@ -57,7 +54,7 @@ for ii = 1:size(xs,1)
     Mb2 = make_model(pb2,rb2,i,s,gps,prm.contmat);
 
     % TPT in vulnerables
-    rc = rb; pc = pb;
+    rc = rb2; pc = pb2;
     rc.TPT = TPTcov*[0 1 1 1];
     Mc = make_model(pc,rc,i,s,gps,prm.contmat);
 
@@ -90,7 +87,6 @@ for ii = 1:size(xs,1)
         
         mat = sdiff(:,i.aux.incsources)*1e5;
         incsto2(:,ii,mi) = sum(mat(:,[incs.L,incs.R]),2);
-        % incsto2(:,ii,mi) = sum(mat(:,:),2);
 
         mrtsto(:,ii,mi) = sdiff(:,i.aux.mort)*1e5;
         
@@ -102,30 +98,26 @@ for ii = 1:size(xs,1)
 end
 fprintf('\n');
 
-
 incmat   = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);
 incmat2  = permute(prctile(incsto2,[2.5,50,97.5],2),[2,1,3]);
 incmatRR = permute(prctile(incstoRR,[2.5,50,97.5],2),[2,1,3]);
-
 mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
-
 
 % -------------------------------------------------------------------------
 % --- Plot figure of incidence and mortality impacts ----------------------
 
-ff=figure; lw = 1.5; fs = 14;
-% allmat = cat(4,incmat,incmat2);
+ff=figure('Position', [577,   226 ,   1029 ,732]); lw = 1.5; fs = 14;
 allmat = cat(4,incmat,incmat2,incmatRR);
 
 cols = linspecer(size(allmat,3));
+cols1 = linspecer(size(mrtmat, 3));
 xx = [2022:2040];
 
-lgs = {'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually'};
+lgs = {'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in contacts','+ TPT in vulnerable population, 50% annually','+ Find and treat active TB in migrants and vulnerable', '+ TPT in general population, 50% annually'};
 
 
-plotopts = {'All incidence','RR incidence','Alternative incidence'};
-plotopt  = plotopts{1};
-
+plotopts = {'All incidence','RR incidence','Alternative incidence', 'Mort'};
+plotopt  = plotopts{4};
 
 
 if strcmp(plotopt, 'All incidence')
@@ -148,12 +140,12 @@ if strcmp(plotopt, 'All incidence')
         %pause;
     end
     
-elseif strcmp(plotop, 'RR incidence')
+elseif strcmp(plotopt, 'RR incidence')
     
     % --- Incidence of RR-TB
     hold on;
     
-    selinds = [1,2,4,6]; %selinds = 1:size(allmat,3);
+    selinds = [1:3];
     allplt = squeeze(allmat(:,:,selinds,3));
     lgsel  = lgs(selinds);
     
@@ -170,7 +162,7 @@ elseif strcmp(plotop, 'RR incidence')
         legend(lg,lgsel(1:ii),'Location','NorthEast');
     end
     
-elseif strcmp(plotop, 'Alternative incidence')
+elseif strcmp(plotopt, 'Alternative incidence')
     
     % --- Two ways of counting
     tis = {'All incidence','Incidence without treatment history'};
@@ -192,96 +184,24 @@ elseif strcmp(plotop, 'Alternative incidence')
         yline(0.1,'k--');
     
     end
-    subplot(1,2,2);
-    ylim(ylims(1,:));
+
+elseif strcmp(plotopt, 'Mort')
     
-    % legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
-    legend(lg,'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually');
-    subplot(1,2,1);
-    ylabel('Rate per 100,000 population');
-
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-return;
-
-tis = {'All incidence','Incidence without treatment history'};
-for is = 1:2
-    subplot(1,2,is); hold on;
-
-    for ii = 1:size(allmat,3)
-        plt = allmat(:,:,ii,is);
-        lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-        jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
+    % --- mortality
+    hold on;
+    lg = gobjects(1, size(mrtmat, 3)); % hard code th array for legend
+    for ii = 1:size(mrtmat,3)
+        plt = mrtmat(:,:,ii);
+        lg(ii) = plot(xx, plt(2,:), 'Color', cols1(ii,:), 'linewidth', lw); hold on;
+        jbfill(xx, plt(3,:), plt(1,:), cols1(ii,:), 'None', 1, 0.1); hold on;
     end
-    yl = ylim; yl(1) = 0; ylim(yl); ylims(is,:) = ylim;
+
     xlim([2022 2040]);
+    ylim([0, 0.4])
     set(gca,'fontsize',fs);
-
-    title(tis{is});
-
-    yline(1,'k--');
-    yline(0.1,'k--');
-
+    xlabel('Year', 'FontWeight', 'bold');
+    set(gca, 'FontWeight', 'bold');
+    ylabel('Mortality rate per 100,000 population');
+    legend(lg, lgs, 'Location', 'Southwest');
+    title('Projected Mortality Rates under Different Interventions');
 end
-subplot(1,2,2);
-ylim(ylims(1,:));
-
-% legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
-legend(lg,'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually');
-subplot(1,2,1);
-ylabel('Rate per 100,000 population');
-
-
-% --- Find remaining sources of incidence
-vec = squeeze(props(end,:,end));
-tmp  = abs(vec)/sum(abs(vec));
-tmp2 = sortrows([tmp; 1:length(tmp)]',-1);
-
-lbls = {}; ind = 1;
-set1 = {'ds','rr'};
-set2 = {'dom','migr','vuln'};
-set3 = {'L','P','R','T'};
-for is3 = 1:length(set3)
-    for is2 = 1:length(set2)
-        for is1 = 1:length(set1)
-            lbls{ind} = [set1{is1}, ' ', set2{is2}, ' ', set3{is3}];
-            ind = ind+1;
-        end
-    end
-end
-
-inds = tmp2(1:6,2)'
-tmp2(1:6,1)'
-lbls(inds)
-
-
-
-
-
-return;
-
-% -------------------------------------------------------------------------
-% --- Plot figure of incidence components as of 2030 ----------------------
-
-tmp1 = reshape(props(:,:,end),3,5);                                        % Dims: 1.Dom/migr_rect/migr_long, 2.Lf,Pf,Ls,Ps,R
-tmp2 = [tmp1(1,:); sum([tmp1(2,:); tmp1(3,:)],1)];                         % Dims: 1.Dom/all migr, 2.Lf,Pf,Ls,Ps,R
-tmp3 = [sum(tmp2(:,[1,3]),2), sum(tmp2(:,[2,4]),2), tmp2(:,end)];          % Dims: 1.Dom/all migr, 2.All L, All P, R
-tmp4 = [tmp3(1,:), tmp3(2,:)];
-labels = {'UK-born without treatment history', 'UK-born after TPT', 'UK-born after TB Rx', 'Migrants without treatment history', 'Migrants after TPT', 'Migrants after TB Rx'};
-figure; pie(tmp4);
-legend(labels,'Location','NorthWest','Orientation','vertical');
-title('Sources of incidence in 2035 with all interventions combined')
-
-
