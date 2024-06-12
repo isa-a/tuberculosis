@@ -1,4 +1,4 @@
-clear all; load calibration_res.mat; 
+clear all; load calib_isa.mat; 
 
 obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 
@@ -50,6 +50,12 @@ for ii = 1:size(xs,1)
     pb.migrTPT = 1;
     Mb = make_model(pb,rb,i,s,gps,prm.contmat);
 
+    % TPT in contacts
+    rb2 = rb; pb2 = pb;
+    rb2.progression  = rb2.progression*0.9;
+    rb2.reactivation = rb2.reactivation*0.9;
+    Mb2 = make_model(pb2,rb2,i,s,gps,prm.contmat);
+
     % TPT in vulnerables
     rc = rb; pc = pb;
     rc.TPT = TPTcov*[0 1 1 1];
@@ -69,7 +75,7 @@ for ii = 1:size(xs,1)
     Me = make_model(pe,re,i,s,gps,prm.contmat);
     
 
-    models = {M0, Ma, Mb, Mc, Md, Me};    
+    models = {M0, Ma, Mb, Mb2, Mc, Md, Me};    
     for mi = 1:length(models)
         
         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
@@ -118,7 +124,7 @@ lgs = {'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of mig
 
 
 plotopts = {'All incidence','RR incidence','Alternative incidence'};
-plotopt  = plotopts{2};
+plotopt  = plotopts{1};
 
 
 
@@ -142,7 +148,7 @@ if strcmp(plotopt, 'All incidence')
         %pause;
     end
     
-elseif strcmp(plotopt, 'RR incidence')
+elseif strcmp(plotop, 'RR incidence')
     
     % --- Incidence of RR-TB
     hold on;

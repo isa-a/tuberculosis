@@ -124,7 +124,7 @@ p.imm          = 0.8;                                                      % Red
 
 % --- Interventions 
 p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
-p.TPTeff       = 0.6;                                                      % Effectiveness of TPT
+p.TPTeff       = [0.6 0.3];                                                      % Effectiveness of TPT
 r.TPT          = [0 0 0 0];                                                % Uptake of TPT amongst: 1.domestic, 2.recent migrants, 3.long-term migrants
 r.TPT2020rec   = 0.004;
 r.ACF          = [0 0 0 0];

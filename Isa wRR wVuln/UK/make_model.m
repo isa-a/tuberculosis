@@ -30,7 +30,7 @@ for is = 1:length(gps.strains)
 
         source  = Pf;
         destin  = I2;
-        rate    = r.progression(ib)*(1-p.TPTeff);
+        rate    = r.progression(ib)*(1-p.TPTeff(is));
         m(destin, source) = m(destin, source) + rate;
 
         % Stabilisation of 'fast' to 'slow' latent
@@ -52,7 +52,7 @@ for is = 1:length(gps.strains)
 
         source  = Ps;
         destin  = I;
-        rate    = r.reactivation(ib)*(1-p.TPTeff);
+        rate    = r.reactivation(ib)*(1-p.TPTeff(is));
         m(destin, source) = m(destin, source) + rate;
 
         % Initiation of treatment

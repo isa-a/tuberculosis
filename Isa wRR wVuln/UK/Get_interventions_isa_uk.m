@@ -1,4 +1,4 @@
-clear all; load calib_isa.mat; load Model_setup;
+clear all; load calibration_isa_uk.mat; 
 
 obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 
@@ -6,7 +6,6 @@ set1 = {'ds','rr'};
 set2 = {'dom','migr','vuln'};
 set3 = {'L','P','R','T'};
 [inci, incs, incd, lim] = get_addresses({set3, set2, set1}, [], [], [], 0);
-
 
 
 midpt = true; 
@@ -76,7 +75,7 @@ for ii = 1:size(xs,1)
     Me = make_model(pe,re,i,s,gps,prm.contmat);
     
 
-    models = {M0, Ma, Mb};    
+    models = {M0, Ma, Mb, Mb2, Mc, Md, Me};    
     for mi = 1:length(models)
         
         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
@@ -114,20 +113,18 @@ mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
 % -------------------------------------------------------------------------
 % --- Plot figure of incidence and mortality impacts ----------------------
 
-ff=figure('Position', [577,   226 ,   1029 ,732]); lw = 1.5; fs = 14;
+ff=figure; lw = 1.5; fs = 14;
 % allmat = cat(4,incmat,incmat2);
 allmat = cat(4,incmat,incmat2,incmatRR);
 
 cols = linspecer(size(allmat,3));
-cols1 = linspecer(size(mrtmat, 3));
 xx = [2022:2040];
 
-lgs = {'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in contacts','+ TPT in vulnerable population, 50% annually','+ Find and treat active TB in migrants and vulnerable', '+ TPT in general population, 50% annually'};
+lgs = {'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in contacts','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually'};
 
 
 plotopts = {'All incidence','RR incidence','Alternative incidence'};
-plotopt  = plotopts{2};
-
+plotopt  = plotopts{1};
 
 
 
@@ -159,34 +156,21 @@ elseif strcmp(plotopt, 'RR incidence')
     selinds = [1:3];
     allplt = squeeze(allmat(:,:,selinds,3));
     lgsel  = lgs(selinds);
-
-    
-    cols(1,:) = [0.545, 0, 0]; % Dark Red for Baseline
-    cols(2,:) = [0, 0, 1]; % Blue for TPT, in-country migrants, 50% annually
-    cols(3,:) = [0, 0.75, 0]; % GREEN
     
     for ii = 1:size(allplt,3)
         plt = allplt(:,:,ii);
-        if ii == 2
-            lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-        else
-            lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-        end
+        lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
         
         xlim([2022 2040]);
         set(gca,'fontsize',fs);
-        ylim([0.08 0.125])
+        
         yline(0.1,'k--');
         ylabel('Incidence rate per 100,000 population');
-        title('Additional coverage of TPT', 'FontWeight', 'bold');
-        xlabel('Year', 'FontWeight', 'bold');
-        set(gca, 'FontWeight', 'bold');
         
-                
         legend(lg,lgsel(1:ii),'Location','NorthEast');
     end
     
-elseif strcmp(plotopt, 'Alternative incidence')
+elseif strcmp(plotop, 'Alternative incidence')
     
     % --- Two ways of counting
     tis = {'All incidence','Incidence without treatment history'};
@@ -203,7 +187,7 @@ elseif strcmp(plotopt, 'Alternative incidence')
         set(gca,'fontsize',fs);
     
         title(tis{is});
-        
+    
         yline(1,'k--');
         yline(0.1,'k--');
     
@@ -212,7 +196,7 @@ elseif strcmp(plotopt, 'Alternative incidence')
     ylim(ylims(1,:));
     
     % legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
-    legend(lg,'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually');
+    legend(lg,'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ Find and treat active TB in migrants and vulnerable', '+ TPT in general population, 50% annually');
     subplot(1,2,1);
     ylabel('Rate per 100,000 population');
 
