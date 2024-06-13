@@ -6,6 +6,7 @@ set1 = {'ds','rr'};
 set2 = {'dom','migr','vuln'};
 set3 = {'L','P','R','T'};
 [inci, incs, incd, lim] = get_addresses({set3, set2, set1}, [], [], [], 0);
+opts = odeset('RelTol', 1e-14, 'AbsTol', 1e-14);
 
 
 
@@ -76,11 +77,11 @@ for ii = 1:size(xs,1)
     Me = make_model(pe,re,i,s,gps,prm.contmat);
     
 
-    models = {M0, Ma, Mb};    
+    models = {M0, Ma, Mb, Mb2, Mc, Md, Me};    
     for mi = 1:length(models)
         
         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
-        [t,soln] = ode15s(geq, [2022:2041], init);
+        [t,soln] = ode15s(geq, [2022:2041], init, opts);
         
         endsolsto(mi,:) = soln(end,:);
         
@@ -114,7 +115,7 @@ mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
 % -------------------------------------------------------------------------
 % --- Plot figure of incidence and mortality impacts ----------------------
 
-ff=figure('Position', [577,   190 ,   800 ,800]); lw = 1.5; fs = 14;
+ff=figure('Position', [577,   190 ,   1029 ,732]); lw = 1.5; fs = 14;
 % allmat = cat(4,incmat,incmat2);
 allmat = cat(4,incmat,incmat2,incmatRR);
 
@@ -126,7 +127,7 @@ lgs = {'Baseline','TPT, in-country migrants, 90% annually','+ TPT in 100% of mig
 
 
 plotopts = {'All incidence','RR incidence','Alternative incidence'};
-plotopt  = plotopts{2};
+plotopt  = plotopts{1};
 
 
 
@@ -157,7 +158,7 @@ elseif strcmp(plotopt, 'RR incidence')
     % --- Incidence of RR-TB
     hold on;
     
-    selinds = [1:4];
+    selinds = [1:7];
     allplt = squeeze(allmat(:,:,selinds,3));
     lgsel  = lgs(selinds);
 
