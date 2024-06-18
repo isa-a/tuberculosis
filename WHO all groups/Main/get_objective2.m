@@ -17,9 +17,9 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.dom)       = 1 - 0.168 - seed;
-    init(i.U.migr_rect) = 0.168;
-    init(i.I.dom.ds)    = seed;
+    init(i.U.ch)       = 1 - 0.168 - seed;
+    init(i.U.ch.migr_rect) = 0.168;
+    init(i.I.ch.dom.ds)    = seed;
     
     % Equlibrium model, without RR-TB
     p0 = p; r0 = r; 

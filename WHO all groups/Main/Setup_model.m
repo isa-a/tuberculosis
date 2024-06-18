@@ -139,8 +139,8 @@ r.ACF2         = [0 0 0 0];
 % lgths =      [1,        1,      1,         1,      1,             1,          1,       1];
 % names = {'beta','betadec','gamma','r_TPT2020rec','p_relrate','r_migr','p_LTBI_in_migr'};      
 % lgths =      [1,        1,      2,             1,          1,       1,               1];
-names = {'beta','relbeta_RR','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr','p_RR_in_migr','r_vuln','relbeta_vuln', 'ageing'};      
-lgths =      [1,           1,        1,      2,          2,       1,               1,             1,       1,             1,       1];
+names = {'beta','relbeta_RR','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr','p_RR_in_migr','r_vuln','relbeta_vuln', 'ageing', 'ch_mort'};      
+lgths =      [1,           1,        1,      2,          2,       1,               1,             1,       1,             1,       1,         1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -162,6 +162,7 @@ bds(xi.p_RR_in_migr,:)   = [0 0.1];
 bds(xi.r_vuln,:)         = [0 2];
 bds(xi.relbeta_vuln,:)   = [0.1 20];
 bds(xi.ageing,:)         = [0.02 0.3];
+bds(xi.ch_mort,:)        = [0, 0.01];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
