@@ -5,7 +5,7 @@ m = zeros(i.nstates);
 
 for ia = 1:length(gps.age)
     age = gps.age(ia);
-
+    
     for is = 1:length(gps.strains)
         strain = gps.strains{is};
         ismdr = strcmp(strain,'rr');
@@ -186,7 +186,10 @@ end
 getinds = @(st1, st2) intersect(intersect(s.migr_rect, s.(st1)), s.(st2));
 
 m = zeros(i.nstates,1);
-m(i.U.migr_rect) = 1-p.LTBI_in_migr;
+
+m(i.U.ch.migr_rect) = 1-p.LTBI_in_migr;
+m(i.U.ad.migr_rect) = 1-p.LTBI_in_migr;
+
 m(getinds('Lf','ds')) = p.LTBI_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;
 m(getinds('Lf','rr')) = p.LTBI_in_migr*(1-p.migrTPT)*p.RR_in_migr*0.02;
 m(getinds('Ls','ds')) = p.LTBI_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.98;
@@ -203,10 +206,10 @@ M.migrentries = sparse(m);
 getinds = @(st1, st2) intersect(intersect(s.infectious, s.(st1)), s.(st2));
 contmat(end,end) = contmat(end,end)*p.relbeta_vuln;
 
-m = zeros(6,i.nstates);                                                    % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
+m = zeros(8,i.nstates);                                                    % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
 
 m(1,getinds('dom', 'ds')) = contmat(1,1);                                  %Isa: this is for both I and I2, children and adults, domestics who have DS
-m(1,getinds('migr','ds')) = contmat(1,2);
+m(1,getinds('migr','ds')) = contmat(1,2);                                  % line 203 doesnt need to be adjusted to include st3?
 m(1,getinds('vuln','ds')) = contmat(1,3);
 
 m(2,getinds('dom', 'rr')) = contmat(1,1);
@@ -228,6 +231,14 @@ m(5,getinds('vuln','ds')) = contmat(3,3);
 m(6,getinds('dom', 'rr')) = contmat(3,1);
 m(6,getinds('migr','rr')) = contmat(3,2);
 m(6,getinds('vuln','rr')) = contmat(3,3);
+
+m(7,getinds('dom', 'rr')) = contmat(3,1);
+m(7,getinds('migr','rr')) = contmat(3,2);
+m(7,getinds('vuln','rr')) = contmat(3,3);
+
+m(8,getinds('dom', 'rr')) = contmat(3,1);
+m(8,getinds('migr','rr')) = contmat(3,2);
+m(8,getinds('vuln','rr')) = contmat(3,3);
 
 % Include infectiousness
 m = m*r.beta;

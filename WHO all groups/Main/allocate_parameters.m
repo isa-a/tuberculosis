@@ -14,3 +14,4 @@ p.LTBI_in_migr = x(xi.p_LTBI_in_migr);
 p.RR_in_migr   = x(xi.p_RR_in_migr);
 r.vuln         = x(xi.r_vuln);
 p.relbeta_vuln = 1;
+r.ageing       = x(xi.r_ageing);
