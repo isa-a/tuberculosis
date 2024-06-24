@@ -167,7 +167,7 @@ bds(xi.r_vuln,:)         = [0 2];
 bds(xi.relbeta_vuln,:)   = [0.1 20];
 bds(xi.ageing,:)         = [0.02 0.3];
 bds(xi.ch_mort,:)        = [0, 0.01];
-bds(xi.p_relrate_factor,:)= [0, 0.3];
+bds(xi.p_relrate_factor,:)= [0, 0.01];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;

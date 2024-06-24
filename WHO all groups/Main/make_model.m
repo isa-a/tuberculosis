@@ -30,11 +30,13 @@ for ia = 1:length(gps.age)
             source  = Lf;
             destin  = I;
             rate    = r.progression(ib);
+            % rate    = r.progression(ia,ib);
             m(destin, source) = m(destin, source) + rate;
     
             source  = Pf;
             destin  = I2;
             rate    = r.progression(ib)*(1-p.TPTeff(is));
+            % rate    = r.progression(ia,ib)*(1-p.TPTeff(is));
             m(destin, source) = m(destin, source) + rate;
     
             % Stabilisation of 'fast' to 'slow' latent
@@ -52,11 +54,13 @@ for ia = 1:length(gps.age)
             source  = Ls;
             destin  = I;
             rate    = r.reactivation(ib);
+            % rate    = r.reactivation(ia,ib);
             m(destin, source) = m(destin, source) + rate;
     
             source  = Ps;
             destin  = I;
             rate    = r.reactivation(ib)*(1-p.TPTeff(is));
+            % rate    = r.reactivation(ia,ib)*(1-p.TPTeff(is));
             m(destin, source) = m(destin, source) + rate;
     
             % Initiation of treatment
@@ -80,7 +84,7 @@ for ia = 1:length(gps.age)
             % Acquisition of drug resistance while on first-line treatment
             if ~ismdr
                 source = Tx;
-                destin = i.Tx.(born).rr;
+                destin = i.Tx.(born).rr;                                   % <--- Include age stratification
                 rate   = r.RR_acqu;
                 m(destin, source) = m(destin, source) + rate;
             end
@@ -170,13 +174,13 @@ for ia = 1:length(gps.age)
             born = gps.born{ib};
     
             m = zeros(i.nstates);
-            susinds = intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age));
+            susinds = intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born));
             m(i.Lf.(age).(born).(strain), susinds) = 1;
             
             imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
             m(:,imminds) = m(:,imminds)*(1-p.imm);
             
-            M.nlin.(age).(born).(strain) = sparse(m - diag(sum(m,1)));
+            M.nlin.(age).(born).(strain) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
         end
     end
 end
@@ -206,7 +210,7 @@ M.migrentries = sparse(m);
 getinds = @(st1, st2) intersect(intersect(s.infectious, s.(st1)), s.(st2));
 contmat(end,end) = contmat(end,end)*p.relbeta_vuln;
 
-m = zeros(8,i.nstates);                                                    % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
+m = zeros(6,i.nstates);                                                    % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
 
 m(1,getinds('dom', 'ds')) = contmat(1,1);                                  %Isa: this is for both I and I2, children and adults, domestics who have DS
 m(1,getinds('migr','ds')) = contmat(1,2);                                  % line 203 doesnt need to be adjusted to include st3?
@@ -231,14 +235,6 @@ m(5,getinds('vuln','ds')) = contmat(3,3);
 m(6,getinds('dom', 'rr')) = contmat(3,1);
 m(6,getinds('migr','rr')) = contmat(3,2);
 m(6,getinds('vuln','rr')) = contmat(3,3);
-
-m(7,getinds('dom', 'rr')) = contmat(3,1);
-m(7,getinds('migr','rr')) = contmat(3,2);
-m(7,getinds('vuln','rr')) = contmat(3,3);
-
-m(8,getinds('dom', 'rr')) = contmat(3,1);
-m(8,getinds('migr','rr')) = contmat(3,2);
-m(8,getinds('vuln','rr')) = contmat(3,3);
 
 % Include infectiousness
 m = m*r.beta;
