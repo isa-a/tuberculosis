@@ -167,7 +167,7 @@ bds(xi.r_vuln,:)         = [0 2];
 bds(xi.relbeta_vuln,:)   = [0.1 20];
 bds(xi.ageing,:)         = [0.02 0.3];
 bds(xi.ch_mort,:)        = [0, 0.01];
-bds(xi.p_relrate_factor,:)= [0, 0.01];
+bds(xi.p_relrate_factor,:)= [0, 0.3];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
@@ -188,8 +188,9 @@ data.p_migrpopn = [0.28 0.38 0.48];                                        % Pro
 data.p_LTBI     = [0.18 0.22 0.28];                                        % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
 data.p_vulnpopn = [5 10 15]/100;                                           % Proportion of UK population being vulnerable
 data.p_vulnTB   = [13 18 23]/100;                                          % Proportion contribution to overall incidence
-
 data.nTPT2019   = 1.3*[0.9 1 1.1];                                         % Number of TPT initiations in 2019, per 10^5 population
+data.incd_ch2020    = [0.18 0.22 0.28];                                        % incidence in children
+
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
@@ -200,13 +201,13 @@ f3  = get_distribution_fns(data.p_migrTB,   'beta',    show);
 f4  = get_distribution_fns(data.p_migrpopn, 'beta',    show);
 f5  = get_distribution_fns(data.p_LTBI,     'beta',    show);
 f6  = get_distribution_fns(data.p_vulnpopn, 'beta',    show);
-f7  = get_distribution_fns(data.p_vulnTB,   'beta', show);
+f7  = get_distribution_fns(data.p_vulnTB,   'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB) f1a(incd2010) + f1b(incd2020) + f1c(incdRR2020) + f2(mort) + ...
+lhd.fn = @(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch) f1a(incd2010) + f1b(incd2020) + f1c(incdRR2020) + f2(mort) + ...
                                                                                                      f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + ...
-                                                                                                     f6(p_vulnpopn) + f7(p_vulnTB);
+                                                                                                     f6(p_vulnpopn) + f7(p_vulnTB) + f8(incd_ch);
 
 save Model_setup;
 

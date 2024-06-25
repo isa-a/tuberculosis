@@ -179,17 +179,18 @@ prm.contmat = [1 1e-3 1; 1e-3 1 1e-3; 1 1e-3 1];
 % --- Specify --------------------------------------------------------
 
 % data.incd2010   = [14.1 14.6 15.1];
-data.incd2010   = [11 12 14];                                              % With broader uncertainty intervals
-data.incd2020   = [6.8  7.9  9.2];                                             
-data.incdRR2020 = [0.07 0.14 0.21];                                        % Incidence of RR-TB
-data.mort       = [0.26 0.36 0.47];                                        % TB mortality, 2020
-data.p_migrTB   = [0.5  0.6  0.7];                                         % Proportion contribution of migrants to overall incidence
-data.p_migrpopn = [0.28 0.38 0.48];                                        % Proportion of population that is migrants
-data.p_LTBI     = [0.18 0.22 0.28];                                        % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
-data.p_vulnpopn = [5 10 15]/100;                                           % Proportion of UK population being vulnerable
-data.p_vulnTB   = [13 18 23]/100;                                          % Proportion contribution to overall incidence
+data.incd2010       = [11 12 14];                                              % With broader uncertainty intervals
+data.incd2020       = [6.8  7.9  9.2];                                             
+data.incdRR2020     = [0.07 0.14 0.21];                                        % Incidence of RR-TB
+data.mort           = [0.26 0.36 0.47];                                        % TB mortality, 2020
+data.p_migrTB       = [0.5  0.6  0.7];                                         % Proportion contribution of migrants to overall incidence
+data.p_migrpopn     = [0.28 0.38 0.48];                                        % Proportion of population that is migrants
+data.p_LTBI         = [0.18 0.22 0.28];                                        % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
+data.p_vulnpopn     = [5 10 15]/100;                                           % Proportion of UK population being vulnerable
+data.p_vulnTB       = [13 18 23]/100;                                          % Proportion contribution to overall incidence
+data.nTPT2019       = 1.3*[0.9 1 1.1];                                         % Number of TPT initiations in 2019, per 10^5 population
+data.incd_ch2020    = [0.18 0.22 0.28];                                        % incidence in children
 
-data.nTPT2019   = 1.3*[0.9 1 1.1];                                         % Number of TPT initiations in 2019, per 10^5 population
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
@@ -200,13 +201,14 @@ f3  = get_distribution_fns(data.p_migrTB,   'beta',    show);
 f4  = get_distribution_fns(data.p_migrpopn, 'beta',    show);
 f5  = get_distribution_fns(data.p_LTBI,     'beta',    show);
 f6  = get_distribution_fns(data.p_vulnpopn, 'beta',    show);
-f7  = get_distribution_fns(data.p_vulnTB,   'beta', show);
+f7  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
+f8  = get_distribution_fns(data.incd_ch2020, 'lognorm',show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB) f1a(incd2010) + f1b(incd2020) + f1c(incdRR2020) + f2(mort) + ...
+lhd.fn = @(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch) f1a(incd2010) + f1b(incd2020) + f1c(incdRR2020) + f2(mort) + ...
                                                                                                      f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + ...
-                                                                                                     f6(p_vulnpopn) + f7(p_vulnTB);
+                                                                                                     f6(p_vulnpopn) + f7(p_vulnTB) + f8(incd_ch2020);
 
 save Model_setup;
 
