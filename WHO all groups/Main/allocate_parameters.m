@@ -6,15 +6,21 @@ p.betadec      = x(xi.betadec);
 r.gamma_2015   = x(xi.gamma(1));
 r.gamma_2020   = x(xi.gamma(2));
 
-r.progression = [
-    r.progression0 * [1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))]; % ch
-    r.progression0 * p_relrate_factor * [1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))]  % ad
-];
+tmp            = r.progression0*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
+r.progression  = [tmp*x(xi.p_relrate_factor), tmp];
 
-r.reactivation = [
-    r.reactivation0 * [1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))]; % ch
-    r.reactivation0 * p_relrate_factor * [1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))]  % ad
-];
+tmp            = r.reactivation0*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
+r.reactivation = [tmp*x(xi.p_relrate_factor), tmp];
+
+% r.progression = [
+%     r.progression0 * [1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))]; % ch
+%     r.progression0 * p_relrate_factor * [1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))]  % ad
+% ];
+% 
+% r.reactivation = [
+%     r.reactivation0 * [1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))]; % ch
+%     r.reactivation0 * p_relrate_factor * [1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))]  % ad
+% ];
 
 r.migr         = x(xi.r_migr);
 p.LTBI_in_migr = x(xi.p_LTBI_in_migr);

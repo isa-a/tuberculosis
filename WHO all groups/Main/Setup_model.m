@@ -155,19 +155,19 @@ end
 
 % Set their boundaries
 bds = [];
-bds(xi.beta,:)           = [0 40];
-bds(xi.relbeta_RR,:)     = [1e-4 1];
-bds(xi.betadec,:)        = [0 0.15];
-bds(xi.gamma,:)          = repmat([1e-4 10],2,1);
-bds(xi.p_relrate,:)      = repmat([1 20],2,1);
-bds(xi.r_migr,:)         = [0 1];
-bds(xi.p_LTBI_in_migr,:) = [0 0.5];
-bds(xi.p_RR_in_migr,:)   = [0 0.1];
-bds(xi.r_vuln,:)         = [0 2];
-bds(xi.relbeta_vuln,:)   = [0.1 20];
-bds(xi.ageing,:)         = [0.02 0.3];
-bds(xi.ch_mort,:)        = [0, 0.01];
-bds(xi.p_relrate_factor,:)= [0, 0.3];
+bds(xi.beta,:)             = [0 40];
+bds(xi.relbeta_RR,:)       = [1e-4 1];
+bds(xi.betadec,:)          = [0 0.15];
+bds(xi.gamma,:)            = repmat([1e-4 10],2,1);
+bds(xi.p_relrate,:)        = repmat([1 20],2,1);
+bds(xi.r_migr,:)           = [0 1];
+bds(xi.p_LTBI_in_migr,:)   = [0 0.5];
+bds(xi.p_RR_in_migr,:)     = [0 0.1];
+bds(xi.r_vuln,:)           = [0 2];
+bds(xi.relbeta_vuln,:)     = [0.1 20];
+bds(xi.ageing,:)           = [0.02 0.3];
+bds(xi.ch_mort,:)          = [0, 0.01];
+bds(xi.p_relrate_factor,:) = [1, 10];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
