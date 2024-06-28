@@ -173,7 +173,28 @@ prm.bounds = bds';
 ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
-prm.contmat = [1 1e-3 1; 1e-3 1 1e-3; 1 1e-3 1];
+prm.contmat_born = [1 1e-3 1; 1e-3 1 1e-3; 1 1e-3 1];
+prm.contmat_age  = [1 1; 1e-3 1];
+prm.contmat      = zeros(6, 6);
+
+
+% go through each element
+for age_row = 1:2                                                           % rows in age
+    for age_col = 1:2                                                       % cols in age
+        for born_row = 1:3                                                  % rows in born
+            for born_col = 1:3                                              % cols in born
+                % calc position in combined matrix
+                row = (born_row-1)*2 + age_row;                             % map current rows into new matrix
+                col = (born_col-1)*2 + age_col;                             % map current cols into new matrix
+                % multiply
+                prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col);
+            end
+        end
+    end
+end
+
+
+
 
 % -------------------------------------------------------------------------
 % --- Specify --------------------------------------------------------
