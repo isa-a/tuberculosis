@@ -212,8 +212,8 @@ contmat(end,end) = contmat(end,end)*p.relbeta_vuln;
 
 m = zeros(12,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
 
-m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                                  %Isa: this is for both I and I2, children and adults, domestics who have DS
-m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  % line 203 doesnt need to be adjusted to include st3?
+m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                             
+m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  
 m(1,getinds('ch', 'migr','ds')) = contmat(1,3);
 m(1,getinds('ad', 'migr','ds')) = contmat(1,4);
 m(1,getinds('ch', 'vuln','ds')) = contmat(1,5);

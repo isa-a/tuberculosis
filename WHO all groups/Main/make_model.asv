@@ -268,8 +268,33 @@ m(8,getinds('ad', 'migr','rr')) = contmat(4,4);
 m(8,getinds('ch', 'vuln','rr')) = contmat(4,5);
 m(8,getinds('ad', 'vuln','rr')) = contmat(4,6);
 
+m(9,getinds('ch', 'dom', 'ds')) = contmat(5,1);
+m(9,getinds('ad', 'dom','ds')) = contmat(5,2);
+m(9,getinds('ch', 'migr','ds')) = contmat(5,3);
+m(9,getinds('ad', 'migr','ds')) = contmat(5,4);
+m(9,getinds('ch', 'vuln','ds')) = contmat(5,5);
+m(9,getinds('ad', 'vuln','ds')) = contmat(5,6);
 
+m(10,getinds('ch', 'dom', 'rr')) = contmat(5,1);
+m(10,getinds('ad', 'dom','rr')) = contmat(5,2);
+m(10,getinds('ch', 'migr','rr')) = contmat(5,3);
+m(10,getinds('ad', 'migr','rr')) = contmat(5,4);
+m(10,getinds('ch', 'vuln','rr')) = contmat(5,5);
+m(10,getinds('ad', 'vuln','rr')) = contmat(5,6);
 
+m(11,getinds('ch', 'dom', 'ds')) = contmat(6,1);
+m(11,getinds('ad', 'dom','ds')) = contmat(6,2);
+m(11,getinds('ch', 'migr','ds')) = contmat(6,3);
+m(11,getinds('ad', 'migr','ds')) = contmat(6,4);
+m(11,getinds('ch', 'vuln','ds')) = contmat(6,5);
+m(11,getinds('ad', 'vuln','ds')) = contmat(6,6);
+
+m(12,getinds('ch', 'dom', 'rr')) = contmat(6,1);
+m(12,getinds('ad', 'dom','rr')) = contmat(6,2);
+m(12,getinds('ch', 'migr','rr')) = contmat(6,3);
+m(12,getinds('ad', 'migr','rr')) = contmat(6,4);
+m(12,getinds('ch', 'vuln','rr')) = contmat(6,5);
+m(12,getinds('ad', 'vuln','rr')) = contmat(6,6);
 
 % Include infectiousness
 m = m*r.beta;
