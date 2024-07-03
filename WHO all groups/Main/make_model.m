@@ -4,7 +4,7 @@ m = zeros(i.nstates);
 
 
 for ia = 1:length(gps.age)
-    age = gps.age(ia);
+    age = gps.age{ia};
 
     for is = 1:length(gps.strains)
         strain = gps.strains{is};
@@ -13,7 +13,7 @@ for ia = 1:length(gps.age)
         for ib = 1:length(gps.born)
             born = gps.born{ib};
             geti = @(st) i.(st).(age).(born).(strain);
-    
+            
             Lf  = geti('Lf');
             Ls  = geti('Ls');
             Pf  = geti('Pf');
@@ -66,13 +66,13 @@ for ia = 1:length(gps.age)
             % Initiation of treatment
             pSLinit = ismdr*p.RRrec;
             source  = I;
-            destins =                  [Tx,             Tx2,         Rhi];
-            rates   = [r.gamma*(1-pSLinit), r.gamma*pSLinit, r.self_cure];
+            destins =                      [Tx,                 Tx2,         Rhi];
+            rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
             m(destins, source) = m(destins, source) + rates';
     
             source  = I2;
-            destins =                  [Tx,             Tx2,         Rhi];
-            rates   = [r.gamma*(1-pSLinit), r.gamma*pSLinit, r.self_cure];
+            destins =                      [Tx,                 Tx2,         Rhi];
+            rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
             m(destins, source) = m(destins, source) + rates';
     
             % Treatment completion or interruption
@@ -84,7 +84,7 @@ for ia = 1:length(gps.age)
             % Acquisition of drug resistance while on first-line treatment
             if ~ismdr
                 source = Tx;
-                destin = i.Tx.(born).rr;                                   % <--- Include age stratification
+                destin = i.Tx.(age).(born).rr;                                   % <--- Include age stratification
                 rate   = r.RR_acqu;
                 m(destin, source) = m(destin, source) + rate;
             end
@@ -304,10 +304,13 @@ m(:,intersect(s.rr,s.infectious)) = m(:,intersect(s.rr,s.infectious))*p.relbeta_
 M.lam = sparse(m);
 
 % Additional matrix to help keep track of numbers in each group 
-m = zeros(3,i.nstates);
-m(1,s.dom)  = 1;
-m(2,s.migr) = 1;
-m(3,s.vuln) = 1;
+m = zeros(6,i.nstates);
+m(1, intersect(s.ch, s.dom))  = 1;  
+m(2, intersect(s.ad, s.dom))  = 1; 
+m(3, intersect(s.ch, s.migr)) = 1; 
+m(4, intersect(s.ad, s.migr)) = 1; 
+m(5, intersect(s.ch, s.vuln)) = 1; 
+m(6, intersect(s.ad, s.vuln)) = 1;  
 M.denvec = sparse(m);
 
 

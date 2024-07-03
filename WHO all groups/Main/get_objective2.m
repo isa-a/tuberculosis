@@ -86,17 +86,17 @@ else
     % Incidence in children; 2020
     incd_ch2020 = dsol(end,i.aux.inc(5))*1e5;
 
-    % Incidence in adults; 2020
-    incd_ad2020 = dsol(end,i.aux.inc(6))*1e5;
-
     % Proportion of population thats kids
     p_chpopn = sum(sfin(s.ch))/sum(sfin(1:i.nstates));
 
     % Proportion of population thats adults
     p_adpopn = sum(sfin(s.ad))/sum(sfin(1:i.nstates));
+
+    % Notifications
+    ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
     
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, incd_ad2020, p_chpopn, p_adpopn);
+        out  = calfn.fn(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         aux.soln       = soln1;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
         aux.incd2010   = incd2010;
@@ -109,10 +109,10 @@ else
         aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
         aux.nTPT       = n_TPT2019;
         aux.incd_ch    = incd_ch2020;
-        aux.incd_ad    = incd_ad2020;
         aux.chpopn     = p_chpopn;
         aux.adpopn     = p_adpopn;
-        aux.sim        = [incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, incd_ad2020, p_chpopn, p_adpopn];
+        aux.ch_notifs  = ch_notifs;
+        aux.sim        = [incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs];
     else
         out = -Inf;
         aux = NaN;
