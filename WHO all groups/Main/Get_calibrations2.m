@@ -27,6 +27,8 @@ for ii = 1:nsam
     outs(ii) = obj(xsam(ii,:));
 end
 
+return;
+
 % Order by fit
 mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);

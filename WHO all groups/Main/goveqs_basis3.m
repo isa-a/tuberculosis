@@ -36,6 +36,7 @@ allmat = M.lin + ...
         lam(7)*M.nlin.ad.migr_long.ds     + lam(8)*M.nlin.ad.migr_long.rr + ...
         lam(9)*M.nlin.ch.vuln.ds          + lam(10)*M.nlin.ch.vuln.rr + ...
         lam(11)*M.nlin.ad.vuln.ds         + lam(12)*M.nlin.ad.vuln.rr;
+
 out(1:i.nstates) = allmat*invec;
 
 % Mortality
@@ -54,6 +55,10 @@ inmigr = sum(sum(morts(s.migr,:))) + r.migr;
 % vec = [1-p.LTBI_in_migr, (1-p.migrTPT)*p.LTBI_in_migr*[0.02 0.98], p.migrTPT*p.LTBI_in_migr*[0.02 0.98]]';
 % out(s.migrstates) = out(s.migrstates) + inmigr*vec;
 out(1:i.nstates) = out(1:i.nstates) + inmigr.*M.migrentries;
+
+if sum(invec)>5
+    keyboard;
+end
 
 % % Migration
 % out(1:i.nstates) = out(1:i.nstates) + M.migration;
