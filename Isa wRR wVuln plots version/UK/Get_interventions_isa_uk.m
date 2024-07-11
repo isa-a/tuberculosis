@@ -124,7 +124,7 @@ lgs = {'Baseline','TPT, in-country migrants, 90% annually','+ TPT in 100% of mig
 
 
 plotopts = {'All incidence','RR incidence','Alternative incidence'};
-plotopt  = plotopts{1};
+plotopt  = plotopts{3};
 
 
 
