@@ -38,23 +38,38 @@ allmat = M.lin + ...
         lam(11)*M.nlin.ad.vuln.ds         + lam(12)*M.nlin.ad.vuln.rr;
 
 out(1:i.nstates) = allmat*invec;
+disp('After allmat:');
+disp(sum(out));
 
 % Mortality
 morts = M.mort.*invec;
 out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
+disp('After mortality:');
+disp(sum(out));
 
 % Births into UK population
 dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
 out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
+disp('After births:');
+disp(sum(out));
 
 % Migration out of UK
 out(s.migr) = out(s.migr) - r.migr*invec(s.migr)/sum(invec(s.migr));
+disp('After migration out:');
+disp(sum(out));
 
 % Migration into UK
 inmigr = sum(sum(morts(s.migr,:))) + r.migr;
 % vec = [1-p.LTBI_in_migr, (1-p.migrTPT)*p.LTBI_in_migr*[0.02 0.98], p.migrTPT*p.LTBI_in_migr*[0.02 0.98]]';
 % out(s.migrstates) = out(s.migrstates) + inmigr*vec;
-out(1:i.nstates) = out(1:i.nstates) + inmigr.*M.migrentries;
+out(1:i.nstates) = out(1:i.nstates) + inmigr.*M.migrentries- (r.migr*invec(s.migr)/sum(invec(s.migr)));
+disp('After migration in:');
+disp(sum(out));
+
+% Check for population explosion
+if sum(out) > 1e6  % Example threshold
+    error('Population explosion detected');
+end
 
 if sum(invec)>5
     keyboard;

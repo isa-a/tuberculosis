@@ -76,11 +76,11 @@ for ii = 1:size(xs,1)
     Me = make_model(pe,re,i,s,gps,prm.contmat);
     
 
-    models = {M0, Ma, Mb};    
+    models = {M0, Ma, Mb, Mb2, Mc, Md, Me};    
     for mi = 1:length(models)
         
         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
-        [t,soln] = ode15s(geq, [2022:2041], init);
+        [t,soln] = ode15s(geq, [2022:2041], init, odeset('RelTol',1e-9,'AbsTol',1e-14));
         
         endsolsto(mi,:) = soln(end,:);
         
@@ -126,7 +126,7 @@ lgs = {'Baseline','TPT, in-country migrants, 90% annually','+ TPT in 100% of mig
 
 
 plotopts = {'All incidence','RR incidence','Alternative incidence'};
-plotopt  = plotopts{2};
+plotopt  = plotopts{1};
 
 
 
@@ -157,7 +157,7 @@ elseif strcmp(plotopt, 'RR incidence')
     % --- Incidence of RR-TB
     hold on;
     
-    selinds = [1:4];
+    selinds = [1:3];
     allplt = squeeze(allmat(:,:,selinds,3));
     lgsel  = lgs(selinds);
 
