@@ -38,53 +38,44 @@ allmat = M.lin + ...
         lam(11)*M.nlin.ad.vuln.ds         + lam(12)*M.nlin.ad.vuln.rr;
 
 out(1:i.nstates) = allmat*invec;
-disp('After allmat:');
-disp(sum(out));
+%disp('after allmat:');
+%disp(sum(out));
 
 % Mortality
 morts = M.mort.*invec;
 out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
-disp('After mortality:');
-disp(sum(out));
+%disp('after mortality:');
+%disp(sum(out));
 
 % Births into UK population
 dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
 out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
-disp('After births:');
-disp(sum(out));
+%disp('after births:');
+%disp(sum(out));
 
 % Migration out of UK
-out(s.migr) = out(s.migr) - r.migr*invec(s.migr)/sum(invec(s.migr));
-disp('After migration out:');
-disp(sum(out));
+outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
+outmigr = min(outmigr, invec(s.migr)); % so migration out doesnt exceed migrpop
+out(s.migr) = out(s.migr) - outmigr;
 
 % Migration into UK
 inmigr = sum(sum(morts(s.migr,:))) + r.migr;
 % vec = [1-p.LTBI_in_migr, (1-p.migrTPT)*p.LTBI_in_migr*[0.02 0.98], p.migrTPT*p.LTBI_in_migr*[0.02 0.98]]';
 % out(s.migrstates) = out(s.migrstates) + inmigr*vec;
-out(1:i.nstates) = out(1:i.nstates) + inmigr.*M.migrentries- (r.migr*invec(s.migr)/sum(invec(s.migr)));
-disp('After migration in:');
-disp(sum(out));
+inmigr = min(inmigr, sum(invec(s.migr))); % make sure incoming migration isnt more than number in migr states
+out(1:i.nstates) = out(1:i.nstates) + inmigr * M.migrentries;
 
-% Check for population explosion
-if sum(out) > 1e6  % Example threshold
-    error('Population explosion detected');
+%disp('after migration in:');
+%disp(sum(out));
+
+% final population
+% pop = sum(out(1:i.nstates));
+% if pop > 5
+%     % bring population down by scale of 5
+%     scale = 5 / pop;
+%     out = out * scale;
+% end
+
+% disp('final population sum:');
+% disp(sum(out));
 end
-
-if sum(invec)>5
-    keyboard;
-end
-
-% % Migration
-% out(1:i.nstates) = out(1:i.nstates) + M.migration;
-
-% Auxiliaries
-out(i.aux.inc)        = agg.inc*(sel.inc.*allmat)*invec;
-tmp1                  = agg.incsources*((sel.L2I.*allmat)*invec);
-tmp2                  = agg.incsources*((sel.P2I.*allmat)*invec);
-tmp3                  = agg.incsources*((sel.R2I.*allmat)*invec);
-tmp4                  = agg.incsources*((sel.T2I.*allmat)*invec);
-out(i.aux.incsources) = [tmp1; tmp2; tmp3; tmp4];
-out(i.aux.mort)       = sum(morts(:,2));
-out(i.aux.nTPT)       = sum((sel.nTPT.*allmat)*invec);
-out(i.aux.ch_notifs)  = sum((sel.ch_notifs.*allmat)*invec);

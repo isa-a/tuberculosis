@@ -68,7 +68,7 @@ for ii = 1:size(xs,1)
     % rf.relapse(1:3) = 0;
     % Mf = make_model(pf,rf,i,s,gps,cont3);
 
-    models = {M0, Ma, Mb, Mc, Md, Me}; 
+    models = {M0,  Mb, Mc, Me}; 
     
     for mi = 1:length(models)
         
@@ -100,7 +100,7 @@ allmat = cat(4,incmat,mrtmat);
 cols = linspecer(size(allmat,3));
 xx = [2022:2040];
 
-lgs = {'Baseline','Elimination of recurrence','+ Elimination in migrants','+ Elimination in vulnerable','+ Elimination of RR TB','+ Elimination in domestic'};
+lgs = {'Baseline','Elimination in migrants','+ Elimination in vulnerable','+ Elimination in domestic'};
 
 
 % --- Single incidence plot, showing one by one

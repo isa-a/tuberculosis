@@ -1,4 +1,4 @@
-function [out, aux] = get_objective2(x, ref, prm, gps, contmat, calfn)
+function [out, aux, msg] = get_objective2(x, ref, prm, gps, contmat, calfn)
 
 i = ref.i; s = ref.s; xi = ref.xi;
 p = prm.p; r = prm.r; sel = prm.sel; agg = prm.agg;
@@ -14,6 +14,7 @@ cond1 = min(tmp2(:))<0;
 if cond1
     out = -Inf;
     aux = NaN;
+    msg = 0;
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
@@ -98,6 +99,7 @@ else
     if incd > 0.1
         out  = calfn.fn(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         aux.soln       = soln1;
+        msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
         aux.incd2010   = incd2010;
         aux.incd2020   = incd2020;
@@ -116,6 +118,9 @@ else
     else
         out = -Inf;
         aux = NaN;
+        msg = 1;
+        % disp('incd <= 0.1');
+        % disp(incd);
         % aux.soln0      = soln0;
         % aux.soln0b     = soln0b;
         % aux.soln       = soln1;

@@ -1,4 +1,4 @@
-clear all; load calib_isa.mat; load Model_setup;
+clear all; load calibration_res_isa_new_2.mat; load Model_setup;
 
 obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 
@@ -30,6 +30,8 @@ for ii = 1:size(xs,1)
     xx = xs(ii,:);
     [out,aux] = obj(xx);
     
+    keyboard; 
+
     init = aux.soln(end,:);
 
     [p0,r0] = allocate_parameters(xx,p,r,xi);
