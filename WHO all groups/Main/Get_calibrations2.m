@@ -14,7 +14,7 @@ xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(pr
 % seed = 1e-5;
 % init(i.U.dom)       = 1 - 0.168 - seed;
 % init(i.U.migr_rect) = 0.168;
-% init(i.I.dom)       = seed;
+% init(i.I.dom)       = Setupseed;
 % 
 % p0 = p; r0 = r; p0.betadec = 0;
 % M0 = make_model(p0, r0, i, s, gps);
@@ -26,10 +26,6 @@ for ii = 1:nsam
     if mod(ii,mk)==0; fprintf('%0.5g ', ii/mk); end
     [outs(ii),~,msg(ii)] = obj(xsam(ii,:));
 end
-
-return;
-
-
 % Order by fit
 mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
@@ -39,6 +35,10 @@ xord = xsam(ord,:);
 % x0 = x0_init;
 x0_init = xord;
 save calibration_res_isa_new_2;
+% return;
+
+options = optimset(PlotFcn=@optimplotfval);
+x0 = fminsearch(nobj,xord(1,:),options);
 
 return;
 

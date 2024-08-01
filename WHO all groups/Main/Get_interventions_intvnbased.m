@@ -30,7 +30,7 @@ for ii = 1:size(xs,1)
     xx = xs(ii,:);
     [out,aux] = obj(xx);
     
-    keyboard; 
+    keyboard;
 
     init = aux.soln(end,:);
 

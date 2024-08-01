@@ -38,44 +38,60 @@ allmat = M.lin + ...
         lam(11)*M.nlin.ad.vuln.ds         + lam(12)*M.nlin.ad.vuln.rr;
 
 out(1:i.nstates) = allmat*invec;
-%disp('after allmat:');
-%disp(sum(out));
 
 % Mortality
 morts = M.mort.*invec;
 out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
-%disp('after mortality:');
-%disp(sum(out));
 
 % Births into UK population
 dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
 out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
-%disp('after births:');
-%disp(sum(out));
+
+% method 1 ----------------------------------------------------------------
 
 % Migration out of UK
 outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
-outmigr = min(outmigr, invec(s.migr)); % so migration out doesnt exceed migrpop
 out(s.migr) = out(s.migr) - outmigr;
-
-% Migration into UK
-inmigr = sum(sum(morts(s.migr,:))) + r.migr;
-% vec = [1-p.LTBI_in_migr, (1-p.migrTPT)*p.LTBI_in_migr*[0.02 0.98], p.migrTPT*p.LTBI_in_migr*[0.02 0.98]]';
-% out(s.migrstates) = out(s.migrstates) + inmigr*vec;
-inmigr = min(inmigr, sum(invec(s.migr))); % make sure incoming migration isnt more than number in migr states
-out(1:i.nstates) = out(1:i.nstates) + inmigr * M.migrentries;
-
-%disp('after migration in:');
+%disp('out');
 %disp(sum(out));
 
-% final population
-% pop = sum(out(1:i.nstates));
-% if pop > 5
-%     % bring population down by scale of 5
-%     scale = 5 / pop;
-%     out = out * scale;
-% end
+% Migration into UK (balance the migration out and migrant mortality)
+migrmorts = sum(sum(morts(s.migr,:)));
+totalout = sum(outmigr) + migrmorts;
+out(1:i.nstates) = out(1:i.nstates) + totalout.*M.migrentries;
 
-% disp('final population sum:');
-% disp(sum(out));
+% keyboard;
+
+% %disp('in');
+% %disp(sum(out));
+
+% method 2 ----------------------------------------------------------------
+
+% % Migration out of UK
+% outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
+% out(s.migr) = out(s.migr) - outmigr;
+% 
+% % Migration into UK
+% migrmorts = sum(sum(morts(s.migr,:)));
+% totalout = sum(outmigr) + migrmorts;
+% % migration into migr recent states only
+% out(s.migr_rect) = out(s.migr_rect) + (totalout / length(s.migr_rect));
+
+
+if sum(invec)>5
+    keyboard;
 end
+
+% % Migration
+% out(1:i.nstates) = out(1:i.nstates) + M.migration;
+
+% Auxiliaries
+out(i.aux.inc)        = agg.inc*(sel.inc.*allmat)*invec;
+tmp1                  = agg.incsources*((sel.L2I.*allmat)*invec);
+tmp2                  = agg.incsources*((sel.P2I.*allmat)*invec);
+tmp3                  = agg.incsources*((sel.R2I.*allmat)*invec);
+tmp4                  = agg.incsources*((sel.T2I.*allmat)*invec);
+out(i.aux.incsources) = [tmp1; tmp2; tmp3; tmp4];
+out(i.aux.mort)       = sum(morts(:,2));
+out(i.aux.nTPT)       = sum((sel.nTPT.*allmat)*invec);
+out(i.aux.ch_notifs)  = sum((sel.ch_notifs.*allmat)*invec);

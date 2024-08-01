@@ -29,14 +29,14 @@ for ia = 1:length(gps.age)
             % Progression from 'fast' latent
             source  = Lf;
             destin  = I;
-            rate    = r.progression(ib);
-            % rate    = r.progression(ia,ib);
+            % rate    = r.progression(ib);
+            rate    = r.progression(ia,ib);
             m(destin, source) = m(destin, source) + rate;
     
             source  = Pf;
             destin  = I2;
-            rate    = r.progression(ib)*(1-p.TPTeff(is));
-            % rate    = r.progression(ia,ib)*(1-p.TPTeff(is));
+            %rate    = r.progression(ib)*(1-p.TPTeff(is));
+            rate    = r.progression(ia,ib)*(1-p.TPTeff(is));
             m(destin, source) = m(destin, source) + rate;
     
             % Stabilisation of 'fast' to 'slow' latent
@@ -53,14 +53,14 @@ for ia = 1:length(gps.age)
             % Reactivation of 'slow' latent
             source  = Ls;
             destin  = I;
-            rate    = r.reactivation(ib);
-            % rate    = r.reactivation(ia,ib);
+            %rate    = r.reactivation(ib);
+            rate    = r.reactivation(ia,ib);
             m(destin, source) = m(destin, source) + rate;
     
             source  = Ps;
             destin  = I;
-            rate    = r.reactivation(ib)*(1-p.TPTeff(is));
-            % rate    = r.reactivation(ia,ib)*(1-p.TPTeff(is));
+            %rate    = r.reactivation(ib)*(1-p.TPTeff(is));
+            rate    = r.reactivation(ia,ib)*(1-p.TPTeff(is));
             m(destin, source) = m(destin, source) + rate;
     
             % Initiation of treatment
@@ -187,21 +187,31 @@ end
 
 % --- Fractions for different migrant entry states ------------------------
 
-getinds = @(st1, st2) intersect(intersect(s.migr_rect, s.(st1)), s.(st2));
-
+getindsch = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(st2)),s.ch);
+getindsad = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(st2)),s.ad);
 m = zeros(i.nstates,1);
 
-m(i.U.ch.migr_rect) = 1-p.LTBI_in_migr;
-m(i.U.ad.migr_rect) = 1-p.LTBI_in_migr;
+m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch)*p.ch_in_migr;
+m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad)*(1-p.ch_in_migr);
 
-m(getinds('Lf','ds')) = p.LTBI_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;
-m(getinds('Lf','rr')) = p.LTBI_in_migr*(1-p.migrTPT)*p.RR_in_migr*0.02;
-m(getinds('Ls','ds')) = p.LTBI_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.98;
-m(getinds('Ls','rr')) = p.LTBI_in_migr*(1-p.migrTPT)*p.RR_in_migr*0.98;
-m(getinds('Pf','ds')) = p.LTBI_in_migr*p.migrTPT*(1-p.RR_in_migr)*0.02;
-m(getinds('Pf','rr')) = p.LTBI_in_migr*p.migrTPT*p.RR_in_migr*0.02;
-m(getinds('Ps','ds')) = p.LTBI_in_migr*p.migrTPT*(1-p.RR_in_migr)*0.98;
-m(getinds('Ps','rr')) = p.LTBI_in_migr*p.migrTPT*p.RR_in_migr*0.98;
+m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;
+m(getindsch('Lf','rr')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*p.RR_in_migr*0.02;
+m(getindsch('Ls','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.98;
+m(getindsch('Ls','rr')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*p.RR_in_migr*0.98;
+m(getindsch('Pf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*(1-p.RR_in_migr)*0.02;
+m(getindsch('Pf','rr')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*p.RR_in_migr*0.02;
+m(getindsch('Ps','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*(1-p.RR_in_migr)*0.98;
+m(getindsch('Ps','rr')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*p.RR_in_migr*0.98;
+
+m(getindsad('Lf','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;
+m(getindsad('Lf','rr')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*p.RR_in_migr*0.02;
+m(getindsad('Ls','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*(1-p.RR_in_migr)*0.98;
+m(getindsad('Ls','rr')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*p.RR_in_migr*0.98;
+m(getindsad('Pf','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*(1-p.RR_in_migr)*0.02;
+m(getindsad('Pf','rr')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*p.RR_in_migr*0.02;
+m(getindsad('Ps','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*(1-p.RR_in_migr)*0.98;
+m(getindsad('Ps','rr')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*p.RR_in_migr*0.98;
+
 M.migrentries = sparse(m);
 
 

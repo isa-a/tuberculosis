@@ -72,7 +72,7 @@ else
     p_migrTB   = incd(2)/incd(1);
     
 %     p_LTBI     = sum(sfin(intersect(s.migr_rect,[s.Lf, s.Ls])))/sum(sfin(s.migr_rect));
-    p_LTBI     = p.LTBI_in_migr;
+    p_LTBI     = p.LTBI_in_migrad*(1-p.ch_in_migr) + p.LTBI_in_migrch*p.ch_in_migr;
     p_migrpopn = sum(sfin(s.migr))/sum(sfin(1:i.nstates));
 
     % Proportion of population being vulnerable
