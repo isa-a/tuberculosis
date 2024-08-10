@@ -12,133 +12,137 @@ for ia = 1:length(gps.age)
     
         for ib = 1:length(gps.born)
             born = gps.born{ib};
-            geti = @(st) i.(st).(age).(born).(strain);
-            
-            Lf  = geti('Lf');
-            Ls  = geti('Ls');
-            Pf  = geti('Pf');
-            Ps  = geti('Ps');
-            I   = geti('I');
-            I2  = geti('I2');
-            Tx  = geti('Tx');
-            Tx2 = geti('Tx2');
-            Rlo = geti('Rlo');
-            Rhi = geti('Rhi');
-            R   = geti('R');
-    
-            % Progression from 'fast' latent
-            source  = Lf;
-            destin  = I;
-            % rate    = r.progression(ib);
-            rate    = r.progression(ia, ib);
-            m(destin, source) = m(destin, source) + rate;
-    
-            source  = Pf;
-            destin  = I2;
-            %rate    = r.progression(ib)*(1-p.TPTeff(is));
-            rate    = r.progression(ia, ib)*(1-p.TPTeff(is));
-            m(destin, source) = m(destin, source) + rate;
-    
-            % Stabilisation of 'fast' to 'slow' latent
-            source = Lf;
-            destin = Ls;
-            rate   = r.LTBI_stabil;
-            m(destin, source) = m(destin, source) + rate;
-    
-            source = Pf;
-            destin = Ps;
-            rate   = r.LTBI_stabil;
-            m(destin, source) = m(destin, source) + rate;
-    
-            % Reactivation of 'slow' latent
-            source  = Ls;
-            destin  = I;
-            %rate    = r.reactivation(ib);
-            rate    = r.reactivation(ia, ib);
-            m(destin, source) = m(destin, source) + rate;
-    
-            source  = Ps;
-            destin  = I;
-            %rate    = r.reactivation(ib)*(1-p.TPTeff(is));
-            rate    = r.reactivation(ia, ib)*(1-p.TPTeff(is));
-            m(destin, source) = m(destin, source) + rate;
-    
-            % Initiation of treatment
-            pSLinit = ismdr*p.RRrec;
-            source  = I;
-            destins =                      [Tx,                 Tx2,         Rhi];
-            rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
-            m(destins, source) = m(destins, source) + rates';
-    
-            source  = I2;
-            destins =                      [Tx,                 Tx2,         Rhi];
-            rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
-            m(destins, source) = m(destins, source) + rates';
-    
-            % Treatment completion or interruption
-            source  = Tx;
-            destins = [Rlo Rhi];
-            rates   = [r.Tx, r.ltfu];
-            m(destins, source) = m(destins, source) + rates';
-    
-            % Acquisition of drug resistance while on first-line treatment
-            if ~ismdr
-                source = Tx;
-                destin = i.Tx.(age).(born).rr;                                   % <--- Include age stratification
-                rate   = r.RR_acqu;
+
+            for ih = 1:length(gps.hiv)
+                hiv = gps.hiv{ih};
+                geti = @(st) i.(st).(age).(born).(strain).(hiv);
+                
+                Lf  = geti('Lf');
+                Ls  = geti('Ls');
+                Pf  = geti('Pf');
+                Ps  = geti('Ps');
+                I   = geti('I');
+                I2  = geti('I2');
+                Tx  = geti('Tx');
+                Tx2 = geti('Tx2');
+                Rlo = geti('Rlo');
+                Rhi = geti('Rhi');
+                R   = geti('R');
+        
+                % Progression from 'fast' latent
+                source  = Lf;
+                destin  = I;
+                % rate    = r.progression(ib);
+                rate    = r.progression(ia, ib, ih);
+                m(destin, source) = m(destin, source) + rate;
+        
+                source  = Pf;
+                destin  = I2;
+                %rate    = r.progression(ib)*(1-p.TPTeff(is));
+                rate    = r.progression(ia, ib, ih)*(1-p.TPTeff(is));
+                m(destin, source) = m(destin, source) + rate;
+        
+                % Stabilisation of 'fast' to 'slow' latent
+                source = Lf;
+                destin = Ls;
+                rate   = r.LTBI_stabil;
+                m(destin, source) = m(destin, source) + rate;
+        
+                source = Pf;
+                destin = Ps;
+                rate   = r.LTBI_stabil;
+                m(destin, source) = m(destin, source) + rate;
+        
+                % Reactivation of 'slow' latent
+                source  = Ls;
+                destin  = I;
+                %rate    = r.reactivation(ib);
+                rate    = r.reactivation(ia, ib, ih);
+                m(destin, source) = m(destin, source) + rate;
+        
+                source  = Ps;
+                destin  = I;
+                %rate    = r.reactivation(ib)*(1-p.TPTeff(is));
+                rate    = r.reactivation(ia, ib, ih)*(1-p.TPTeff(is));
+                m(destin, source) = m(destin, source) + rate;
+        
+                % Initiation of treatment
+                pSLinit = ismdr*p.RRrec;
+                source  = I;
+                destins =                      [Tx,                 Tx2,         Rhi];
+                rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
+                m(destins, source) = m(destins, source) + rates';
+        
+                source  = I2;
+                destins =                      [Tx,                 Tx2,         Rhi];
+                rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
+                m(destins, source) = m(destins, source) + rates';
+        
+                % Treatment completion or interruption
+                source  = Tx;
+                destins = [Rlo Rhi];
+                rates   = [r.Tx, r.ltfu];
+                m(destins, source) = m(destins, source) + rates';
+        
+                % Acquisition of drug resistance while on first-line treatment
+                if ~ismdr
+                    source = Tx;
+                    destin = i.Tx.(age).(born).rr;                                   % <--- Include age stratification
+                    rate   = r.RR_acqu;
+                    m(destin, source) = m(destin, source) + rate;
+                end
+        
+                % Second-line treatment
+                source  = Tx2;
+                destins = [Rlo Rhi];
+                rates   = [r.Tx2, r.ltfu2];
+                m(destins, source) = m(destins, source) + rates';
+        
+                % Relapse
+                sources = [Rlo Rhi R];
+                destin  = I2;
+                rates   = r.relapse;
+                m(destin, sources) = m(destin, sources) + rates;
+        
+                % Stabilisation of relapse risk
+                sources = [Rlo Rhi];
+                destin  = R;
+                rates   = 0.5;
+                m(destin, sources) = m(destin, sources) + rates;
+        
+                % Initiation of TPT
+                source = Lf;
+                destin = Pf;
+                rate   = r.TPT(ib);
+                m(destin, source) = m(destin, source) + rate;
+        
+                source = Ls;
+                destin = Ps;
+                rate   = r.TPT(ib);
+                m(destin, source) = m(destin, source) + rate;
+        
+                % Case-finding
+                sources = [I I2];
+                destin  = Tx;
+                rate    = r.ACF(ib)*(1-pSLinit);
+                m(destin, sources) = m(destin, sources) + rate;
+        
+                sources = [I I2];
+                destin  = Tx2;
+                rate    = r.ACF(ib)*pSLinit;
+                m(destin, sources) = m(destin, sources) + rate;
+        
+        
+                source = I2;
+                destin = Tx;
+                rate   = r.ACF2(ib)*(1-pSLinit);
+                m(destin, source) = m(destin, source) + rate;
+        
+                source = I2;
+                destin = Tx2;
+                rate   = r.ACF2(ib)*pSLinit;
                 m(destin, source) = m(destin, source) + rate;
             end
-    
-            % Second-line treatment
-            source  = Tx2;
-            destins = [Rlo Rhi];
-            rates   = [r.Tx2, r.ltfu2];
-            m(destins, source) = m(destins, source) + rates';
-    
-            % Relapse
-            sources = [Rlo Rhi R];
-            destin  = I2;
-            rates   = r.relapse;
-            m(destin, sources) = m(destin, sources) + rates;
-    
-            % Stabilisation of relapse risk
-            sources = [Rlo Rhi];
-            destin  = R;
-            rates   = 0.5;
-            m(destin, sources) = m(destin, sources) + rates;
-    
-            % Initiation of TPT
-            source = Lf;
-            destin = Pf;
-            rate   = r.TPT(ib);
-            m(destin, source) = m(destin, source) + rate;
-    
-            source = Ls;
-            destin = Ps;
-            rate   = r.TPT(ib);
-            m(destin, source) = m(destin, source) + rate;
-    
-            % Case-finding
-            sources = [I I2];
-            destin  = Tx;
-            rate    = r.ACF(ib)*(1-pSLinit);
-            m(destin, sources) = m(destin, sources) + rate;
-    
-            sources = [I I2];
-            destin  = Tx2;
-            rate    = r.ACF(ib)*pSLinit;
-            m(destin, sources) = m(destin, sources) + rate;
-    
-    
-            source = I2;
-            destin = Tx;
-            rate   = r.ACF2(ib)*(1-pSLinit);
-            m(destin, source) = m(destin, source) + rate;
-    
-            source = I2;
-            destin = Tx2;
-            rate   = r.ACF2(ib)*pSLinit;
-            m(destin, source) = m(destin, source) + rate;
         end
     end
 end
@@ -160,6 +164,13 @@ sources = s.ch;
 destins = s.ad;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + r.ageing;
+
+% Transition from HIV negative to positive
+sources = s.neg;
+destins = s.pos;
+inds = sub2ind([i.nstates, i.nstates], destins, sources);
+m(inds) = m(inds) + r.HIVprog;                                             % this rate will be progression of HIV?
+
 
 M.lin = sparse(m - diag(sum(m,1)));
 
@@ -331,6 +342,7 @@ m(s.ch,1)         = r.ch_mort;
 m(:,1)            = 1/83;
 m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
+m(s.pos,1)        = r.muHIV;
 M.mort            = sparse(m);
 
 

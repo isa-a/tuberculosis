@@ -39,14 +39,11 @@ x0_init = xord;
 
 options = optimset(PlotFcn=@optimplotfval);
 x0 = fminsearch(nobj,xord(1,:),options);
-x1 = fminsearch(nobj,x0,options);
-x2 = fminsearch(nobj,x1,options);
-
-save optim_res4;
 
 
 % Perform MCMC
-[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e3, 1, [], [], [], 1);
+[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e4, 1, [], [], [], 1);
+cov0 = [];
 
 inds = find(outsto==max(outsto));
 x0 = xsto(inds(1),:);

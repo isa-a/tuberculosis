@@ -1,20 +1,23 @@
-clear all; load optim_res3.mat;
+clear all; load calibration_res.mat;
 
-ix0 = size(x0)/2;
+ix0 = size(xsto,1)/2;
 nx  = 200;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
-for ii = 1:size(x1,1)
-    [out, aux] = obj(x1(ii,:));
-    sims(ii,:) = aux.sim;
-    inc(:,ii)  = aux.incd;
-    pp(ii)     = aux.p_migrect;
+for ii = 1:size(xs,1)
+    [out, aux] = obj(xs(ii,:));
+    incd(:,:,ii) = diff(aux.soln(:,i.aux.inc),[],1)*1e5;
 end
+incd_pct = prctile(incd,[2.5,50,97.5],3);
+
+
+return;
+
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.incdRR2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI; data.p_vulnpopn; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn];
+alldat = [data.incd2010; data.incd2020; data.incdRR2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI; data.p_vulnpopn; data.p_vulnTB];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -57,6 +60,6 @@ for ii = 1:length(fnames)
 end
 for ii = 1:12
    subplot(4,3,ii); 
-   histogram(x1(:,ii));
+   histogram(xsto(:,ii));
    title(names{ii});
 end
