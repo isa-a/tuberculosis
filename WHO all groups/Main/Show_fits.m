@@ -1,12 +1,12 @@
-clear all; load optim_res3.mat;
+clear all; load optim_res_new.mat;
 
-ix0 = size(x0)/2;
+ix0 = size(xsto,1)/2;
 nx  = 200;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
-for ii = 1:size(x1,1)
-    [out, aux] = obj(x1(ii,:));
+for ii = 1:size(xs,1)
+    [out, aux] = obj(xs(ii,:));
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
@@ -14,7 +14,7 @@ end
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.incdRR2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI; data.p_vulnpopn; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn];
+alldat = [data.incd2010; data.incd2020; data.incdRR2020; data.mort; data.p_migrpopn; data.p_LTBI; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -35,9 +35,12 @@ set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
 
 yl = ylim; yl(1) = 0; ylim(yl);
 
+
 % Plot incidence timeseries
 figure; hold on;
 plot(inc,'Color',0.5*[1 1 1]);
+
+
 
 % Plot data for comparison
 vecs = [data.incd2010; data.incd2020]';
@@ -57,6 +60,6 @@ for ii = 1:length(fnames)
 end
 for ii = 1:12
    subplot(4,3,ii); 
-   histogram(x1(:,ii));
+   histogram(xsto(:,ii));
    title(names{ii});
 end

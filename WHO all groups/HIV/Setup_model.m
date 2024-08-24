@@ -5,9 +5,10 @@ states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
 gps.born    = {'dom','migr_rect','migr_long','vuln'};
 gps.strains = {'ds','rr'};
+gps.hiv     = {'neg', 'pos', 'art'};
 
 [i, s, d, lim] = get_addresses({states1, gps.age, gps.born}, [], [], [], 0);
-[i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains}, i, s, d, lim);
+[i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains, gps.hiv}, i, s, d, lim);
 d = char(d);
 
 s.migr       = [s.migr_rect, s.migr_long];
@@ -15,10 +16,12 @@ s.allI       = [s.I, s.I2];
 % s.migrstates = [i.U.migr_rect, i.Lf.migr_rect, i.Ls.migr_rect, i.Pf.migr_rect, i.Ps.migr_rect];
 s.migrstates = intersect([s.U, s.Lf, s.Ls, s.Pf, s.Ps],s.migr_rect);
 s.infectious = [s.allI, intersect(s.rr,s.Tx)];
+s.allH       = [s.allI, intersect(s.pos,s.art)];
+
 
 % Include the auxiliaries
-names = {'inc','incsources','mort','nTPT'};
-lgths = [    5,          24,     1,     1];
+names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
+lgths = [    6,          24,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -37,6 +40,8 @@ tmp(2,intersect(s.allI,s.migr)) = 1;
 tmp(3,intersect(s.allI,s.rr))   = 1;
 tmp(4,intersect(s.allI,s.vuln)) = 1;
 tmp(5,intersect(s.allI,s.ch))   = 1;
+tmp(6,intersect(s.allI,s.pos))  = 1;
+
 agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);
@@ -53,6 +58,11 @@ tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
+% Remove transitions due to change in HIV status
+tmp(s.neg, s.pos) = 0;
+tmp(s.pos, s.neg) = 0;
+tmp(s.pos, s.art) = 0;
+tmp(s.art, s.pos) = 0;
 sel.inc = tmp - diag(diag(tmp));
 
 
@@ -67,6 +77,7 @@ sel.inc = tmp - diag(diag(tmp));
 
 set1 = {s.dom, s.migr, s.vuln};
 set2 = {s.ds,  s.rr};
+set3 = {s.neg, s.pos, s.art};
 
 tmp  = zeros(length(set1)*length(set2),i.nstates);
 row  = 1;
@@ -120,10 +131,14 @@ tmp(s.ds, s.rr) = 0;
 tmp(s.dom, s.vuln) = 0;
 tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
-%tmp(s.ch, s.ad) = 0;
-%tmp(s.ad, s.ch) = 0;
-%sel.ch_notifs = tmp - diag(diag(tmp));
-
+tmp(s.ch, s.ad) = 0;
+tmp(s.ad, s.ch) = 0;
+% Remove transitions due to change in vulnerability status
+tmp(s.neg, s.pos) = 0;
+tmp(s.pos, s.neg) = 0;
+tmp(s.pos, s.art) = 0;
+tmp(s.art, s.pos) = 0;
+sel.ch_notifs = tmp - diag(diag(tmp));
 
 
 % -- Natural history parameters -------------------------------------------
@@ -143,6 +158,8 @@ r.relapse      = [0.032 0.14 0.0015];
 % r.relapse      = [0 0 0];
 % r.mu           = 1/66;                                                   % natural mortality
 r.muTB         = 1/6;                                                      % TB related mortality
+r.HIVprog      = 0.07;                                                     % HIV progression?
+r.muHIV        = 1/6;                                                      % HIV mortality
 p.imm          = 0.8;                                                      % Reduced susceptibility conferred by previous infection
 
 p.ch_in_migr   = 0.1;                                                      % GUESS: check with countries
@@ -225,7 +242,7 @@ data.incd2010       = [11 12 14];                                          % Wit
 data.incd2020       = [6.8  7.9  9.2];                                             
 data.incdRR2020     = [0.07 0.14 0.21];                                    % Incidence of RR-TB
 data.mort           = [0.26 0.36 0.47];                                    % TB mortality, 2020
-data.p_migrTB      = [0.5  0.6  0.7];                                     % Proportion contribution of migrants to overall incidence
+data.p_migrTB       = [0.5  0.6  0.7];                                     % Proportion contribution of migrants to overall incidence
 data.p_migrpopn     = [0.337 0.437 0.537];                                 % Proportion of population that is migrants
 data.p_LTBI         = [0.18 0.22 0.28];                                    % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
 data.p_vulnpopn     = [5 10 15]/100;                                       % Proportion of UK population being vulnerable
@@ -234,7 +251,7 @@ data.nTPT2019       = 1.3*[0.9 1 1.1];                                     % Num
 data.incd_ch2020    = [2 3 5];                                             % incidence in children
 data.p_chpopn       = [0.286 0.292 0.3];                                   % proportion of country thats children
 data.p_adpopn       = [0.688 0.708 0.728];                                 % proportion of country thats adults
-%data.ch_notifs      = [310 360 420]/4.5e6*1e5;                            % notifications in the country   
+data.ch_notifs      = [310 360 420]/4.5e6*1e5;                             % notifications in the country   
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
@@ -249,15 +266,15 @@ f7  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
 f8  = get_distribution_fns(data.incd_ch2020,'lognorm', show);
 f10  = get_distribution_fns(data.p_chpopn,  'beta',    show);
 f11  = get_distribution_fns(data.p_adpopn,  'beta',    show);
-%f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
+f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn) f1a(incd2010) + ...
+lhd.fn = @(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, notifs) f1a(incd2010) + ...
                                                                                                      f1b(incd2020) + f1c(incdRR2020) + f2(mort) + ...
-                                                                                                     f3(p_migrTBf4(p_migrpopn) + f5(p_LTBI) + ...
+                                                                                                     f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + ...
                                                                                                      f6(p_vulnpopn) + f7(p_vulnTB) + f8(incd_ch2020) + ...
-                                                                                                     f10(p_chpopn) + f11(p_adpopn);
+                                                                                                     f10(p_chpopn) + f11(p_adpopn) + f12(notifs);
 
 save Model_setup;
 

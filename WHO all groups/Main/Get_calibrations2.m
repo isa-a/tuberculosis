@@ -31,9 +31,6 @@ mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
 xord = xsam(ord,:);
 
-% load calibration_res x0_init;
-% x0 = x0_init;
-x0_init = xord;
 
 % return;
 
@@ -42,18 +39,18 @@ x0 = fminsearch(nobj,xord(1,:),options);
 x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
 
-save optim_res4;
+save optim_res_new3;
 
 
 % Perform MCMC
 [xsto, outsto] = MCMC_adaptive33(obj, x0, 1e3, 1, [], [], [], 1);
 
 inds = find(outsto==max(outsto));
-x0 = xsto(inds(1),:);
+x_new = xsto(inds(1),:);
 
 
 cov0 = cov(xsto);
-[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e4, 1, [], [], cov0, 1);
+[xsto, outsto] = MCMC_adaptive33(obj, x_new, 1e4, 1, [], [], cov0, 1);
 
 
 nreps = 4;

@@ -1,5 +1,3 @@
-function out = goveqs_basis2(t, in, i, s, M, agg, sel, r, p)
-
 out = zeros(length(in),1);
 invec = in(1:i.nstates);
 

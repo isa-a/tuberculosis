@@ -1,4 +1,4 @@
-clear all; load calibration_res_isa_new_2.mat; load Model_setup;
+clear all; load optim_res7.mat; load Model_setup;
 
 obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 
@@ -6,7 +6,7 @@ set1 = {'ds','rr'};
 set2 = {'dom','migr','vuln'};
 set3 = {'L','P','R','T'};
 [inci, incs, incd, lim] = get_addresses({set3, set2, set1}, [], [], [], 0);
-opts = odeset('RelTol', 1e-14, 'AbsTol', 1e-14);
+opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
 
 
@@ -14,7 +14,7 @@ midpt = true;
 if midpt
     % inds = find(outsto==max(outsto));
     % xs = xsto(inds(1),:);
-    xs = x0_init;
+    xs = x1;
 else
     ix0 = size(xsto,1)/2;
     nx  = 200;
@@ -30,7 +30,6 @@ for ii = 1:size(xs,1)
     xx = xs(ii,:);
     [out,aux] = obj(xx);
     
-    keyboard;
 
     init = aux.soln(end,:);
 

@@ -183,15 +183,18 @@ for ia = 1:length(gps.age)
         strain = gps.strains{is};
         for ib = 1:length(gps.born)
             born = gps.born{ib};
-    
-            m = zeros(i.nstates);
-            susinds = intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born));
-            m(i.Lf.(age).(born).(strain), susinds) = 1;
-            
-            imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
-            m(:,imminds) = m(:,imminds)*(1-p.imm);
-            
-            M.nlin.(age).(born).(strain) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
+            for ih = 1:length(gps.hiv)
+                hiv = gps.hiv{ih};
+
+                m = zeros(i.nstates);
+                susinds = intersect(intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R], s.(hiv)), s.(age)), s.(born));
+                m(i.Lf.(age).(born).(strain).(hiv), susinds) = 1;
+
+                imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
+                m(:,imminds) = m(:,imminds)*(1-p.imm);
+
+                M.nlin.(age).(born).(strain).(hiv) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
+            end
         end
     end
 end
