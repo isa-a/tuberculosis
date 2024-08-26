@@ -18,8 +18,8 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.ad.dom)       = 1 - 0.16 - seed;
-    init(i.U.ad.migr_rect) = 0.16;
+    init(i.U.ad.dom)       = 1 - 0.168 - seed;
+    init(i.U.ad.migr_rect) = 0.168;
     init(i.I.ad.dom.ds)    = seed;
     
     % Equlibrium model, without RR-TB
@@ -97,7 +97,7 @@ else
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
     
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, incdRR2020, mort, p_migrpopn, p_LTBI, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
+        out  = calfn.fn(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
@@ -116,7 +116,7 @@ else
         aux.chpopn     = p_chpopn;
         aux.adpopn     = p_adpopn;
         aux.ch_notifs  = ch_notifs;
-        aux.sim        = [incd2010, incd2020, incdRR2020, mort, p_migrpopn, p_LTBI, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs];
+        aux.sim        = [incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs];
     else
         out = -Inf;
         aux = NaN;

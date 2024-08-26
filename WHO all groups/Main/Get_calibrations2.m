@@ -39,11 +39,11 @@ x0 = fminsearch(nobj,xord(1,:),options);
 x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
 
-save optim_res_new3;
+save optim_resUK;
 
 
 % Perform MCMC
-[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e3, 1, [], [], [], 1);
+[xsto, outsto] = MCMC_adaptive33(obj, x2, 1e3, 1, [], [], [], 1);
 
 inds = find(outsto==max(outsto));
 x_new = xsto(inds(1),:);
