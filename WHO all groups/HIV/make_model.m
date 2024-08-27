@@ -87,7 +87,7 @@ for ia = 1:length(gps.age)
                 % Acquisition of drug resistance while on first-line treatment
                 if ~ismdr
                     source = Tx;
-                    destin = i.Tx.(age).(born).rr;                                   % <--- Include age stratification
+                    destin = i.Tx.(age).(born).rr.(hiv);                                   % <--- Include age stratification
                     rate   = r.RR_acqu;
                     m(destin, source) = m(destin, source) + rate;
                 end
@@ -166,10 +166,10 @@ inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + r.ageing;
 
 % Transition from HIV negative to positive
-sources = s.neg;
-destins = s.pos;
-inds = sub2ind([i.nstates, i.nstates], destins, sources);
-m(inds) = m(inds) + r.HIVprog;                                             % this rate will be progression of HIV?
+% sources = s.neg;
+% destins = s.pos;
+% inds = sub2ind([i.nstates, i.nstates], destins, sources);
+% m(inds) = m(inds) + r.HIVprog;                                             % this rate will be progression of HIV?
 
 
 M.lin = sparse(m - diag(sum(m,1)));
