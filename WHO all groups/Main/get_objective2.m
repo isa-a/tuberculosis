@@ -95,6 +95,9 @@ else
 
     % Notifications
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
+
+    % HIV prevalence
+    hiv_prev  = dsol;
     
     if incd > 0.1
         out  = calfn.fn(incd2010, incd2020, incdRR2020, mort, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn);
