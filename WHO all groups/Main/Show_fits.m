@@ -1,4 +1,4 @@
-clear all; load optim_res_new.mat;
+clear all; load optim_resUK3.mat;
 
 ix0 = size(xsto,1)/2;
 nx  = 200;
@@ -31,8 +31,8 @@ md = sim_plt(2,:); hilo = diff(sim_plt,[],1);
 xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
-set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-
+%set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
+set(gca, 'XTick', 1:length(md), 'XTickLabel', {'incd2010', 'incd2020', 'incdRR2020', 'mort', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 
