@@ -32,6 +32,22 @@ ord  = mat(:,2);
 xord = xsam(ord,:);
 
 
+xopts = zeros(5, size(xord, 2));  
+new_outs = zeros(1, 5);         
+
+
+for ii = 1:5
+    options = optimset('PlotFcn',@optimplotfval);
+    [xopts(ii,:), fval] = fminsearch(nobj, xord(ii,:), options);
+    new_outs(ii) = -fval;  
+end
+
+
+mat  = sortrows([outs(ord(1:5)); ord(1:5)]', -1);
+ord  = mat(:,2);
+xord = xord(ord,:);
+
+
 % return;
 
 options = optimset(PlotFcn=@optimplotfval);
@@ -39,7 +55,7 @@ x0 = fminsearch(nobj,xord(1,:),options);
 x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
 
-save optim_resUK4;
+save optim_resUK5;
 
 
 % Perform MCMC

@@ -5,8 +5,8 @@ nx  = 200;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
-for ii = 1:size(xs,1)
-    [out, aux] = obj(xs(ii,:));
+for ii = 1:size((xopts(3,:)),1)
+    [out, aux] = obj(xopts(3,:));
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
@@ -58,8 +58,8 @@ for ii = 1:length(fnames)
     fname = fnames{ii};
     names = [names, repmat({fname},1,length(xi.(fname)))];
 end
-for ii = 1:12
-   subplot(4,3,ii); 
-   histogram(xsto(:,ii));
+for ii = 1:16
+   subplot(4,4,ii); 
+   histogram(xone(:,ii));
    title(names{ii});
 end
