@@ -32,6 +32,7 @@ ord  = mat(:,2);
 xord = xsam(ord,:);
 
 
+<<<<<<< HEAD
 xopts = zeros(5, size(xord, 2));  
 new_outs = zeros(1, 5);         
 
@@ -44,6 +45,16 @@ end
 
 
 mat  = sortrows([outs(ord(1:5)); ord(1:5)]', -1);
+=======
+for ii = 1:10
+    options = optimset('PlotFcn',@optimplotfval);
+    [xord(ii,:), fval] = fminsearch(nobj, xord(ii,:), options);
+    outs(ord(ii)) = -fval;  % Update outs with maximized values
+end
+
+
+mat  = sortrows([outs(ord(1:10)); ord(1:10)]', -1);
+>>>>>>> 93fab5d393ca25e789e2cb26d4530b105e853857
 ord  = mat(:,2);
 xord = xord(ord,:);
 
