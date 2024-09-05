@@ -5,13 +5,9 @@ nx  = 200;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
-<<<<<<< HEAD
+
 for ii = 1:size((xopts(3,:)),1)
     [out, aux] = obj(xopts(3,:));
-=======
-for ii = 1:size(x0,1)
-    [out, aux] = obj(x0(ii,:));
->>>>>>> 93fab5d393ca25e789e2cb26d4530b105e853857
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
