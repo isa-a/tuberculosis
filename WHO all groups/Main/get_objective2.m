@@ -97,7 +97,7 @@ else
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
     
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, incdRR2020, mort, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, p_chpopn, p_adpopn);
+        out  = calfn.fn(incd2020, incdRR2020, mort, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
