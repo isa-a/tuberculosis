@@ -4,7 +4,7 @@ states1     = {'U'};
 states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
 gps.born    = {'dom','migr_rect','migr_long','vuln'};
-gps.strains = {'ds','rr'};
+gps.strains = {'ds'};
 
 [i, s, d, lim] = get_addresses({states1, gps.age, gps.born}, [], [], [], 0);
 [i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains}, i, s, d, lim);
@@ -14,7 +14,7 @@ s.migr       = [s.migr_rect, s.migr_long];
 s.allI       = [s.I, s.I2];
 % s.migrstates = [i.U.migr_rect, i.Lf.migr_rect, i.Ls.migr_rect, i.Pf.migr_rect, i.Ps.migr_rect];
 s.migrstates = intersect([s.U, s.Lf, s.Ls, s.Pf, s.Ps],s.migr_rect);
-s.infectious = [s.allI, intersect(s.rr,s.Tx)];
+s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
@@ -31,12 +31,11 @@ i.nx = lim;
 % --- Set up selectors and aggregators
 
 % --- Incidence
-tmp = zeros(5,i.nstates); 
+tmp = zeros(4,i.nstates); 
 tmp(1,s.allI) = 1;
 tmp(2,intersect(s.allI,s.migr)) = 1;
-tmp(3,intersect(s.allI,s.rr))   = 1;
-tmp(4,intersect(s.allI,s.vuln)) = 1;
-tmp(5,intersect(s.allI,s.ch))   = 1;
+tmp(3,intersect(s.allI,s.vuln)) = 1;
+tmp(4,intersect(s.allI,s.ch))   = 1;
 agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);
@@ -45,8 +44,7 @@ tmp(s.allI,:) = 1;
 tmp(s.migr_rect, s.migr_long) = 0;
 tmp(s.migr_long, s.migr_rect) = 0;
 % Remove transitions due to changing drug resistance status
-tmp(s.rr, s.ds) = 0;
-tmp(s.ds, s.rr) = 0;
+
 % Remove transitions due to change in vulnerability status
 tmp(s.dom, s.vuln) = 0;
 tmp(s.vuln, s.dom) = 0;
@@ -66,7 +64,7 @@ sel.inc = tmp - diag(diag(tmp));
 % agg.incsources = sparse(tmp);
 
 set1 = {s.dom, s.migr, s.vuln};
-set2 = {s.ds,  s.rr};
+set2 = {s.ds};
 
 tmp  = zeros(length(set1)*length(set2),i.nstates);
 row  = 1;
@@ -114,8 +112,7 @@ tmp(intersect([s.Tx, s.Tx2],s.ch),:) = 1;
 tmp(s.migr_rect, s.migr_long) = 0;
 tmp(s.migr_long, s.migr_rect) = 0;
 % Remove transitions due to changing drug resistance status
-tmp(s.rr, s.ds) = 0;
-tmp(s.ds, s.rr) = 0;
+
 % Remove transitions due to change in vulnerability status
 tmp(s.dom, s.vuln) = 0;
 tmp(s.vuln, s.dom) = 0;
