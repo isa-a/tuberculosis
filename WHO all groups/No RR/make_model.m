@@ -194,22 +194,22 @@ m = zeros(i.nstates,1);
 m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch)*p.ch_in_migr;
 m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad)*(1-p.ch_in_migr);
 
-m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT);
+m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.02;
 
-m(getindsch('Ls','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT);
+m(getindsch('Ls','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.98;
 
-m(getindsch('Pf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT;
+m(getindsch('Pf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.02;
 
-m(getindsch('Ps','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT;
+m(getindsch('Ps','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.98;
 
 
-m(getindsad('Lf','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT);
+m(getindsad('Lf','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.02;
 
-m(getindsad('Ls','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT);
+m(getindsad('Ls','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.98;
 
-m(getindsad('Pf','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT;
+m(getindsad('Pf','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.02;
 
-m(getindsad('Ps','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT;
+m(getindsad('Ps','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.98;
 
 
 % m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;

@@ -24,7 +24,7 @@ r.reactivation = [tmp*x(xi.p_relrate_factor); tmp];
 
 r.migr           = x(xi.r_migr);
 p.LTBI_in_migrad = x(xi.p_LTBI_in_migr);
-p.LTBI_in_migrch = x(xi.p_LTBI_in_migr)/4;                                 % CHECK this assumption of 4
+p.LTBI_in_migrch = x(xi.p_LTBI_in_migr)/2;                                 % CHECK this assumption of 4
 %p.RR_in_migr     = x(xi.p_RR_in_migr);
 r.vuln           = x(xi.r_vuln);
 p.relbeta_vuln   = 1;

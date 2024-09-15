@@ -18,7 +18,7 @@ s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    4,          24,     1,     1,           1];
+lgths = [    4,          12,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -75,7 +75,7 @@ for is1 = 1:length(set1)
     end
 end
 agg.incsources = sparse(tmp);
-keyboard;
+
 % --- Selectors for different origins 
 
 % Untreated TB infection
@@ -146,7 +146,8 @@ p.ch_in_migr   = 0.1;                                                      % GUE
 
 % --- Interventions 
 p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
-p.TPTeff       = [0.6 0.1];                                                % Effectiveness of TPT
+% p.TPTeff       = [0.6 0.1];                                                % Effectiveness of TPT
+p.TPTeff       = 0.6;                                                % Effectiveness of TPT
 r.TPT          = [0 0 0 0];                                                % Uptake of TPT amongst: 1.domestic, 2.recent migrants, 3.long-term migrants
 r.TPT2020rec   = 0.004;
 r.ACF          = [0 0 0 0];
