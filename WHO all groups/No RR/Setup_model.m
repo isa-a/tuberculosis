@@ -18,7 +18,7 @@ s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    5,          24,     1,     1,           1];
+lgths = [    4,          24,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -75,7 +75,7 @@ for is1 = 1:length(set1)
     end
 end
 agg.incsources = sparse(tmp);
-
+keyboard;
 % --- Selectors for different origins 
 
 % Untreated TB infection
@@ -160,8 +160,10 @@ r.ACF2         = [0 0 0 0];
 % lgths =      [1,        1,      1,         1,      1,             1,          1,       1];
 % names = {'beta','betadec','gamma','r_TPT2020rec','p_relrate','r_migr','p_LTBI_in_migr'};      
 % lgths =      [1,        1,      2,             1,          1,       1,               1];
-names = {'beta','relbeta_RR','betadec','gamma','p_relrate_gamma_chvad','p_relrate','r_migr','p_LTBI_in_migr','p_RR_in_migr','r_vuln','relbeta_vuln', 'ageing', 'ch_mort', 'p_relrate_factor'};      
-lgths =      [1,           1,        1,      2,                      1,          2,       1,               1,             1,       1,             1,       1,         1,                 1];
+
+
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','r_migr','p_LTBI_in_migr','r_vuln','relbeta_vuln', 'ageing', 'ch_mort', 'p_relrate_factor'};      
+lgths =      [1,      1,      2,                  1,          2,            1,               1,       1,             1,       1,         1,                 1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -173,14 +175,14 @@ end
 % Set their boundaries
 bds = [];
 bds(xi.beta,:)             = [0 40];
-bds(xi.relbeta_RR,:)       = [1e-4 1];
+%bds(xi.relbeta_RR,:)       = [1e-4 1];
 bds(xi.betadec,:)          = [0 0.15];
 bds(xi.gamma,:)            = repmat([1e-4 10],2,1);
 bds(xi.p_relrate_gamma_chvad,:) = [0 2];
 bds(xi.p_relrate,:)        = repmat([1 20],2,1);
 bds(xi.r_migr,:)           = [0 1];
 bds(xi.p_LTBI_in_migr,:)   = [0 0.5];
-bds(xi.p_RR_in_migr,:)     = [0 0.1];
+%bds(xi.p_RR_in_migr,:)     = [0 0.1];
 bds(xi.r_vuln,:)           = [0 2];
 bds(xi.relbeta_vuln,:)     = [0.1 20];
 bds(xi.ageing,:)           = [0.02 0.3];
@@ -235,7 +237,7 @@ end
 
 data.incd2010       = [13.6 14.6 15.6];                                    % With broader uncertainty intervals
 data.incd2020       = [6.5 7 7.5];                                             
-data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
+%data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
 data.mort           = [0.28 0.3 0.32];                                     % TB mortality, 2020
 data.p_migrTB       = [0.708 0.728 0.748];                                 % Proportion contribution of migrants to overall incidence
 data.p_migrpopn     = [0.138 0.168 0.198];                                 % Proportion of population that is migrants
@@ -251,7 +253,7 @@ data.ch_notifs      = [101 141 181]/55.98e6*1e5;                           % not
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
 f1b = get_distribution_fns(data.incd2020,   'lognorm', show);
-f1c = get_distribution_fns(data.incdRR2020, 'lognorm', show);
+%f1c = get_distribution_fns(data.incdRR2020, 'lognorm', show);
 f2  = get_distribution_fns(data.mort,       'lognorm', show);
 f3  = get_distribution_fns(data.p_migrTB,   'beta',    show);
 f4  = get_distribution_fns(data.p_migrpopn, 'beta',    show);
@@ -265,11 +267,11 @@ f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, incdRR2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, p_chpopn, p_adpopn) f1a(incd2010) + f1b(incd2020) + f1c(incdRR2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + ...
                                                                                                      f4(p_migrpopn) + f5(p_LTBI) + ...
-                                                                                                     f6(p_vulnpopn) + f7(p_vulnTB) + ...
-                                                                                                     f10(p_chpopn) + f11(p_adpopn);
+                                                                                                     f8(incd_ch2020) + f6(p_vulnpopn) + f7(p_vulnTB) + ...
+                                                                                                     f10(p_chpopn) + f11(p_adpopn) +f12(ch_notifs);
 
 save Model_setup;
 
