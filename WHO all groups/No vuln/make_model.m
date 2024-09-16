@@ -150,10 +150,10 @@ inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + 1/5;
 
 % Transition from dom to vulnerable population
-sources = s.dom;
-destins = s.vuln;
-inds = sub2ind([i.nstates, i.nstates], destins, sources);
-m(inds) = m(inds) + r.vuln;
+% sources = s.dom;
+% destins = s.vuln;
+% inds = sub2ind([i.nstates, i.nstates], destins, sources);
+% m(inds) = m(inds) + r.vuln;
 
 % --- Ageing process
 sources = s.ch;
@@ -236,17 +236,17 @@ M.migrentries = sparse(m);
 % --- Force of infection --------------------------------------------------
 
 getinds = @(st1, st2, st3) intersect(intersect(intersect(s.infectious, s.(st1)), s.(st2)), s.(st3));
-contmat(end,end) = contmat(end,end)*p.relbeta_vuln;
+contmat(end,end) = contmat(end,end);
 
 m = zeros(6,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
                                                                             % no RR Rows: 1.Dom DS 2.Migr DS 3.Vuln DS   
 
-m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                             
+m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
 m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  
 m(1,getinds('ch', 'migr','ds')) = contmat(1,3);
 m(1,getinds('ad', 'migr','ds')) = contmat(1,4);
-m(1,getinds('ch', 'vuln','ds')) = contmat(1,5);
-m(1,getinds('ad', 'vuln','ds')) = contmat(1,6);
+% m(1,getinds('ch', 'vuln','ds')) = contmat(1,5);
+% m(1,getinds('ad', 'vuln','ds')) = contmat(1,6);
 
 % m(2,getinds('ch', 'dom', 'rr')) = contmat(1,1);
 % m(2,getinds('ad', 'dom','rr')) = contmat(1,2);
@@ -259,8 +259,8 @@ m(2,getinds('ch', 'dom', 'ds')) = contmat(2,1);
 m(2,getinds('ad', 'dom','ds')) = contmat(2,2);
 m(2,getinds('ch', 'migr','ds')) = contmat(2,3);
 m(2,getinds('ad', 'migr','ds')) = contmat(2,4);
-m(2,getinds('ch', 'vuln','ds')) = contmat(2,5);
-m(2,getinds('ad', 'vuln','ds')) = contmat(2,6);
+% m(2,getinds('ch', 'vuln','ds')) = contmat(2,5);
+% m(2,getinds('ad', 'vuln','ds')) = contmat(2,6);
 
 % m(4,getinds('ch', 'dom', 'rr')) = contmat(2,1);
 % m(4,getinds('ad', 'dom','rr')) = contmat(2,2);
@@ -273,8 +273,8 @@ m(3,getinds('ch', 'dom', 'ds')) = contmat(3,1);
 m(3,getinds('ad', 'dom','ds')) = contmat(3,2);
 m(3,getinds('ch', 'migr','ds')) = contmat(3,3);
 m(3,getinds('ad', 'migr','ds')) = contmat(3,4);
-m(3,getinds('ch', 'vuln','ds')) = contmat(3,5);
-m(3,getinds('ad', 'vuln','ds')) = contmat(3,6);
+% m(3,getinds('ch', 'vuln','ds')) = contmat(3,5);
+% m(3,getinds('ad', 'vuln','ds')) = contmat(3,6);
 
 % m(6,getinds('ch', 'dom', 'rr')) = contmat(3,1);
 % m(6,getinds('ad', 'dom','rr')) = contmat(3,2);
@@ -287,8 +287,8 @@ m(4,getinds('ch', 'dom', 'ds')) = contmat(4,1);
 m(4,getinds('ad', 'dom','ds')) = contmat(4,2);
 m(4,getinds('ch', 'migr','ds')) = contmat(4,3);
 m(4,getinds('ad', 'migr','ds')) = contmat(4,4);
-m(4,getinds('ch', 'vuln','ds')) = contmat(4,5);
-m(4,getinds('ad', 'vuln','ds')) = contmat(4,6);
+% m(4,getinds('ch', 'vuln','ds')) = contmat(4,5);
+% m(4,getinds('ad', 'vuln','ds')) = contmat(4,6);
 
 % m(8,getinds('ch', 'dom', 'rr')) = contmat(4,1);
 % m(8,getinds('ad', 'dom','rr')) = contmat(4,2);
@@ -297,12 +297,12 @@ m(4,getinds('ad', 'vuln','ds')) = contmat(4,6);
 % m(8,getinds('ch', 'vuln','rr')) = contmat(4,5);
 % m(8,getinds('ad', 'vuln','rr')) = contmat(4,6);
 
-m(5,getinds('ch', 'dom', 'ds')) = contmat(5,1);
-m(5,getinds('ad', 'dom','ds')) = contmat(5,2);
-m(5,getinds('ch', 'migr','ds')) = contmat(5,3);
-m(5,getinds('ad', 'migr','ds')) = contmat(5,4);
-m(5,getinds('ch', 'vuln','ds')) = contmat(5,5);
-m(5,getinds('ad', 'vuln','ds')) = contmat(5,6);
+% m(5,getinds('ch', 'dom', 'ds')) = contmat(5,1);
+% m(5,getinds('ad', 'dom','ds')) = contmat(5,2);
+% m(5,getinds('ch', 'migr','ds')) = contmat(5,3);
+% m(5,getinds('ad', 'migr','ds')) = contmat(5,4);
+% m(5,getinds('ch', 'vuln','ds')) = contmat(5,5);
+% m(5,getinds('ad', 'vuln','ds')) = contmat(5,6);
 
 % m(10,getinds('ch', 'dom', 'rr')) = contmat(5,1);
 % m(10,getinds('ad', 'dom','rr')) = contmat(5,2);
@@ -311,12 +311,12 @@ m(5,getinds('ad', 'vuln','ds')) = contmat(5,6);
 % m(10,getinds('ch', 'vuln','rr')) = contmat(5,5);
 % m(10,getinds('ad', 'vuln','rr')) = contmat(5,6);
 
-m(6,getinds('ch', 'dom', 'ds')) = contmat(6,1);
-m(6,getinds('ad', 'dom','ds')) = contmat(6,2);
-m(6,getinds('ch', 'migr','ds')) = contmat(6,3);
-m(6,getinds('ad', 'migr','ds')) = contmat(6,4);
-m(6,getinds('ch', 'vuln','ds')) = contmat(6,5);
-m(6,getinds('ad', 'vuln','ds')) = contmat(6,6);
+% m(6,getinds('ch', 'dom', 'ds')) = contmat(6,1);
+% m(6,getinds('ad', 'dom','ds')) = contmat(6,2);
+% m(6,getinds('ch', 'migr','ds')) = contmat(6,3);
+% m(6,getinds('ad', 'migr','ds')) = contmat(6,4);
+% m(6,getinds('ch', 'vuln','ds')) = contmat(6,5);
+% m(6,getinds('ad', 'vuln','ds')) = contmat(6,6);
 
 % m(12,getinds('ch', 'dom', 'rr')) = contmat(6,1);
 % m(12,getinds('ad', 'dom','rr')) = contmat(6,2);
@@ -338,8 +338,8 @@ m(1, intersect(s.ch, s.dom))  = 1;
 m(2, intersect(s.ad, s.dom))  = 1; 
 m(3, intersect(s.ch, s.migr)) = 1; 
 m(4, intersect(s.ad, s.migr)) = 1; 
-m(5, intersect(s.ch, s.vuln)) = 1; 
-m(6, intersect(s.ad, s.vuln)) = 1;  
+% m(5, intersect(s.ch, s.vuln)) = 1; 
+% m(6, intersect(s.ad, s.vuln)) = 1;  
 M.denvec = sparse(m);
 
 
@@ -348,7 +348,7 @@ M.denvec = sparse(m);
 m = zeros(i.nstates,2);
 m(s.ch,1)         = r.ch_mort;
 m(:,1)            = 1/83;
-m(s.vuln,1)       = 1/55;
+%m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
 M.mort            = sparse(m);
 

@@ -18,7 +18,7 @@ s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    3,          12,     1,     1,           1];
+lgths = [    3,          8,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -31,7 +31,7 @@ i.nx = lim;
 % --- Set up selectors and aggregators
 
 % --- Incidence
-tmp = zeros(4,i.nstates); 
+tmp = zeros(3,i.nstates); 
 tmp(1,s.allI) = 1;
 tmp(2,intersect(s.allI,s.migr)) = 1;
 %tmp(3,intersect(s.allI,s.vuln)) = 1;
@@ -197,16 +197,16 @@ prm.bounds = bds';
 ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
-prm.contmat_born = [1 1e-3 1; 1e-3 1 1e-3; 1 1e-3 1];
+prm.contmat_born = [1 1e-3; 1e-3 1; 1 1e-3];
 prm.contmat_age  = [1 1e-3; 1e-3 1];
-prm.contmat      = zeros(6, 6);
+prm.contmat      = zeros(4, 4);
 
 
 % go through each element
 for age_row = 1:2                                                           % rows in age
     for age_col = 1:2                                                       % cols in age
-        for born_row = 1:3                                                  % rows in born
-            for born_col = 1:3                                              % cols in born
+        for born_row = 1:2                                                  % rows in born
+            for born_col = 1:2                                              % cols in born
                 % calc position in combined matrix
                 row = (born_row-1)*2 + age_row;                             % correctly scale current rows into new matrix
                 col = (born_col-1)*2 + age_col;                             % correctly scale current cols into new matrix

@@ -6,8 +6,8 @@ dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(xopt(3,:),1)
-    [out, aux] = obj(xopt(3,:));
+for ii = 1:size(x0,1)
+    [out, aux] = obj(x0);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
@@ -15,7 +15,7 @@ end
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI; data.p_vulnpopn; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -33,7 +33,7 @@ xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
+set(gca, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 
