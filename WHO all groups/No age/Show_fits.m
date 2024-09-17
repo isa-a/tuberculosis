@@ -6,8 +6,8 @@ dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(x0,1)
-    [out, aux] = obj(x0);
+for ii = 1:size(xopt(3,:),1)
+    [out, aux] = obj(xopt(3,:));
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;

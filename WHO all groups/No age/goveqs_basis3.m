@@ -87,15 +87,22 @@ out(i.U.ad.dom) = out(i.U.ad.dom) + dom_morts;
 % method 1 ----------------------------------------------------------------
 
 % Migration out of UK
-outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
-out(s.migr) = out(s.migr) - outmigr;
-%disp('out');
-%disp(sum(out));
+% outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
+% out(s.migr) = out(s.migr) - outmigr;
+% %disp('out');
+% %disp(sum(out));
+out(s.migr) = out(s.migr) - r.migr*invec(s.migr)/sum(invec(s.migr));
+
 
 % Migration into UK (balance the migration out and migrant mortality)
-migrmorts = sum(sum(morts(s.migr,:)));
-totalout = sum(outmigr) + migrmorts;
-out(1:i.nstates) = out(1:i.nstates) + totalout.*M.migrentries;
+% migrmorts = sum(sum(morts(s.migr,:)));
+% totalout = sum(outmigr) + migrmorts;
+% out(1:i.nstates) = out(1:i.nstates) + totalout.*M.migrentries;
+% Migration into UK
+inmigr = sum(sum(morts(s.migr,:))) + r.migr;
+vec = [1-p.LTBI_in_migrad, (1-p.migrTPT)*p.LTBI_in_migrad*[0.02 0.98], p.migrTPT*p.LTBI_in_migrad*[0.02 0.98]]';
+out(s.migrstates) = out(s.migrstates) + inmigr*vec;
+
 
 % keyboard;
 
