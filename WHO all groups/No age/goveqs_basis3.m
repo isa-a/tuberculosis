@@ -4,12 +4,13 @@ out = zeros(length(in),1);
 invec = in(1:i.nstates);
 
 % Prepare population denominators
-tmp = M.denvec*invec;
-den = sum(tmp.*M.denvec,1)';
-den(den==0) = Inf;
+% tmp = M.denvec*invec;
+% den = sum(tmp.*M.denvec,1)';
+% den(den==0) = Inf;
 
 % New infections
-lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
+lam = M.lam*invec/sum(invec)*(1-p.betadec)^(max((t-2010),0));
+% lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
 % lam = M.lam*(invec./sum(invec))*(1-p.betadec)^(max((t-2010),0));
 
 % Indices for lambda entries
@@ -34,18 +35,20 @@ lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
 % 5. ch vuln ds
 % 6. ad vuln ds
 
-
 % Indices for NO RR NO VULN lambda entries
 % 1. ch dom  ds
 % 2. ad dom  ds
 % 3. ch migr ds
 % 4. ad migr ds
 
+% Indices for NO RR NO VULN NO AGE lambda entries
+% 1. ad dom  ds
+% 2. ad migr  ds
+
 
 allmat = M.lin + ...
-        lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + ...
-        lam(3)*M.nlin.ch.migr_rect.ds     + lam(4)*M.nlin.ad.migr_rect.ds + ...
-        lam(3)*M.nlin.ch.migr_long.ds     + lam(4)*M.nlin.ad.migr_long.ds;
+        lam(1)*M.nlin.ad.dom.ds           + lam(1)*M.nlin.ad.migr_rect.ds + ...
+        lam(1)*M.nlin.ad.migr_long.ds;
 
 out(1:i.nstates) = allmat*invec;
 
@@ -75,7 +78,7 @@ out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
 
 % Births into UK population
 dom_morts = sum(sum(morts([s.dom],:)));
-out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
+out(i.U.ad.dom) = out(i.U.ad.dom) + dom_morts;
 
 
 % dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
@@ -122,13 +125,11 @@ end
 
 % Auxiliaries
 out(i.aux.inc)        = agg.inc*(sel.inc.*allmat)*invec;
-
 tmp1                  = agg.incsources*((sel.L2I.*allmat)*invec);
 tmp2                  = agg.incsources*((sel.P2I.*allmat)*invec);
 tmp3                  = agg.incsources*((sel.R2I.*allmat)*invec);
 tmp4                  = agg.incsources*((sel.T2I.*allmat)*invec);
-keyboard;
 out(i.aux.incsources) = [tmp1; tmp2; tmp3; tmp4];
 out(i.aux.mort)       = sum(morts(:,2));
 out(i.aux.nTPT)       = sum((sel.nTPT.*allmat)*invec);
-out(i.aux.ch_notifs)  = sum((sel.ch_notifs.*allmat)*invec);
+out(i.aux.notifs)     = sum((sel.notifs.*allmat)*invec);
