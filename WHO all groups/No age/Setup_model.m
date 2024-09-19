@@ -167,8 +167,8 @@ r.ACF2         = [0 0 0 0];
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','r_migr','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
 % lgths =      [1,      1,      2,                  1,          2,            1,               1,        1,         1,                 1];
 
-names = {'beta','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr', 'ageing', 'p_relrate_factor', 'p_init_migr'};      
-lgths =      [1,      1,      2,          2,     1,               1,        1,              1,                   1];
+names = {'beta','betadec','gamma','p_relrate','r_migr','p_LTBI_in_migr', 'ageing', 'p_relrate_factor'};      
+lgths =      [1,      1,      2,          2,     1,               1,        1,              1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -193,7 +193,7 @@ bds(xi.p_LTBI_in_migr,:)   = [0 0.5];
 bds(xi.ageing,:)           = [0.02 0.3];
 %bds(xi.ch_mort,:)          = [0, 0.01];
 bds(xi.p_relrate_factor,:) = [1, 10];
-bds(xi.p_init_migr, :)     = [0, 0.3];
+%bds(xi.p_init_migr, :)     = [0, 0.3];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;

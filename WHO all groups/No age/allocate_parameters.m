@@ -34,7 +34,7 @@ p.LTBI_in_migrad = x(xi.p_LTBI_in_migr);
 r.ageing         = x(xi.ageing);
 %r.ch_mort        = x(xi.ch_mort);
 
-p.p_init_migr    = x(xi.p_init_migr);
+%p.p_init_migr    = x(xi.p_init_migr);
 
 %r.reactivation = r.reactivation0*[1 x(xi.p_relrate(1)) 1 x(xi.p_relrate(2))];
 %r.progression  = r.progression0*[1 x(xi.p_relrate(1)) 1 x(xi.p_relrate(2))];
