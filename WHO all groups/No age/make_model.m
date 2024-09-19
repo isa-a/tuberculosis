@@ -363,7 +363,7 @@ M.lam = sparse(m);
 % m(2, intersect(s.ad, s.migr)) = 1; 
 % M.denvec = sparse(m);
 
-% % Additional matrix to help keep track of numbers in each group 
+% % Additional matrix to help keep track of numbers in each group migr
 % m = zeros(6,i.nstates);
 % m(1, intersect(s.ch, s.dom))  = 1;  
 % m(2, intersect(s.ad, s.dom))  = 1; 
