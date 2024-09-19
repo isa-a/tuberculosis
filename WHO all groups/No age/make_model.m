@@ -194,8 +194,8 @@ m = zeros(i.nstates,1);
 % m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch)*p.ch_in_migr;
 % m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad)*(1-p.ch_in_migr);
 
-m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad);
-
+% m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad);
+m(i.U.ad.migr_rect) = (p.LTBI_in_migrad);
 % m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.02;
 % 
 % m(getindsch('Ls','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.98;
