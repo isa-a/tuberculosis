@@ -92,7 +92,7 @@ plot(xx, md, 'r.', 'markersize', ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'r', 'linestyle', 'None');
 
 % Define colors for each parameter set
-colors = {'b', 'k', 'g'}; % Blue, black, green
+colors = {'b', 'k', 'g', 'y', 'm'}; % Blue, black, green
 
 % Plot simulation results for each parameter set
 for ii = 1:size(sim_plt, 1)
@@ -110,5 +110,7 @@ h1 = plot(nan, nan, 'r.', 'markersize', ms);  % Placeholder for real data
 h2 = plot(nan, nan, 'b.', 'markersize', ms);  % Placeholder for Set 1
 h3 = plot(nan, nan, 'k.', 'markersize', ms);  % Placeholder for Set 2
 h4 = plot(nan, nan, 'g.', 'markersize', ms);  % Placeholder for Set 3
-legend([h1, h2, h3, h4], {'Real Data', 'Set 1', 'Set 2', 'Set 3'}, 'Location', 'Best');
+h5 = plot(nan, nan, 'y.', 'markersize', ms);  % Placeholder for Set 2
+h6 = plot(nan, nan, 'm.', 'markersize', ms);  % Placeholder for Set 3
+legend([h1, h2, h3, h4, h5, h6], {'Real Data', 'Set 1', 'Set 2', 'Set 3'}, 'Location', 'Best');
 

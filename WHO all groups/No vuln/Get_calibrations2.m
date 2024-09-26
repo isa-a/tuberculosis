@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 100; 
+nsam = 1000; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 % obj(xsam(1,:));
@@ -32,11 +32,11 @@ ord  = mat(:,2);
 xord = xsam(ord,:);
 
 
-xopt = zeros(10, size(xord, 2));
-fvals_opt = zeros(1, 10);    
+xopt = zeros(5, size(xord, 2));
+fvals_opt = zeros(1, 5);    
 
 
-for ii = 1:10
+for ii = 1:5
     options = optimset('PlotFcn',@optimplotfval);
     [xopt(ii,:), fval] = fminsearch(nobj, xord(ii,:), options);
     fvals_opt(ii) = -fval;  % Store the maximized objective function value
