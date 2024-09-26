@@ -96,7 +96,7 @@ else
     % Notifications
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
     
-    if incd > 0.1
+    if incd(1) > 0.1
         out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         aux.soln       = soln1;
         msg            = 2;
@@ -119,7 +119,23 @@ else
         aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs];
     else
         out = -Inf;
-        aux = NaN;
+        aux.incd2010   = incd2010;
+        aux.incd2020   = incd2020;
+        %aux.incdRR2020 = incdRR2020;
+        aux.soln       = soln1;
+        aux.mort       = mort;
+        aux.p_migrTB   = p_migrTB;
+        aux.p_migrpopn = p_migrpopn;
+        aux.p_LTBI     = p_LTBI;
+        aux.p_vulnpopn = p_vulnpopn;
+        aux.p_vulnTB   = p_vulnTB;
+        aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
+        aux.nTPT       = n_TPT2019;
+        aux.incd_ch    = incd_ch2020;
+        aux.chpopn     = p_chpopn;
+        aux.adpopn     = p_adpopn;
+        aux.ch_notifs  = ch_notifs;
+        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs];
         msg = 1;
         % disp('incd <= 0.1');
         % disp(incd);

@@ -19,7 +19,7 @@ else
     init = zeros(1,i.nx);
     seed = 1e-5;
     init(i.U.ad.dom)       = 1 - 0.168 - seed;
-    init(i.U.ad.migr_rect) = 0.168;
+    init(i.U.ad.migr_rect) = p.migrect_popn;
     init(i.I.ad.dom.ds)    = seed;
     
     % Equlibrium model, without RR-TB
@@ -71,7 +71,7 @@ else
     mort       = dsol(end,i.aux.mort)*1e5;
     p_migrTB   = incd(2)/incd(1);
     
-%     p_LTBI     = sum(sfin(intersect(s.migr_rect,[s.Lf, s.Ls])))/sum(sfin(s.migr_rect));
+    %p_LTBI     = sum(sfin(intersect(s.migr_rect,[s.Lf, s.Ls])))/sum(sfin(s.migr_rect));
     p_LTBI     = p.LTBI_in_migrad*(1-p.ch_in_migr) + p.LTBI_in_migrch*p.ch_in_migr;
     p_migrpopn = sum(sfin(s.migr))/sum(sfin(1:i.nstates));
 

@@ -154,6 +154,11 @@ r.TPT2020rec   = 0.004;
 r.ACF          = [0 0 0 0];
 r.ACF2         = [0 0 0 0];
 
+p.migrect_popn = 0.168;
+r.migr         = 1/10;
+p.LTBI_in_migrad = 0.2;
+p.LTBI_in_migrch = p.LTBI_in_migrad/4;
+
 
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
@@ -164,10 +169,13 @@ r.ACF2         = [0 0 0 0];
 % lgths =      [1,        1,      2,             1,          1,       1,               1];
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','r_migr','p_LTBI_in_migr','r_vuln','relbeta_vuln', 'ageing', 'ch_mort', 'p_relrate_factor'};      
 % lgths =      [1,      1,      2,                  1,          2,            1,               1,       1,             1,       1,         1,                 1];
+% names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','r_migr','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
+% lgths =      [1,      1,      2,                  1,          2,            1,               1,        1,         1,                 1];
+% names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
+% lgths =      [1,      1,      2,                  1,          2,                  1,        1,         1,                 1];
 
-
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','r_migr','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
-lgths =      [1,      1,      2,                  1,          2,            1,               1,        1,         1,                 1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate', 'ageing', 'ch_mort', 'p_relrate_factor'};      
+lgths =      [1,      1,      2,                  1,          2,           1,         1,                 1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -184,8 +192,8 @@ bds(xi.betadec,:)          = [0 0.15];
 bds(xi.gamma,:)            = repmat([1e-4 10],2,1);
 bds(xi.p_relrate_gamma_chvad,:) = [0 2];
 bds(xi.p_relrate,:)        = repmat([1 20],2,1);
-bds(xi.r_migr,:)           = [0 1];
-bds(xi.p_LTBI_in_migr,:)   = [0 0.5];
+%bds(xi.r_migr,:)           = [0 1];
+%bds(xi.p_LTBI_in_migr,:)   = [0 0.5];
 %bds(xi.p_RR_in_migr,:)     = [0 0.1];
 %bds(xi.r_vuln,:)           = [0 2];
 %bds(xi.relbeta_vuln,:)     = [0.1 20];

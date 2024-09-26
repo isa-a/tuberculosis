@@ -120,7 +120,7 @@ else
     else
         out = -Inf;
         aux = NaN;
-        msg = 1;
+        msg = 1;        
         % disp('incd <= 0.1');
         % disp(incd);
         % aux.soln0      = soln0;
@@ -138,6 +138,5 @@ else
         % aux.nTPT       = n_TPT2019;
         % aux.M0         = M0;
     end
-    
     %keyboard;
 end
