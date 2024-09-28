@@ -29,7 +29,7 @@ r.reactivation = [tmp*x(xi.p_relrate_factor); tmp];
 %r.vuln           = x(xi.r_vuln);
 %p.relbeta_vuln   = 1;
 r.ageing         = x(xi.ageing);
-r.ch_mort        = x(xi.ch_mort);
+%r.ch_mort        = x(xi.ch_mort);
 
 %r.reactivation = r.reactivation0*[1 x(xi.p_relrate(1)) 1 x(xi.p_relrate(2))];
 %r.progression  = r.progression0*[1 x(xi.p_relrate(1)) 1 x(xi.p_relrate(2))];

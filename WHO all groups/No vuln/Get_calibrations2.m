@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 1000; 
+nsam = 100; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 % obj(xsam(1,:));
@@ -31,12 +31,21 @@ mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
 xord = xsam(ord,:);
 
+options = optimset(PlotFcn=@optimplotfval);
+x0 = fminsearch(nobj,xord(1,:),options);
+% x1 = fminsearch(nobj,x0,options);
+% x2 = fminsearch(nobj,x1,options);
 
-xopt = zeros(5, size(xord, 2));
-fvals_opt = zeros(1, 5);    
+save optim_res_noVULN5;
+
+return;
 
 
-for ii = 1:5
+xopt = zeros(3, size(xord, 2));
+fvals_opt = zeros(1, 3);    
+
+
+for ii = 1:3
     options = optimset('PlotFcn',@optimplotfval);
     [xopt(ii,:), fval] = fminsearch(nobj, xord(ii,:), options);
     fvals_opt(ii) = -fval;  % Store the maximized objective function value
@@ -50,7 +59,7 @@ x0 = fminsearch(nobj,xord(1,:),options);
 x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
 
-save optim_res_noVULN3;
+
 
 
 % Perform MCMC

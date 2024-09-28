@@ -61,7 +61,7 @@ for ii = 1:length(fnames)
 end
 for ii = 1:16
    subplot(4,4,ii); 
-   histogram(xone(:,ii));
+   histogram(x0(:,ii));
    title(names{ii});
 end
 
@@ -112,5 +112,5 @@ h3 = plot(nan, nan, 'k.', 'markersize', ms);  % Placeholder for Set 2
 h4 = plot(nan, nan, 'g.', 'markersize', ms);  % Placeholder for Set 3
 h5 = plot(nan, nan, 'y.', 'markersize', ms);  % Placeholder for Set 2
 h6 = plot(nan, nan, 'm.', 'markersize', ms);  % Placeholder for Set 3
-legend([h1, h2, h3, h4, h5, h6], {'Real Data', 'Set 1', 'Set 2', 'Set 3'}, 'Location', 'Best');
+legend([h1, h2, h3, h4, h5, h6], {'Real Data', 'Set 1', 'Set 2', 'Set 3', 'Set 4', 'Set 5'}, 'Location', 'Best');
 
