@@ -147,7 +147,7 @@ r.relapse      = [0.032 0.14 0.0015];
 r.muTB         = 1/6;                                                      % TB related mortality
 p.imm          = 0.8;                                                      % Reduced susceptibility conferred by previous infection
 
-p.ch_in_migr   = 0.07;                                                      % GUESS: check with countries
+p.ch_in_migr   = 0.08;                                                      % DOUBLE check with country data
 
 % --- Interventions 
 p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
@@ -260,7 +260,7 @@ data.p_LTBI_inmigr  = [0.18 0.22 0.28];                                     % Pr
 data.p_vulnpopn     = [2 4 6]/100;                                         % Proportion of UK population being vulnerable
 data.p_vulnTB       = [6 9 12]/100;                                        % Proportion contribution to overall incidence
 data.nTPT2019       = 1.3*[0.9 1 1.1];                                     % Number of TPT initiations in 2019, per 10^5 population
-data.incd_ch2020    = [0.5 1.3 2.5];                                       % incidence in children
+data.incd_ch2020    = [3 5 7];                                       % incidence in children
 data.p_chpopn       = [0.286 0.292 0.3];                              % proportion of country thats children
 data.p_adpopn       = [0.688 0.708 0.728];                                % proportion of country thats adults
 data.ch_notifs      = [310 360 420]/55.98e6*1e5;                           % notifications in the country   
