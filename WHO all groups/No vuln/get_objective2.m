@@ -72,8 +72,8 @@ else
     p_migrTB   = incd(2)/incd(1);
     
     %p_LTBI     = sum(sfin(intersect(s.migr_rect,[s.Lf, s.Ls])))/sum(sfin(s.migr_rect));
-    p_LTBI     = p.LTBI_in_migrad*(1-p.ch_in_migr) + p.LTBI_in_migrch*p.ch_in_migr;
-    p_migrpopn = sum(sfin(s.migr))/sum(sfin(1:i.nstates));
+    p_LTBI_inmigr = p.LTBI_in_migrch*p.ch_in_migr + p.LTBI_in_migrad*(1-p.ch_in_migr);
+    p_migrpopn    = sum(sfin(s.migr))/sum(sfin(1:i.nstates));
 
     % Proportion of population being vulnerable
     %p_vulnpopn = sum(sfin(s.vuln))/sum(sfin(1:i.nstates));
@@ -84,11 +84,11 @@ else
     % Number initiating TPT in 2019
     n_TPT2019  = dsol(end,i.aux.nTPT)*1e5;
 
-    % Incidence in children; 2020
-    incd_ch2020 = dsol(end,i.aux.inc(3))*1e5;
-
     % Proportion of population thats kids
     p_chpopn = sum(sfin(s.ch))/sum(sfin(1:i.nstates));
+
+    % Incidence in children; 2020
+    incd_ch2020 = dsol(end,i.aux.inc(3))*1e5/p_chpopn;
 
     % Proportion of population thats adults
     p_adpopn = sum(sfin(s.ad))/sum(sfin(1:i.nstates));
@@ -97,17 +97,16 @@ else
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
     
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
         aux.incd2010   = incd2010;
         aux.incd2020   = incd2020;
-        %aux.incdRR2020 = incdRR2020;
         aux.mort       = mort;
         aux.p_migrTB   = p_migrTB;
         aux.p_migrpopn = p_migrpopn;
-        aux.p_LTBI     = p_LTBI;
+        aux.p_LTBI_inmigr = p_LTBI_inmigr;
         %aux.p_vulnpopn = p_vulnpopn;
         %aux.p_vulnTB   = p_vulnTB;
         aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
@@ -116,7 +115,7 @@ else
         aux.chpopn     = p_chpopn;
         aux.adpopn     = p_adpopn;
         aux.ch_notifs  = ch_notifs;
-        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, incd_ch2020, p_chpopn, p_adpopn, ch_notifs];
+        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, p_adpopn, ch_notifs];
     else
         out = -Inf;
         aux = NaN;
