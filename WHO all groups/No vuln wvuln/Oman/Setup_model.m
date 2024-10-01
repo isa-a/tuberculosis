@@ -127,7 +127,6 @@ tmp(s.ad, s.ch) = 0;
 sel.ch_notifs = tmp - diag(diag(tmp));
 
 
-
 % -- Natural history parameters -------------------------------------------
 r.progression0  = 0.0826;
 r.LTBI_stabil   = 0.872;
@@ -234,7 +233,7 @@ end
 % -------------------------------------------------------------------------
 % --- Specify --------------------------------------------------------
 
-% data.incd2010   = [14.1 14.6 15.1];
+
 % data.incd2010       = [11 12 14];                                          % With broader uncertainty intervals
 % data.incd2020       = [6.8  7.9  9.2];                                             
 % data.incdRR2020     = [0.07 0.14 0.21];                                    % Incidence of RR-TB
@@ -254,16 +253,17 @@ data.incd2010       = [11 12 14];                                    % With broa
 data.incd2020       = [6.8  7.9  9.2];                                             
 %data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
 data.mort           = [0.26 0.36 0.47];                                     % TB mortality, 2020
-data.p_migrTB       = [0.5  0.6  0.7];                                 % Proportion contribution of migrants to overall incidence
+data.p_migrTB       = [0.5  0.6  0.7];                                      % Proportion contribution of migrants to overall incidence
 data.p_migrpopn     = [0.337 0.437 0.537];                                 % Proportion of population that is migrants
 data.p_LTBI_inmigr  = [0.18 0.22 0.28];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
-data.p_vulnpopn     = [2 4 6]/100;                                         % Proportion of UK population being vulnerable
-data.p_vulnTB       = [6 9 12]/100;                                        % Proportion contribution to overall incidence
+data.p_vulnpopn     = [8 10 12]/100;                                         % Proportion of UK population being vulnerable
+data.p_vulnTB       = [5 7 9]/100;                                        % Proportion contribution to overall incidence
 data.nTPT2019       = 1.3*[0.9 1 1.1];                                     % Number of TPT initiations in 2019, per 10^5 population
-data.incd_ch2020    = [3 5 7];                                       % incidence in children
-data.p_chpopn       = [0.286 0.292 0.3];                              % proportion of country thats children
+%data.incd_ch2020    = [0.05 0.11 0.16];                                              % incidence in children
+data.propincd_ch    = [0.009 0.014 0.02];
+data.p_chpopn       = [0.286 0.292 0.3];                                    % proportion of country thats children
 data.p_adpopn       = [0.688 0.708 0.728];                                % proportion of country thats adults
-data.ch_notifs      = [310 360 420]/55.98e6*1e5;                           % notifications in the country   
+data.ch_notifs      = [3 3.69 4.2]/4.576e6*1e5;                           % notifications in the country   
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
@@ -275,17 +275,18 @@ f4  = get_distribution_fns(data.p_migrpopn, 'beta',    show);
 f5  = get_distribution_fns(data.p_LTBI_inmigr, 'beta',    show);
 f6  = get_distribution_fns(data.p_vulnpopn, 'beta',    show);
 f7  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
-f8  = get_distribution_fns(data.incd_ch2020,'lognorm', show);
+%f8  = get_distribution_fns(data.incd_ch2020,'lognorm', show);
+f9  = get_distribution_fns(data.propincd_ch,'beta', show);
 f10  = get_distribution_fns(data.p_chpopn,  'beta',    show);
 f11  = get_distribution_fns(data.p_adpopn,  'beta',    show);
 f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + f5(p_LTBI_inmigr) + ...
                                                                                                      f6(p_vulnpopn) + f7(p_vulnTB) + ...
-                                                                                                     f8(incd_ch2020) + ...
+                                                                                                     f9(propincd_ch) + ...
                                                                                                      f10(p_chpopn) +f12(ch_notifs);
 
 save Model_setup;

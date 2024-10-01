@@ -83,6 +83,15 @@ for ii = 1:size(xs,1)
     re.ACF2 = rd.ACF;
     re.TPT  = TPTcov*[1 1 1 1];
     Me = make_model(pe,re,i,s,gps,prm.contmat);
+
+    % New tools
+    rf = re; pf = pe;
+    rf.ACF  = ACFcov*[1 1 1 1];
+    rf.ACF2 = re.ACF;
+    rf.TPT  = TPTcov*[1 1 1 1];
+    rf.progression  = rf.progression*0.9;
+    rf.reactivation = rf.reactivation*0.9;
+    Mf = make_model(pf,rf,i,s,gps,prm.contmat);
     
 
     models = {M0, Ma, Mb, Mb1, Mb2, Mc, Md, Me};    
