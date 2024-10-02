@@ -84,10 +84,10 @@ for ii = 1:size(xs,1)
     % vaccine - f = f*(1-cov*eff)
     % reduced relapse
     rf = re; pf = pe;
-    %pf.TPTeff = 0.8;
-    %rf.relapse = rf.relapse/2;
-    rf.progression  = rf.progression*(1 - (0.9*0.6));
-    rf.reactivation = rf.reactivation*(1 - (0.9*0.65));
+    pf.TPTeff = 0.96;
+    rf.relapse = re.relapse/2/2/2;
+    rf.progression  = rf.progression*(1 - (0.9*0.9));
+    rf.reactivation = rf.reactivation*(1 - (0.9*0.9));
     Mf = make_model(pf,rf,i,s,gps,prm.contmat);
     
 
@@ -126,8 +126,8 @@ for ii = 1:size(xs,1)
     end
 end
 fprintf('\n');
-
-ff=figure('Position', [577,   190 ,   1029 ,732]); lw = 1.5; fs = 14;
+return;
+ff=figure('Position', [577,   190 ,   1329 ,732]); lw = 1.5; fs = 14;
 %figure; 
 plot(squeeze(incsto), 'LineWidth', 2); % Make curves thicker/bolder
 
@@ -146,7 +146,9 @@ set(gca, 'FontWeight', 'bold', 'FontSize', 12);
 yline(0.1, '--', 'LineWidth', 1.5, 'Color', 'k'); 
 legend({'Baseline', 'TPT, recent migrants', 'TPT, pre-entry', 'TPT, long-term migrants', ...
     'TPT, contacts', 'TPT, vulnerables', 'ACF, migrants and vulnerables', ...
-    'ACF, general population', 'Addition of new tools: TPT and first line treatment'}, 'FontWeight', 'bold', 'FontSize', 12);
+    'ACF, general population', 'New tools: TPT and treatment'}, 'FontWeight', 'bold', 'FontSize', 12);
+
+
 
 
 incmat   = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);

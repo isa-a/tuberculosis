@@ -83,14 +83,14 @@ for ii = 1:size(xs,1)
     re.TPT  = TPTcov*[1 1 1 1];
     Me = make_model(pe,re,i,s,gps,prm.contmat);
 
-    % New tools, lower relapse rates, higher TPT eff
-    rf = re; pf = pe;
-    pf.TPTeff = 0.8;
-    rf.relapse = re.relapse*0.7;
-    Mf = make_model(pf,rf,i,s,gps,prm.contmat);
+%     % New tools, lower relapse rates, higher TPT eff
+%     rf = re; pf = pe;
+%     pf.TPTeff = 0.8;
+%     rf.relapse = re.relapse*0.7;
+%     Mf = make_model(pf,rf,i,s,gps,prm.contmat);
     
 
-    models = {M0, Ma, Mb, Mb1, Mb2, Mc, Md, Me, Mf};    
+    models = {M0, Ma, Mb, Mb1, Mb2, Mc, Md, Me};    
     for mi = 1:length(models)
         
         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
@@ -117,14 +117,26 @@ for ii = 1:size(xs,1)
 end
 fprintf('\n');
 
-figure; plot(squeeze(incsto)); yl = ylim; yl(1) = 0; ylim(yl);
+ff=figure('Position', [577,   190 ,   1329 ,732]); lw = 1.5; fs = 14;
+%figure; 
+plot(squeeze(incsto), 'LineWidth', 2); % Make curves thicker/bolder
+
+yl = ylim; 
+yl(1) = 0; 
+ylim(yl);
+
 set(gca, 'XTick', 1:size(squeeze(incsto), 1));
 set(gca, 'XTickLabel', 2022:2041);
-xlim([1, size(squeeze(incsto), 1)]); 
-xlabel('Year');
-legend('Baseline','TPT, recent migrants','TPT, pre-entry','TPT, long-term migrants','TPT, contacts','TPT, vulnerables','ACF, migrants and vulnerables','ACF, general population');
-ylabel('Rate per 100,000 population');
+xlim([1, size(squeeze(incsto), 1)]);
 
+
+xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
+ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
+set(gca, 'FontWeight', 'bold', 'FontSize', 12); 
+yline(0.1, '--', 'LineWidth', 1.5, 'Color', 'k');
+legend({'Baseline', 'TPT, recent migrants', 'TPT, pre-entry', 'TPT, long-term migrants', ...
+    'TPT, contacts', 'TPT, vulnerables', 'ACF, migrants and vulnerables', ...
+    'ACF, general population'}, 'FontWeight', 'bold', 'FontSize', 12);
 
 
 incmat   = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);
