@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 100; 
+nsam = 2000; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 % obj(xsam(1,:));
@@ -32,18 +32,13 @@ ord  = mat(:,2);
 xord = xsam(ord,:);
 
 options = optimset(PlotFcn=@optimplotfval);
-for ii = 1:10
-    tmp = fminsearch(nobj,xord(ii,:),options);
-    x0sto(ii,:) = fminsearch(nobj,tmp,options);
+for ii = 1:3
+    x0sto(ii,:) = fminsearch(nobj,x0sto(ii,:),options);
 end
-
 % x1 = fminsearch(nobj,x0,options);
 % x2 = fminsearch(nobj,x1,options);
-% save optim_res_noVULN5_v2;
 
-save optim_res_MAIN_OMAN_2
-% [xsto, outsto] = MCMC_adaptive2(obj, x0sto(2,:), 1000, 1, [], true);
-
+save optim_res_noVULNoman;
 
 return;
 
@@ -63,15 +58,14 @@ end
 
 options = optimset(PlotFcn=@optimplotfval);
 x0 = fminsearch(nobj,xord(1,:),options);
-x1 = fminsearch(nobj,x0sto(6,:),options);
+x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
-x3 = fminsearch(nobj,x2,options);
 
 
 
 
 % Perform MCMC
-[xsto, outsto] = MCMC_adaptive33(obj, x0sto(3,:), 1e3, 1, [], [], [], 1);
+[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e3, 1, [], [], [], 1);
 
 inds = find(outsto==max(outsto));
 x_new = xsto(inds(1),:);

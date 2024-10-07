@@ -18,7 +18,7 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.ad.dom)       = 1 - 0.437 - seed;
+    init(i.U.ad.dom)       = 1 - 0.168 - seed;
     init(i.U.ad.migr_rect) = p.migrect_popn;
     init(i.I.ad.dom.ds)    = seed;
     
@@ -84,36 +84,19 @@ else
     % Number initiating TPT in 2019
     n_TPT2019  = dsol(end,i.aux.nTPT)*1e5;
 
-        % Incidence in children; 2020
-%     incd_ch2020 = dsol(end,i.aux.inc(4))*1e5/p_chpopn;
-%   propincd_ch = dsol(end,i.aux.inc(4)) / dsol(end,i.aux.inc(1));
-
-    % Contribution of kids to overall incidence
-    propincd_ch =  incd(4)/incd(1);
-
     % Proportion of population thats kids
     p_chpopn = sum(sfin(s.ch))/sum(sfin(1:i.nstates));
+
+    propincd_ch = incd(3)/incd(1);
 
     % Proportion of population thats adults
     p_adpopn = sum(sfin(s.ad))/sum(sfin(1:i.nstates));
 
     % Notifications
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
-
-    % prevalence of diabetes
-    vuln_prev = sum(sfin(s.vuln))/100;
-
-    % amount of tb in people who dont have diabetes
-    no_vuln_with_TB = sum(sfin(intersect(s.allI, setdiff(1:i.nstates, s.vuln)))) / sum(sfin(setdiff(1:i.nstates, s.vuln)));
-
-    % amount of tb in the diabetic
-    vuln_with_TB = sum(sfin(intersect(s.allI, s.vuln))) / sum(sfin(s.vuln));
-
-    % risk of two groups should be 3 fold
-    vuln_relrisk = vuln_with_TB / no_vuln_with_TB;
-
+    
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, propincd_ch, p_chpopn, ch_notifs, vuln_prev, vuln_relrisk);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, propincd_ch, p_chpopn, ch_notifs);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
@@ -127,13 +110,11 @@ else
 %         aux.p_vulnTB   = p_vulnTB;
         aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
         aux.nTPT       = n_TPT2019;
-        aux.propincd_ch = propincd_ch;
+        aux.propincd_ch    = propincd_ch;
         aux.chpopn     = p_chpopn;
         aux.adpopn     = p_adpopn;
         aux.ch_notifs  = ch_notifs;
-        aux.vuln_prev  = vuln_prev;
-        aux.vuln_relrisk    = vuln_relrisk;
-        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, propincd_ch, p_chpopn, p_adpopn, ch_notifs, vuln_prev, vuln_relrisk];
+        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, propincd_ch, p_chpopn, p_adpopn, ch_notifs];
     else
         out = -Inf;
         aux = NaN;

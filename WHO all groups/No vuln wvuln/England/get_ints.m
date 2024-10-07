@@ -41,8 +41,14 @@ for ii = 1:size(xs,1)
     TPTcov = -log(1-0.99); %TPTcov = 100;
     ACFcov = -log(1-0.99); %ACFcov = 100;
 
+    % social protection
+    ra1 = r0; pa1 = p0;
+    ra1.TPT = TPTcov*[0 0 0 1];
+    pa1.TPTeff = 0.8;
+    Ma1 = make_model(pa1,ra1,i,s,gps,prm.contmat);    
+
     % TPT in recent migrants
-    ra = r0; pa = p0;
+    ra = ra1; pa = pa1;
     ra.TPT = TPTcov*[0 1 0 0];
     Ma = make_model(pa,ra,i,s,gps,prm.contmat);
     
@@ -84,14 +90,14 @@ for ii = 1:size(xs,1)
     % vaccine - f = f*(1-cov*eff)
     % reduced relapse
     rf = re; pf = pe;
-    pf.TPTeff = 0.96;
-    rf.relapse = re.relapse/2/2/2;
+    pf.TPTeff = 0.8;
+%     rf.relapse = re.relapse/2/2/2;
     rf.progression  = rf.progression*(1 - (0.9*0.9));
     rf.reactivation = rf.reactivation*(1 - (0.9*0.9));
     Mf = make_model(pf,rf,i,s,gps,prm.contmat);
     
 
-    models = {M0, Ma, Mb, Mb1, Mb2, Mc, Md, Me, Mf};    
+    models = {M0, Ma1, Ma, Mb, Mb2, Mc, Md, Me, Mf};    
     for mi = 1:length(models)
     if mi == length(models) 
         % run Me
@@ -127,26 +133,30 @@ for ii = 1:size(xs,1)
 end
 fprintf('\n');
 return;
-ff=figure('Position', [577,   190 ,   1329 ,732]); lw = 1.5; fs = 14;
+ff=figure('Position', [577,   190 ,   1029 ,732]); lw = 1.5; fs = 14;
 %figure; 
 plot(squeeze(incsto), 'LineWidth', 2); % Make curves thicker/bolder
-
+years = 2022:2035;
 yl = ylim; 
 yl(1) = 0; 
 ylim(yl);
 
-set(gca, 'XTick', 1:size(squeeze(incsto), 1));
-set(gca, 'XTickLabel', 2022:2041);
-xlim([1, size(squeeze(incsto), 1)]);
-
+% set(gca, 'XTick', 1:size(squeeze(incsto), 1));
+% set(gca, 'XTickLabel', 2022:2041);
+% xlim([1, size(squeeze(incsto), 1)]);
+        % Set x-axis ticks and labels for the time range 2022-2035
+set(gca, 'XTick', 1:length(years));  % Match the number of years
+set(gca, 'XTickLabel', years);  % Update labels to show from 2022 to 2035
+xlim([1 length(years)]);  % Explicitly set the x-axis limits to end at 2035
 
 xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
 ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
 set(gca, 'FontWeight', 'bold', 'FontSize', 12); 
 yline(0.1, '--', 'LineWidth', 1.5, 'Color', 'k'); 
-legend({'Baseline', 'TPT, recent migrants', 'TPT, pre-entry', 'TPT, long-term migrants', ...
-    'TPT, contacts', 'TPT, vulnerables', 'ACF, migrants and vulnerables', ...
-    'ACF, general population', 'New tools: TPT and treatment'}, 'FontWeight', 'bold', 'FontSize', 12);
+%legend({'Baseline', 'Social protection', 'TPT, recent migrants', 'TPT, pre-entry', ...
+%     'TPT, contacts', 'TPT, vulnerables', 'Find and treat, migrants and vulnerables', ...
+%     'Find and treat, general population', 'New: TPT+treatment+vaccine'}, 'FontWeight', 'bold', 'FontSize', 12);
+
 
 
 
@@ -156,6 +166,54 @@ incmat2  = permute(prctile(incsto2,[2.5,50,97.5],2),[2,1,3]);
 incmatRR = permute(prctile(incstoRR,[2.5,50,97.5],2),[2,1,3]);
 
 mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
+
+
+%
+
+
+
+ff = figure('Position', [577, 190, 1329, 732]); 
+lw = 1.5; 
+fs = 14;
+% Initialize the plot
+hold on;
+
+% Legends for each curve
+legendEntries = {'Baseline', 'Social protection', 'TPT, recent migrants', ...
+    'TPT, pre-entry', 'TPT, long-term migrants', 'TPT, contacts', ...
+    'TPT, vulnerables', 'ACF, migrants and vulnerables', ...
+    'ACF, general population', 'New tools: TPT and treatment'};
+
+% Add the zero line, but ensure it's not part of the legend
+yline(0.1, '--', 'LineWidth', 1.5, 'Color', 'k', 'HandleVisibility', 'off'); 
+
+% Loop through each scenario to plot the curves one by one
+for mi = 1:length(legendEntries)
+    plot(squeeze(incsto(:, :, mi)), 'LineWidth', 2); % Plot each scenario
+    
+    % Update y-axis limits
+    yl = ylim; 
+    yl(1) = 0; 
+    ylim(yl);
+    
+    % Set x-axis ticks and labels
+    set(gca, 'XTick', 1:size(squeeze(incsto), 1));
+    set(gca, 'XTickLabel', 2022:2041);
+    xlim([1, size(squeeze(incsto), 1)]);
+
+    % Label axes
+    xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
+    ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
+    set(gca, 'FontWeight', 'bold', 'FontSize', 12); 
+    
+    % Update the legend with the currently plotted curves
+    legend(legendEntries(1:mi), 'FontWeight', 'bold', 'FontSize', 12);
+    
+    % Pause to wait for the user to press a key
+    pause;
+end
+
+hold off;
 
 
 

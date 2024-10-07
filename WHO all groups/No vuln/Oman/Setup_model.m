@@ -1,12 +1,9 @@
-% UPDATE vuln data following most recent discussion with Sharon
-% Tidy contact matrix and how it's implemented
-
 clear all;
 
 states1     = {'U'};
 states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
-gps.born    = {'dom','migr_rect','migr_long','vuln'};
+gps.born    = {'dom','migr_rect','migr_long'};
 gps.strains = {'ds'};
 
 [i, s, d, lim] = get_addresses({states1, gps.age, gps.born}, [], [], [], 0);
@@ -21,7 +18,7 @@ s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    4,          12,     1,     1,           1];
+lgths = [    3,          8,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -37,8 +34,8 @@ i.nx = lim;
 tmp = zeros(3,i.nstates); 
 tmp(1,s.allI) = 1;
 tmp(2,intersect(s.allI,s.migr)) = 1;
-tmp(3,intersect(s.allI,s.vuln)) = 1;
-tmp(4,intersect(s.allI,s.ch))   = 1;
+%tmp(3,intersect(s.allI,s.vuln)) = 1;
+tmp(3,intersect(s.allI,s.ch))   = 1;
 agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);
@@ -49,8 +46,8 @@ tmp(s.migr_long, s.migr_rect) = 0;
 % Remove transitions due to changing drug resistance status
 
 % Remove transitions due to change in vulnerability status
-tmp(s.dom, s.vuln) = 0;
-tmp(s.vuln, s.dom) = 0;
+% tmp(s.dom, s.vuln) = 0;
+% tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
@@ -66,8 +63,8 @@ sel.inc = tmp - diag(diag(tmp));
 % tmp(4,intersect(intersect(s.allI, s.migr),s.rr)) = 1;
 % agg.incsources = sparse(tmp);
 
-set1 = {s.dom, s.migr, s.vuln};
-% set1 = {s.dom, s.migr};
+% set1 = {s.dom, s.migr, s.vuln};
+set1 = {s.dom, s.migr};
 set2 = {s.ds};
 
 tmp  = zeros(length(set1)*length(set2),i.nstates);
@@ -79,7 +76,6 @@ for is1 = 1:length(set1)
     end
 end
 agg.incsources = sparse(tmp);
-
 
 % --- Selectors for different origins 
 
@@ -119,12 +115,13 @@ tmp(s.migr_long, s.migr_rect) = 0;
 % Remove transitions due to changing drug resistance status
 
 % Remove transitions due to change in vulnerability status
-tmp(s.dom, s.vuln) = 0;
-tmp(s.vuln, s.dom) = 0;
+% tmp(s.dom, s.vuln) = 0;
+% tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
 sel.ch_notifs = tmp - diag(diag(tmp));
+
 
 
 % -- Natural history parameters -------------------------------------------
@@ -164,6 +161,7 @@ r.migr         = 0.0847;                                                   % htt
 % p.LTBI_in_migrch = 0.03;
 
 
+
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
@@ -178,8 +176,8 @@ r.migr         = 0.0847;                                                   % htt
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
 % lgths =      [1,      1,      2,                  1,          2,                  1,        1,         1,                 1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln','relbeta_vuln', 'p_relrate', 'ageing', 'p_relrate_factor'};      
-lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,                  1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch', 'p_relrate', 'ageing', 'p_relrate_factor'};      
+lgths =      [1,        1,      2,                      1,                 1,                       1,           2,        1,                  1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -198,8 +196,8 @@ bds(xi.p_LTBI_in_migrad,:)       = [0.1 0.6];
 bds(xi.p_relLTBI_inmigr_advch,:) = [3 7];                                % Estimated using simple ARTI calculation
 bds(xi.p_relrate,:)              = repmat([1 20],2,1);
 %bds(xi.r_migr,:)           = [0 1];
-bds(xi.r_vuln,:)                 = [0 2];
-bds(xi.relbeta_vuln,:)           = [0.1 20];
+% bds(xi.r_vuln,:)                 = [0 2];
+% bds(xi.relbeta_vuln,:)           = [0.1 20];
 bds(xi.ageing,:)                 = [0.02 0.3];
 %bds(xi.ch_mort,:)          = [0, 0.01];
 bds(xi.p_relrate_factor,:) = [1, 10];
@@ -208,15 +206,15 @@ prm.bounds = bds';
 ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
-prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
+prm.contmat_born = [1, 0.5; 0.5, 1; 0.2, 0.2];
 prm.contmat_age  = [1 0.3; 0.3 1];
 
-prm.contmat      = zeros(6, 6);
+
 % go through each element
 for age_row = 1:2                                                           % rows in age
     for age_col = 1:2                                                       % cols in age
-        for born_row = 1:3                                                  % rows in born
-            for born_col = 1:3                                              % cols in born
+        for born_row = 1:2                                                  % rows in born
+            for born_col = 1:2                                              % cols in born
                 % calc position in combined matrix
                 row = (born_row-1)*2 + age_row;                             % correctly scale current rows into new matrix
                 col = (born_col-1)*2 + age_col;                             % correctly scale current cols into new matrix
@@ -233,7 +231,7 @@ end
 % -------------------------------------------------------------------------
 % --- Specify --------------------------------------------------------
 
-
+% data.incd2010   = [14.1 14.6 15.1];
 % data.incd2010       = [11 12 14];                                          % With broader uncertainty intervals
 % data.incd2020       = [6.8  7.9  9.2];                                             
 % data.incdRR2020     = [0.07 0.14 0.21];                                    % Incidence of RR-TB
@@ -249,24 +247,21 @@ end
 % data.p_adpopn       = [0.688 0.708 0.728];                                 % proportion of country thats adults
 % data.ch_notifs      = [310 360 420]/4.5e6*1e5;                             % notifications in the country   
 
-data.incd2010       = [11 12 14];                                           % With broader uncertainty intervals
+data.incd2010       = [11 12 14];                                    % With broader uncertainty intervals
 data.incd2020       = [6.8  7.9  9.2];                                             
 %data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
 data.mort           = [0.26 0.36 0.47];                                     % TB mortality, 2020
 data.p_migrTB       = [0.5  0.6  0.7];                                      % Proportion contribution of migrants to overall incidence
-data.p_migrpopn     = [0.337 0.437 0.537];                                  % Proportion of population that is migrants
+data.p_migrpopn     = [0.337 0.437 0.537];                                 % Proportion of population that is migrants
 data.p_LTBI_inmigr  = [0.18 0.22 0.28];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
-% data.p_vulnpopn     = [8 10 12]/100;                                        % Proportion of UK population being vulnerable
-% data.p_vulnTB       = [5 7 9]/100;                                          % Proportion contribution to overall incidence
-data.nTPT2019       = 1.3*[0.9 1 1.1];                                      % Number of TPT initiations in 2019, per 10^5 population
-%data.incd_ch2020    = [0.05 0.11 0.16];                                    % incidence in children
+% data.p_vulnpopn     = [8 10 12]/100;                                         % Proportion of UK population being vulnerable
+% data.p_vulnTB       = [5 7 9]/100;                                        % Proportion contribution to overall incidence
+data.nTPT2019       = 1.3*[0.9 1 1.1];                                     % Number of TPT initiations in 2019, per 10^5 population
+%data.incd_ch2020    = [0.05 0.11 0.16];                                              % incidence in children
 data.propincd_ch    = [0.006 0.014 0.025];
 data.p_chpopn       = [0.286 0.292 0.3];                                    % proportion of country thats children
-data.p_adpopn       = [0.688 0.708 0.728];                                  % proportion of country thats adults
-data.ch_notifs      = [3 3.69 4.2]/4.576e6*1e5;                             % notifications in the country  
-data.vuln_prev      = [10 12 14]/100;                                     
-data.vuln_relrisk   = [2 3 4];                                         
-
+data.p_adpopn       = [0.688 0.708 0.728];                                % proportion of country thats adults
+data.ch_notifs      = [3 3.69 4.2]/4.576e6*1e5;                           % notifications in the country   
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
@@ -283,15 +278,13 @@ f9  = get_distribution_fns(data.propincd_ch,'beta', show);
 f10  = get_distribution_fns(data.p_chpopn,  'beta',    show);
 f11  = get_distribution_fns(data.p_adpopn,  'beta',    show);
 f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
-f13  = get_distribution_fns(data.vuln_prev, 'beta', show);
-f14  = get_distribution_fns(data.vuln_relrisk, 'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, propincd_ch, p_chpopn, ch_notifs, vuln_prev, vuln_relrisk) f1a(incd2010) + f1b(incd2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, propincd_ch, p_chpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + f5(p_LTBI_inmigr) + ...
                                                                                                      f9(propincd_ch) + ...
-                                                                                                     f10(p_chpopn) +f12(ch_notifs) +f13(vuln_prev) +f14(vuln_relrisk);
+                                                                                                     f10(p_chpopn) +f12(ch_notifs);
 
 save Model_setup;
 

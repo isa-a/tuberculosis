@@ -1,8 +1,7 @@
 clear all; %load optim_resUK3.mat;
-% load optim_res_noVULN5_v2.mat;
-load optim_res_MAIN;
+load optim_res_noVULN5_v2.mat;
 
-x0 = x0sto(5,:);
+x0 = x0sto(2,:);
 
 % ix0 = size(xsto,1)/2;
 % nx  = 200;
@@ -10,8 +9,8 @@ x0 = x0sto(5,:);
 % xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(x0,1)
-    [out, aux] = obj(x0);
+for ii = 1:size(x1,1)
+    [out, aux] = obj(x1);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
@@ -19,7 +18,7 @@ end
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_vulnpopn; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.propincd_ch; data.p_chpopn; data.p_adpopn; data.ch_notifs];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -37,8 +36,9 @@ xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
+set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI','incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
 yl = ylim; yl(1) = 0; ylim(yl);
+
 
 return
 
@@ -71,15 +71,15 @@ for ii = 1:16
 end
 
 
-for ii = 1:size(x0sto,1)
-    [out, aux] = obj(x0sto(ii,:));
+for ii = 1:size(xopt,1)
+    [out, aux] = obj(xopt(ii,:));
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
 end
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_vulnpopn; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
 den = alldat(:,2)';
 
 % Compute the simulation results for plotting
@@ -107,7 +107,7 @@ for ii = 1:size(sim_plt, 1)
 end
 
 % Set X-axis labels
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
+set(gca, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 % Create legend
