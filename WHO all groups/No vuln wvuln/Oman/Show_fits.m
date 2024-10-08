@@ -19,7 +19,7 @@ end
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_chpopn; data.p_adpopn; data.ch_notifs; data.vuln_prev; data.vuln_relrisk;];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_LTBI_inmigr; data.propincd_ch; data.p_chpopn; data.ch_notifs; data.vuln_prev; data.vuln_relrisk;];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -79,7 +79,7 @@ for ii = 1:size(x0sto,1)
 end
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_vulnpopn; data.p_vulnTB; data.propincd_ch; data.p_chpopn; data.p_adpopn; data.ch_notifs];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.propincd_ch; data.p_chpopn; data.p_adpopn; data.ch_notifs; data.vuln_prev; data.vuln_relrisk;];
 den = alldat(:,2)';
 
 % Compute the simulation results for plotting
@@ -107,7 +107,7 @@ for ii = 1:size(sim_plt, 1)
 end
 
 % Set X-axis labels
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
+set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs',  'vuln_prev', 'vuln_relrisk'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 % Create legend

@@ -101,7 +101,7 @@ else
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
 
     % prevalence of diabetes
-    vuln_prev = sum(sfin(s.vuln))/100;
+    vuln_prev = sum(sfin(s.vuln)) / sum(sfin(1:i.nstates));
 
     % amount of tb in people who dont have diabetes
     no_vuln_with_TB = sum(sfin(intersect(s.allI, setdiff(1:i.nstates, s.vuln)))) / sum(sfin(setdiff(1:i.nstates, s.vuln)));
