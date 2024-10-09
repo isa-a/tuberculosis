@@ -18,7 +18,7 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.ad.dom)       = 1 - 0.168 - seed;
+    init(i.U.ad.dom)       = 1 - 0.437 - seed;
     init(i.U.ad.migr_rect) = p.migrect_popn;
     init(i.I.ad.dom.ds)    = seed;
     
@@ -96,7 +96,7 @@ else
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
     
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, propincd_ch, p_chpopn, ch_notifs);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_chpopn, ch_notifs);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;

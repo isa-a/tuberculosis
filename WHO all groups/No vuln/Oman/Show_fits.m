@@ -9,8 +9,8 @@ x0 = x0sto(2,:);
 % xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(x1,1)
-    [out, aux] = obj(x1);
+for ii = 1:size(x2)
+    [out, aux] = obj(x2);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
@@ -36,7 +36,7 @@ xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI','incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
+set(gca, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 
@@ -71,15 +71,15 @@ for ii = 1:16
 end
 
 
-for ii = 1:size(xopt,1)
-    [out, aux] = obj(xopt(ii,:));
+for ii = 1:size(x0sto,1)
+    [out, aux] = obj(x0sto(ii,:));
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
 end
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.propincd_ch; data.p_chpopn; data.p_adpopn; data.ch_notifs];
 den = alldat(:,2)';
 
 % Compute the simulation results for plotting
@@ -117,5 +117,5 @@ h3 = plot(nan, nan, 'k.', 'markersize', ms);  % Placeholder for Set 2
 h4 = plot(nan, nan, 'g.', 'markersize', ms);  % Placeholder for Set 3
 h5 = plot(nan, nan, 'y.', 'markersize', ms);  % Placeholder for Set 2
 h6 = plot(nan, nan, 'm.', 'markersize', ms);  % Placeholder for Set 3
-legend([h1, h2, h3, h4, h5, h6], {'Real Data', 'Set 1', 'Set 2', 'Set 3', 'Set 4', 'Set 5'}, 'Location', 'Best');
+legend([h1, h2, h3, h4], {'Real Data', 'Set 1', 'Set 2', 'Set 3'}, 'Location', 'Best');
 

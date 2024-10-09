@@ -19,7 +19,7 @@ end
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_LTBI_inmigr; data.propincd_ch; data.p_chpopn; data.ch_notifs; data.vuln_prev; data.vuln_relrisk;];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.propincd_ch; data.p_chpopn; data.p_adpopn; data.ch_notifs; data.vuln_prev; data.vuln_relrisk;];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -117,7 +117,7 @@ h3 = plot(nan, nan, 'k.', 'markersize', ms);  % Placeholder for Set 2
 h4 = plot(nan, nan, 'g.', 'markersize', ms);  % Placeholder for Set 3
 h5 = plot(nan, nan, 'y.', 'markersize', ms);  % Placeholder for Set 2
 h6 = plot(nan, nan, 'm.', 'markersize', ms);  % Placeholder for Set 3
-legend([h1, h2, h3, h4, h5, h6], {'Real Data', 'Set 1', 'Set 2', 'Set 3', 'Set 4', 'Set 5'}, 'Location', 'Best');
+legend([h1, h2, h3, h4], {'Real Data', 'Set 1', 'Set 2', 'Set 3'}, 'Location', 'Best');
 
 
 

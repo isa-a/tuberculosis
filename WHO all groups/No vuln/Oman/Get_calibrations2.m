@@ -33,12 +33,14 @@ xord = xsam(ord,:);
 
 options = optimset(PlotFcn=@optimplotfval);
 for ii = 1:3
-    x0sto(ii,:) = fminsearch(nobj,x0sto(ii,:),options);
+    tmp = fminsearch(nobj,xord(ii,:),options);
+    x0sto(ii,:) = fminsearch(nobj,tmp,options);
 end
+
 % x1 = fminsearch(nobj,x0,options);
 % x2 = fminsearch(nobj,x1,options);
 
-save optim_res_noVULNoman;
+save optim_res_noVULNoman2;
 
 return;
 
