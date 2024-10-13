@@ -200,14 +200,14 @@ bds(xi.p_relrate,:)              = repmat([1 20],2,1);
 % bds(xi.relbeta_vuln,:)           = [0.1 20];
 bds(xi.ageing,:)                 = [0.02 0.3];
 %bds(xi.ch_mort,:)          = [0, 0.01];
-bds(xi.p_relrate_factor,:) = [1, 10];
+bds(xi.p_relrate_factor,:) = [0, 10];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 prm.contmat_born = [1, 0.5; 0.5, 1; 0.2, 0.2];
-prm.contmat_age  = [1 0.1; 0.1 1];
+prm.contmat_age  = [1 0.157; 0.153 1];
 
 
 % go through each element
@@ -281,9 +281,9 @@ f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_chpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, propincd_ch, p_chpopn) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + f5(p_LTBI_inmigr) + ...
-                                                                                                     f10(p_chpopn) +f12(ch_notifs);
+                                                                                                     f9(propincd_ch) + f10(p_chpopn);
 
 save Model_setup;
 
