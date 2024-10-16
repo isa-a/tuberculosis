@@ -18,7 +18,7 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.ad.dom)       = 1 - 0.437 - seed;
+    init(i.U.ad.dom)       = 1 - 0.495 - seed;
     init(i.U.ad.migr_rect) = p.migrect_popn;
     init(i.I.ad.dom.ds)    = seed;
     

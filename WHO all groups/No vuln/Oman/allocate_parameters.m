@@ -19,7 +19,7 @@ p.LTBI_in_migrch = x(xi.p_LTBI_in_migrad)/x(xi.p_relLTBI_inmigr_advch);
 
 r.ageing         = x(xi.ageing);
 
-%r.ch_mort        = x(xi.ch_mort);
+r.ch_mort        = x(xi.ch_mort);
 
 
 

@@ -143,18 +143,18 @@ r.relapse      = [0.032 0.14 0.0015];
 r.muTB         = 1/6;                                                      % TB related mortality
 p.imm          = 0.8;                                                      % Reduced susceptibility conferred by previous infection
 
-p.ch_in_migr   = 0.0789;                                                      % DOUBLE check with country data
+p.ch_in_migr   = 0.0789;                                                   % DOUBLE check with country data
 
 % --- Interventions 
 p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
-% p.TPTeff       = [0.6 0.1];                                                % Effectiveness of TPT
-p.TPTeff       = 0.6;                                                % Effectiveness of TPT
+% p.TPTeff       = [0.6 0.1];                                              % Effectiveness of TPT
+p.TPTeff       = 0.6;                                                      % Effectiveness of TPT
 r.TPT          = [0 0 0 0];                                                % Uptake of TPT amongst: 1.domestic, 2.recent migrants, 3.long-term migrants
 r.TPT2020rec   = 0.004;
 r.ACF          = [0 0 0 0];
 r.ACF2         = [0 0 0 0];
 
-p.migrect_popn = 0.437;
+p.migrect_popn = 0.495;
 r.migr         = 0.0847;                                                   % https://doi.org/10.1007/s44197-022-00040-w
 
 % p.LTBI_in_migrad = 0.17;
@@ -176,8 +176,8 @@ r.migr         = 0.0847;                                                   % htt
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
 % lgths =      [1,      1,      2,                  1,          2,                  1,        1,         1,                 1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch', 'p_relrate', 'ageing', 'p_relrate_factor'};      
-lgths =      [1,        1,      2,                      1,                 1,                       1,           2,        1,                  1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch', 'p_relrate', 'ageing', 'ch_mort', 'p_relrate_factor'};      
+lgths =      [1,        1,      2,                      1,                 1,                       1,           2,        1,       1,              1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -199,15 +199,16 @@ bds(xi.p_relrate,:)              = repmat([1 20],2,1);
 % bds(xi.r_vuln,:)                 = [0 2];
 % bds(xi.relbeta_vuln,:)           = [0.1 20];
 bds(xi.ageing,:)                 = [0.02 0.3];
-%bds(xi.ch_mort,:)          = [0, 0.01];
-bds(xi.p_relrate_factor,:) = [0, 10];
+bds(xi.ch_mort,:)          = [0, 0.01];
+bds(xi.p_relrate_factor,:) = [1, 10];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 prm.contmat_born = [1, 0.5; 0.5, 1; 0.2, 0.2];
-prm.contmat_age  = [1 0.157; 0.153 1];
+% prm.contmat_age  = [10.004 8.923; 2.447 13.97]/35.3440;
+prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];
 
 
 % go through each element
@@ -252,7 +253,7 @@ data.incd2020       = [6.8  7.9  9.2];
 %data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
 data.mort           = [0.26 0.36 0.47];                                     % TB mortality, 2020
 data.p_migrTB       = [0.5  0.6  0.7];                                      % Proportion contribution of migrants to overall incidence
-data.p_migrpopn     = [0.337 0.437 0.537];                                 % Proportion of population that is migrants
+data.p_migrpopn     = [0.395 0.495 0.595];                                 % Proportion of population that is migrants
 data.p_LTBI_inmigr  = [0.18 0.22 0.28];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
 % data.p_vulnpopn     = [8 10 12]/100;                                         % Proportion of UK population being vulnerable
 % data.p_vulnTB       = [5 7 9]/100;                                        % Proportion contribution to overall incidence
@@ -281,9 +282,9 @@ f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, propincd_ch, p_chpopn) f1a(incd2010) + f1b(incd2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_chpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + f5(p_LTBI_inmigr) + ...
-                                                                                                     f9(propincd_ch) + f10(p_chpopn);
+                                                                                                     f10(p_chpopn)+ f12(ch_notifs);
 
 save Model_setup;
 

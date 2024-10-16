@@ -345,8 +345,8 @@ M.denvec = sparse(m);
 
 % --- Mortality -----------------------------------------------------------
 m = zeros(i.nstates,2);
-m(s.ch,1)         = 0;
-m(s.ad,1)         = 1/83;
+m(s.ch,1)         = r.ch_mort;
+m(s.ad,1)         = 1/72;
 %m(:,1)            = 1/83;
 % m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
