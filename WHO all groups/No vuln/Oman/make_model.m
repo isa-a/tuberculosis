@@ -68,11 +68,13 @@ for ia = 1:length(gps.age)
             source  = I;
             destins =                      [Tx,                 Tx2,         Rhi];
             rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
+            %rates   = [r.gamma(ia), r.gamma(ia), r.self_cure];
             m(destins, source) = m(destins, source) + rates';
     
             source  = I2;
             destins =                      [Tx,                 Tx2,         Rhi];
             rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
+            %rates   = [r.gamma(ia), r.gamma(ia), r.self_cure];
             m(destins, source) = m(destins, source) + rates';
     
             % Treatment completion or interruption
@@ -122,22 +124,26 @@ for ia = 1:length(gps.age)
             sources = [I I2];
             destin  = Tx;
             rate    = r.ACF(ib)*(1-pSLinit);
+            %rate    = r.ACF(ib);
             m(destin, sources) = m(destin, sources) + rate;
     
             sources = [I I2];
             destin  = Tx2;
             rate    = r.ACF(ib)*pSLinit;
+            %rate    = r.ACF(ib);
             m(destin, sources) = m(destin, sources) + rate;
     
     
             source = I2;
             destin = Tx;
             rate   = r.ACF2(ib)*(1-pSLinit);
+            %rate   = r.ACF2(ib);
             m(destin, source) = m(destin, source) + rate;
     
             source = I2;
             destin = Tx2;
             rate   = r.ACF2(ib)*pSLinit;
+            %rate   = r.ACF2(ib);
             m(destin, source) = m(destin, source) + rate;
         end
     end
@@ -238,7 +244,7 @@ M.migrentries = sparse(m);
 getinds = @(st1, st2, st3) intersect(intersect(intersect(s.infectious, s.(st1)), s.(st2)), s.(st3));
 contmat(end,end) = contmat(end,end);
 
-m = zeros(6,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
+m = zeros(4,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
                                                                             % no RR Rows: 1.Dom DS 2.Migr DS 3.Vuln DS   
 
 m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
@@ -345,7 +351,7 @@ M.denvec = sparse(m);
 
 % --- Mortality -----------------------------------------------------------
 m = zeros(i.nstates,2);
-m(s.ch,1)         = r.ch_mort;
+m(s.ch,1)         = 0;
 m(s.ad,1)         = 1/72;
 %m(:,1)            = 1/83;
 % m(s.vuln,1)       = 1/55;

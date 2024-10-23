@@ -1,4 +1,5 @@
-function [p,r] = allocate_parameters(x,p,r,xi)
+function [p,r,prm] = allocate_parameters(x,p,r,prm,xi)
+
 
 r.beta           = x(xi.beta);
 p.betadec        = x(xi.betadec);
@@ -19,7 +20,12 @@ p.LTBI_in_migrch = x(xi.p_LTBI_in_migrad)/x(xi.p_relLTBI_inmigr_advch);
 
 r.ageing         = x(xi.ageing);
 
-r.ch_mort        = x(xi.ch_mort);
+tmp_c = prm.contmat_age;
+prm.contmat_age = [tmp_c(1, :) * x(xi.contmat_factor); tmp_c(2, :)];
+
+
+
+%r.ch_mort        = x(xi.ch_mort);
 
 
 

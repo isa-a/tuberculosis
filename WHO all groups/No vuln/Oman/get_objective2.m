@@ -3,7 +3,7 @@ function [out, aux, msg] = get_objective2(x, ref, prm, gps, contmat, calfn)
 i = ref.i; s = ref.s; xi = ref.xi;
 p = prm.p; r = prm.r; sel = prm.sel; agg = prm.agg;
 
-[p,r] = allocate_parameters(x, p, r, xi);
+[p,r] = allocate_parameters(x, p, r, prm, xi);
 
 % keyboard;
 
@@ -18,7 +18,7 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.ad.dom)       = 1 - 0.495 - seed;
+    init(i.U.ad.dom)       = 1 - 0.437 - seed;
     init(i.U.ad.migr_rect) = p.migrect_popn;
     init(i.I.ad.dom.ds)    = seed;
     
@@ -109,11 +109,14 @@ else
 %         aux.p_vulnpopn = p_vulnpopn;
 %         aux.p_vulnTB   = p_vulnTB;
         aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
+        aux.p_migrect_ch  = sum(sfin(intersect(s.migr_rect,[s.ch])))/sum(sfin(s.migr_rect));
+        aux.p_migrlong_ch  = sum(sfin(intersect(s.migr_long,[s.ch])))/sum(sfin(s.migr_long));
         aux.nTPT       = n_TPT2019;
         aux.propincd_ch    = propincd_ch;
         aux.chpopn     = p_chpopn;
         aux.adpopn     = p_adpopn;
         aux.ch_notifs  = ch_notifs;
+        aux.prop_ch_migr   = sum(sfin(intersect(s.migr,[s.ch])))/sum(sfin(s.migr));
         aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, propincd_ch, p_chpopn, p_adpopn, ch_notifs];
     else
         out = -Inf;

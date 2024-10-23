@@ -131,7 +131,7 @@ r.reactivation0 = 0.0006;
 
 r.Tx            = 2;
 p.RRrec         = 1;
-r.RR_acqu       = 0.01;
+r.RR_acqu       = 0;
 r.Tx2           = 9/12;
 r.ltfu          = 0.01;                                                     % loss to followup
 r.ltfu2         = r.Tx2*2;
@@ -154,7 +154,7 @@ r.TPT2020rec   = 0.004;
 r.ACF          = [0 0 0 0];
 r.ACF2         = [0 0 0 0];
 
-p.migrect_popn = 0.495;
+p.migrect_popn = 0.437;
 r.migr         = 0.0847;                                                   % https://doi.org/10.1007/s44197-022-00040-w
 
 % p.LTBI_in_migrad = 0.17;
@@ -176,8 +176,8 @@ r.migr         = 0.0847;                                                   % htt
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
 % lgths =      [1,      1,      2,                  1,          2,                  1,        1,         1,                 1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch', 'p_relrate', 'ageing', 'ch_mort', 'p_relrate_factor'};      
-lgths =      [1,        1,      2,                      1,                 1,                       1,           2,        1,       1,              1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch', 'p_relrate', 'ageing', 'p_relrate_factor', 'contmat_factor'};      
+lgths =      [1,        1,      2,                      1,                 1,                       1,           2,     1,                   1,                 1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -191,7 +191,7 @@ bds = [];
 bds(xi.beta,:)                   = [0 40];
 bds(xi.betadec,:)                = [0 0.15];
 bds(xi.gamma,:)                  = repmat([1e-4 10],2,1);
-bds(xi.p_relrate_gamma_chvad,:)  = [0 2];
+bds(xi.p_relrate_gamma_chvad,:)  = [0 1];
 bds(xi.p_LTBI_in_migrad,:)       = [0.1 0.6];
 bds(xi.p_relLTBI_inmigr_advch,:) = [3 7];                                % Estimated using simple ARTI calculation
 bds(xi.p_relrate,:)              = repmat([1 20],2,1);
@@ -199,8 +199,9 @@ bds(xi.p_relrate,:)              = repmat([1 20],2,1);
 % bds(xi.r_vuln,:)                 = [0 2];
 % bds(xi.relbeta_vuln,:)           = [0.1 20];
 bds(xi.ageing,:)                 = [0.02 0.3];
-bds(xi.ch_mort,:)          = [0, 0.01];
-bds(xi.p_relrate_factor,:) = [1, 10];
+%bds(xi.ch_mort,:)          = [0, 0.01];
+bds(xi.p_relrate_factor,:)  = [1, 10];
+bds(xi.contmat_factor,:)    = [0, 1];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
@@ -248,20 +249,20 @@ end
 % data.p_adpopn       = [0.688 0.708 0.728];                                 % proportion of country thats adults
 % data.ch_notifs      = [310 360 420]/4.5e6*1e5;                             % notifications in the country   
 
-data.incd2010       = [11 12 14];                                    % With broader uncertainty intervals
+data.incd2010       = [10 12 14];                                    % With broader uncertainty intervals
 data.incd2020       = [6.8  7.9  9.2];                                             
 %data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
 data.mort           = [0.26 0.36 0.47];                                     % TB mortality, 2020
 data.p_migrTB       = [0.5  0.6  0.7];                                      % Proportion contribution of migrants to overall incidence
-data.p_migrpopn     = [0.395 0.495 0.595];                                 % Proportion of population that is migrants
+data.p_migrpopn     = [0.337 0.437 0.537];                                 % Proportion of population that is migrants
 data.p_LTBI_inmigr  = [0.18 0.22 0.28];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
 % data.p_vulnpopn     = [8 10 12]/100;                                         % Proportion of UK population being vulnerable
 % data.p_vulnTB       = [5 7 9]/100;                                        % Proportion contribution to overall incidence
 data.nTPT2019       = 1.3*[0.9 1 1.1];                                     % Number of TPT initiations in 2019, per 10^5 population
 %data.incd_ch2020    = [0.05 0.11 0.16];                                              % incidence in children
 data.propincd_ch    = [0.006 0.014 0.025];
-data.p_chpopn       = [0.286 0.292 0.3];                                    % proportion of country thats children
-data.p_adpopn       = [0.688 0.708 0.728];                                % proportion of country thats adults
+data.p_chpopn       = [0.198 0.2471 0.3];                                    % proportion of country thats children
+data.p_adpopn       = [0.65 0.7529 0.85];                                % proportion of country thats adults
 data.ch_notifs      = [3 3.69 4.2]/4.576e6*1e5;                           % notifications in the country   
 
 show = 0;

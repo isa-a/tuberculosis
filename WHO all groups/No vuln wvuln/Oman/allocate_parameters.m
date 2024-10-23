@@ -18,7 +18,7 @@ r.vuln           = x(xi.r_vuln);
 p.relbeta_vuln   = 1;
 
 r.ageing         = x(xi.ageing);
-r.ch_mort        = x(xi.ch_mort);
+%r.ch_mort        = x(xi.ch_mort);
 
 
 

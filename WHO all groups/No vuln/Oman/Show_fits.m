@@ -2,6 +2,10 @@ clear all; %load optim_resUK3.mat;
 load optim_res_noVULN5_v2.mat;
 
 x0 = x0sto(1,:);
+x1 = x0sto(2,:);
+x2 = x0sto(3,:);
+
+x3=xopt(3,:);
 
 % ix0 = size(xsto,1)/2;
 % nx  = 200;
@@ -9,7 +13,7 @@ x0 = x0sto(1,:);
 % xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(x0)
+for ii = 1:size(x0,1)
     [out, aux] = obj(x0);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
@@ -71,8 +75,8 @@ for ii = 1:16
 end
 
 
-for ii = 1:size(x0sto,1)
-    [out, aux] = obj(x0sto(ii,:));
+for ii = 1:size(xopt,1)
+    [out, aux] = obj(xopt(ii,:));
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;

@@ -30,17 +30,12 @@ end
 mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
 xord = xsam(ord,:);
-
-options = optimset(PlotFcn=@optimplotfval);
-for ii = 1:3
-    tmp = fminsearch(nobj,xord(ii,:),options);
-    x0sto(ii,:) = fminsearch(nobj,tmp,options);
-end
+ 
 
 % x1 = fminsearch(nobj,x0,options);
 % x2 = fminsearch(nobj,x1,options);
 
-save optim_res_noVULNoman4;
+save optim_res_noVULNoman5;
 
 return;
 
@@ -49,7 +44,7 @@ xopt = zeros(3, size(xord, 2));
 fvals_opt = zeros(1, 3);    
 
 
-for ii = 1:3
+for ii = 1:5
     options = optimset('PlotFcn',@optimplotfval);
     [xopt(ii,:), fval] = fminsearch(nobj, xord(ii,:), options);
     fvals_opt(ii) = -fval;  % Store the maximized objective function value

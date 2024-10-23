@@ -32,7 +32,7 @@ ord  = mat(:,2);
 xord = xsam(ord,:);
 
 options = optimset(PlotFcn=@optimplotfval);
-for ii = 1:3
+for ii = 1:5
     tmp = fminsearch(nobj,xord(ii,:),options);
     x0sto(ii,:) = fminsearch(nobj,tmp,options);
 end
@@ -41,7 +41,7 @@ end
 % x2 = fminsearch(nobj,x1,options);
 % save optim_res_noVULN5_v2;
 
-save optim_res_MAIN_OMAN_3
+save optim_res_MAIN_OMAN_6;
 % [xsto, outsto] = MCMC_adaptive2(obj, x0sto(2,:), 1000, 1, [], true);
 
 
@@ -63,9 +63,8 @@ end
 
 options = optimset(PlotFcn=@optimplotfval);
 x0 = fminsearch(nobj,xord(1,:),options);
-x1 = fminsearch(nobj,x0sto(6,:),options);
+x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
-x3 = fminsearch(nobj,x2,options);
 
 
 
