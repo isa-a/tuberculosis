@@ -5,7 +5,7 @@ x0 = x0sto(1,:);
 x1 = x0sto(2,:);
 x2 = x0sto(3,:);
 
-x3=xopt(3,:);
+x0=x0sto(8,:);
 
 % ix0 = size(xsto,1)/2;
 % nx  = 200;

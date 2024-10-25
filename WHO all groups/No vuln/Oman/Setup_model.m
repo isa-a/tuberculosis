@@ -207,7 +207,7 @@ prm.bounds = bds';
 ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
-prm.contmat_born = [1, 0.5; 0.5, 1; 0.2, 0.2];
+prm.contmat_born = [1, 0.5; 0.5, 1];
 % prm.contmat_age  = [10.004 8.923; 2.447 13.97]/35.3440;
 prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];
 

@@ -10,8 +10,8 @@ x2 = x0sto(1,:);
 % xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(x2,1)
-    [out, aux] = obj(x2);
+for ii = 1:size(x3,1)
+    [out, aux] = obj(x3);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;

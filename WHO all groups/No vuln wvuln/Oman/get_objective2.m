@@ -3,7 +3,7 @@ function [out, aux, msg] = get_objective2(x, ref, prm, gps, contmat, calfn)
 i = ref.i; s = ref.s; xi = ref.xi;
 p = prm.p; r = prm.r; sel = prm.sel; agg = prm.agg;
 
-[p,r] = allocate_parameters(x, p, r, xi);
+[p,r,prm] = allocate_parameters(x, p, r, prm, xi);
 
 % keyboard;
 
@@ -27,7 +27,7 @@ else
     p0.betadec = 0;
     r0.gamma   = r.gamma_2015;
     p0.relbeta = 0; r0.RR_acqu = 0;
-    M0 = make_model(p0, r0, i, s, gps, contmat);
+    M0 = make_model(p0, r0, i, s, gps, prm.contmat);
 
     % Introduction of RR-TB from 1970
 %     p0b = p; r0b = r; 
@@ -39,12 +39,12 @@ else
     p1 = p; r1 = r; 
     r1.TPT = [0 r.TPT2020rec 0 0];
     r1.gamma = r.gamma_2015;
-    M1 = make_model(p1, r1, i, s, gps, contmat);
+    M1 = make_model(p1, r1, i, s, gps, prm.contmat);
     
     % >2010: increase in case-finding
     p2 = p; r2 = r; 
     r2.gamma = r.gamma_2020;
-    M2 = make_model(p2, r2, i, s, gps, contmat);
+    M2 = make_model(p2, r2, i, s, gps, prm.contmat);
 
     % --- Now simulate them all
 
