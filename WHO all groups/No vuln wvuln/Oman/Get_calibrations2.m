@@ -37,22 +37,18 @@ for ii = 1:5
     x0sto(ii,:) = fminsearch(nobj,tmp,options);
 end
 
-
 options = optimset('PlotFcn', @optimplotfval);
-index = 1; 
-
-for ii = 1:10  
-    for jj = 1:3 
-        
-        x0 = xord(ii, :);
-
-        
-        [xopt(index, :), fval] = fminsearch(nobj, x0, options);
-        fvals_opt(index) = -fval;  
-
-        index = index + 1; 
-    end
+for ii = 1:10
+    % First optimization
+    tmp = fminsearch(nobj, xord(ii,:), options);
+    
+    % Second optimization using the result of the first
+    tmp = fminsearch(nobj, tmp, options);
+    
+    % Third optimization using the result of the second
+    x0sto(ii,:) = fminsearch(nobj, tmp, options);
 end
+
 
 x0sto = xopt(3:3:end, :);
 
@@ -60,7 +56,7 @@ x0sto = xopt(3:3:end, :);
 % x2 = fminsearch(nobj,x1,options);
 % save optim_res_noVULN5_v2;
 
-save optim_res_OMAN;
+save optim_res_OMAN2;
 % [xsto, outsto] = MCMC_adaptive2(obj, x0sto(2,:), 1000, 1, [], true);
 
 
@@ -89,14 +85,14 @@ x3 = fminsearch(nobj,x2,options);
 
 
 % Perform MCMC
-[xsto, outsto] = MCMC_adaptive33(obj, x0sto(3,:), 1e3, 1, [], [], [], 1);
+[xsto, outsto] = MCMC_adaptive(obj, x3, 1e2, 1, [], [], [], 1);
 
 inds = find(outsto==max(outsto));
 x_new = xsto(inds(1),:);
 
 
 cov0 = cov(xsto);
-[xsto, outsto] = MCMC_adaptive33(obj, x_new, 1e4, 1, [], [], cov0, 1);
+[xsto, outsto] = MCMC_adaptive(obj, x_new, 1e4, 1, [], [], cov0, 1);
 
 
 nreps = 4;

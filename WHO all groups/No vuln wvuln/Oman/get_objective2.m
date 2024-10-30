@@ -47,7 +47,6 @@ else
     M2 = make_model(p2, r2, i, s, gps, prm.contmat);
 
     % --- Now simulate them all
-
     geq0 = @(t,in) goveqs_basis3(t, in, i, s, M0, agg, sel, r0, p0);
     [t0, soln0] = ode15s(geq0, [0:5e3], init, odeset('NonNegative',1:i.nstates));
 

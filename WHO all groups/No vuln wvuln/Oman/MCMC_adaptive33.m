@@ -57,10 +57,10 @@ for t = 2:n
         
         % to make sure the matrix is positive semi def
 
-        regterm = 1e-6;  % the small regularization term
+        regterm = 1e-4;  % the small regularization term
         covmat = covmat + regterm * eye(d);
 
-        regterm = max(1e-6, -min(eig(covmat)) + 1e-6);
+        regterm = max(1e-4, -min(eig(covmat)) + 1e-4);
         covmat = covmat + regterm * eye(d);
 
 

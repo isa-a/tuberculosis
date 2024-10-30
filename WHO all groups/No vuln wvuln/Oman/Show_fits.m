@@ -2,14 +2,14 @@ clear all; %load optim_resUK3.mat;
 % load optim_res_noVULN5_v2.mat;
 load optim_res_MAIN_OMAN;
 
-x2 = x0sto(1,:);
+
 
 % ix0 = size(xsto,1)/2;
 % nx  = 200;
 % dx  = round(ix0/nx);
 % xs  = xsto(ix0:dx:end,:);
 
-
+x2 = x0sto(4,:);
 for ii = 1:size(x3,1)
     [out, aux] = obj(x3);
     sims(ii,:) = aux.sim;
