@@ -82,7 +82,7 @@ x2 = fminsearch(nobj,x1,options);
 
 
 % Perform MCMC
-[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e3, 1, [], [], [], 1);
+[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e4, 1, [], [], [], 1);
 
 inds = find(outsto==max(outsto));
 x_new = xsto(inds(1),:);

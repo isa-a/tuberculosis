@@ -1,7 +1,7 @@
 clear all; %load optim_resUK3.mat;
 load optim_res_noVULN5_v2.mat;
 
-x0 = x0sto(1,:);
+x0 = xopt(1,:);
 x1 = x0sto(2,:);
 x2 = x0sto(3,:);
 
