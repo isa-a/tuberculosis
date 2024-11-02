@@ -1,4 +1,4 @@
-clear all; load optim_res7.mat; load Model_setup;
+clear all; load optim_res_MAIN.mat; load Model_setup;
 
 obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 
@@ -10,11 +10,11 @@ opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
 
 
-midpt = false; 
+midpt = true; 
 if midpt
     % inds = find(outsto==max(outsto));
     % xs = xsto(inds(1),:);
-    xs = x1;
+    xs = x0sto(2,:);
 else
     ix0 = size(xsto,1)/2;
     nx  = 200;
@@ -40,12 +40,12 @@ for ii = 1:size(xs,1)
     % ---------------------------------------------------------------------
     % --- Model intervention
     
-    TPTcov = -log(0.1); %TPTcov = 100;
-    ACFcov = -log(0.1); %ACFcov = 100;
+    TPTcov = -log(0.8); %TPTcov = 100;
+    ACFcov = -log(0.8); %ACFcov = 100;
 
-    % TPT in existing migrants
+    % TPT in recent migrants
     ra = r0; pa = p0;
-    ra.TPT = TPTcov*[0 1 1 0];
+    ra.TPT = TPTcov*[0 1 0 0];
     Ma = make_model(pa,ra,i,s,gps,prm.contmat);
     
     % TPT at point of entry
@@ -53,8 +53,13 @@ for ii = 1:size(xs,1)
     pb.migrTPT = 1;
     Mb = make_model(pb,rb,i,s,gps,prm.contmat);
 
+    % TPT in longer-term migrants
+    rb1 = rb; pb1 = pb;
+    pb1.TPT = TPTcov*[0 1 1 1];
+    Mb1 = make_model(pb1,rb1,i,s,gps,prm.contmat);
+
     % TPT in contacts
-    rb2 = rb; pb2 = pb;
+    rb2 = rb1; pb2 = pb1;
     rb2.progression  = rb2.progression*0.9;
     rb2.reactivation = rb2.reactivation*0.9;
     Mb2 = make_model(pb2,rb2,i,s,gps,prm.contmat);
@@ -66,7 +71,7 @@ for ii = 1:size(xs,1)
 
     % ACF in migrants and vulnerables
     rd = rc; pd = pc;
-    rd.ACF  = ACFcov*[0 1 1 1];
+    rd.ACF  = ACFcov*[0 1 0 1];
     rd.ACF2 = rd.ACF;
     Md = make_model(pd,rd,i,s,gps,prm.contmat);
 
@@ -78,7 +83,7 @@ for ii = 1:size(xs,1)
     Me = make_model(pe,re,i,s,gps,prm.contmat);
     
 
-    models = {M0, Ma, Mb, Mb2, Mc, Md, Me};    
+    models = {M0, Ma, Mb, Mb1, Mb2, Mc, Md, Me};    
     for mi = 1:length(models)
         
         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
@@ -89,10 +94,10 @@ for ii = 1:size(xs,1)
         sdiff = diff(soln,[],1);
         incsto(:,ii,mi) = sdiff(:,i.aux.inc(1))*1e5;
 
-        incstoRR(:,ii,mi) = sdiff(:,i.aux.inc(3))*1e5;
+        % incstoRR(:,ii,mi) = sdiff(:,i.aux.inc(3))*1e5;
         
-        mat = sdiff(:,i.aux.incsources)*1e5;
-        incsto2(:,ii,mi) = sum(mat(:,[incs.L,incs.R]),2);
+        % mat = sdiff(:,i.aux.incsources)*1e5;
+        % incsto2(:,ii,mi) = sum(mat(:,[incs.L,incs.R]),2);
         % incsto2(:,ii,mi) = sum(mat(:,:),2);
 
         mrtsto(:,ii,mi) = sdiff(:,i.aux.mort)*1e5;
@@ -104,6 +109,11 @@ for ii = 1:size(xs,1)
     end
 end
 fprintf('\n');
+
+figure; plot(squeeze(incsto)); yl = ylim; yl(1) = 0; ylim(yl);
+legend('Baseline','TPT, recent migrants','TPT, pre-entry','TPT, long-term migrants','TPT, contacts','TPT, vulnerables','ACF, migrants and vulnerables','ACF, general population');
+
+return;
 
 
 incmat   = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);

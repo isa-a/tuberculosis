@@ -2,20 +2,20 @@ clear all; %load optim_resUK3.mat;
 % load optim_res_noVULN5_v2.mat;
 load optim_res_MAIN;
 
-x0 = x0sto(5,:);
+ix0 = size(xsto,1)/2;
+nx  = 200;
+dx  = round(ix0/nx);
+x0  = xsto(ix0:dx:end,:);
 
-% ix0 = size(xsto,1)/2;
-% nx  = 200;
-% dx  = round(ix0/nx);
-% xs  = xsto(ix0:dx:end,:);
-
-
-for ii = 1:size(x3,1)
-    [out, aux] = obj(x3);
+mk = round(size(x0,1)/25);
+for ii = 1:size(x0,1)
+    if mod(ii,mk) == 0; fprintf('%0.5g ', ii/mk); end
+    [out, aux] = obj(x0(ii,:));
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
 end
+fprintf('\n');
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
@@ -24,6 +24,10 @@ den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
 dat_plt = alldat'./den;
+
+
+% -------------------------------------------------------------------------
+% --- Compare model against data ------------------------------------------
 
 figure; ms = 24; hold on;
 
@@ -39,6 +43,32 @@ errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
 set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
 yl = ylim; yl(1) = 0; ylim(yl);
+
+
+% -------------------------------------------------------------------------
+% --- Plot posterior densities --------------------------------------------
+
+figure;
+names  = {};
+fnames = fieldnames(xi);
+for ii = 1:length(fnames)
+    fname = fnames{ii};
+    names = [names, repmat({fname},1,length(xi.(fname)))];
+end
+for ii = 1:size(x0,2)
+   subplot(4,4,ii); 
+   histogram(x0(:,ii));
+   title(names{ii});
+   xlim(prm.bounds(:,ii));
+end
+
+
+
+
+
+
+
+
 
 return
 
@@ -56,19 +86,7 @@ plot(10,vecs(2,2),'r.','markersize',24);
 errorbar([1, 10], vecs(2,:), hilo(1,:), hilo(2,:),'linestyle','None');
 yl = ylim; yl(1) = 0; ylim(yl);
 
-% Plot posterior densities
-figure;
-names  = {};
-fnames = fieldnames(xi);
-for ii = 1:length(fnames)
-    fname = fnames{ii};
-    names = [names, repmat({fname},1,length(xi.(fname)))];
-end
-for ii = 1:16
-   subplot(4,4,ii); 
-   histogram(x0(:,ii));
-   title(names{ii});
-end
+
 
 
 for ii = 1:size(x0sto,1)

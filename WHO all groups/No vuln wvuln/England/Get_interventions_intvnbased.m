@@ -15,7 +15,7 @@ midpt = true;
 if midpt
     % inds = find(outsto==max(outsto));
     % xs = xsto(inds(1),:);
-    xs = x0sto(2,:);
+    xs = x0sto(5,:);
 else
     ix0 = size(xsto,1)/2;
     nx  = 200;

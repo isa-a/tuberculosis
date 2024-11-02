@@ -1,4 +1,4 @@
-function [p,r,prm] = allocate_parameters(x,p,r,prm,xi)
+function [p,r] = allocate_parameters(x,p,r,xi)
 
 r.beta           = x(xi.beta);
 p.betadec        = x(xi.betadec);
@@ -14,29 +14,13 @@ r.reactivation   = [tmp*x(xi.p_relrate_factor); tmp];
 p.LTBI_in_migrad = x(xi.p_LTBI_in_migrad);
 p.LTBI_in_migrch = x(xi.p_LTBI_in_migrad)/x(xi.p_relLTBI_inmigr_advch);
 
-r.vuln           = x(xi.r_vuln)/1000;
+r.vuln           = x(xi.r_vuln_sc)/500;
 p.relbeta_vuln   = 1;
 
-r.ageing         = x(xi.ageing);
+r.ageing         = x(xi.r_ageing_sc)/10;
 %r.ch_mort        = x(xi.ch_mort);
 
-tmp_c = prm.contmat_age;
-prm.contmat_age = [tmp_c(1, :) * x(xi.contmat_factor); tmp_c(2, :)];
 
-prm.contmat = zeros(4, 4); % Adjust size if needed
-for age_row = 1:2 % rows in age
-    for age_col = 1:2 % cols in age
-        for born_row = 1:3 % rows in born
-            for born_col = 1:3 % cols in born
-                % Calculate position in combined matrix
-                row = (born_row - 1) * 2 + age_row;
-                col = (born_col - 1) * 2 + age_col;
-                % Multiply
-                prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col);
-            end
-        end
-    end
-end
 
 
 

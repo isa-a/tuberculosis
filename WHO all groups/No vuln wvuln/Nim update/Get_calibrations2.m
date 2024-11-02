@@ -3,23 +3,8 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 100; 
+nsam = 2000; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
-
-% obj(xsam(1,:));
-
-% xx = xsam(1,:);
-% [p,r] = allocate_parameters(xx, p, r, xi);
-% init = zeros(1,i.nx);
-% seed = 1e-5;
-% init(i.U.dom)       = 1 - 0.168 - seed;
-% init(i.U.migr_rect) = 0.168;
-% init(i.I.dom)       = Setupseed;
-% 
-% p0 = p; r0 = r; p0.betadec = 0;
-% M0 = make_model(p0, r0, i, s, gps);
-% geq0 = @(t,in) goveqs_basis3(t, in, i, s, M0, agg, sel, r0, p0);
-% [t0, soln0] = ode15s(geq0, [0:1e4], init, odeset('NonNegative',1:5));
 
 mk = round(nsam/25);
 for ii = 1:nsam
@@ -32,7 +17,7 @@ ord  = mat(:,2);
 xord = xsam(ord,:);
 
 options = optimset(PlotFcn=@optimplotfval);
-for ii = 1:10
+for ii = 1:3
     tmp = fminsearch(nobj,xord(ii,:),options);
     x0sto(ii,:) = fminsearch(nobj,tmp,options);
 end
@@ -41,8 +26,22 @@ end
 % x2 = fminsearch(nobj,x1,options);
 % save optim_res_noVULN5_v2;
 
+% [xsto, outsto] = MCMC_adaptive2(obj, x0sto(1,:), 1000, 1, [], true);
+
+x0 = x0sto(1,:);
+cov0 = [];
+
+nreps = 4;
+niter = [1, 1, 1, 5]*2e3;
+for ii = 1:nreps
+    [xsto, outsto] = MCMC_adaptive2(obj, x0, niter(ii), 1, cov0, 1);
+    inds = find(outsto==max(outsto));
+    x0 = xsto(inds(1),:);
+    cov0 = cov(xsto);
+    fprintf('\n');
+end
+
 save optim_res_MAIN
-% [xsto, outsto] = MCMC_adaptive2(obj, x0sto(2,:), 1000, 1, [], true);
 
 
 return;
@@ -65,7 +64,7 @@ options = optimset(PlotFcn=@optimplotfval);
 x0 = fminsearch(nobj,xord(1,:),options);
 x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
-x3 = fminsearch(nobj,x2,options);
+
 
 
 
@@ -80,14 +79,6 @@ cov0 = cov(xsto);
 [xsto, outsto] = MCMC_adaptive33(obj, x_new, 1e4, 1, [], [], cov0, 1);
 
 
-nreps = 4;
-niter = [1, 1, 1, 5]*1e4;
-for ii = 1:nreps
-    inds = find(outsto==max(outsto));
-    x0 = xsto(inds(1),:);
-    cov0 = cov(xsto);
-    [xsto, outsto] = MCMC_adaptive33(obj, x0, niter(ii), 1, [], [], cov0, 1);
-end
 
 
 save calibration_res_isa_new_2;

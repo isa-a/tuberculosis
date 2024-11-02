@@ -49,7 +49,7 @@ else
     % --- Now simulate them all
 
     geq0 = @(t,in) goveqs_basis3(t, in, i, s, M0, agg, sel, r0, p0);
-    [t0, soln0] = ode15s(geq0, [0:5e3], init, odeset('NonNegative',1:i.nstates));
+    [t0, soln0] = ode15s(geq0, [0:5e3], init, odeset('NonNegative', 1:i.nstates));
 
     % Emergence of RR-TB
     %geq0b = @(t,in) goveqs_basis3(t, in, i, s, M0b, agg, sel, r0b, p0b);
@@ -57,7 +57,7 @@ else
 
     % Increased TPT and case-finding
     geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, [2015 2020; 2010 2020], i, s, p2, r2, prm, sel, agg);
-    [t1, soln1] = ode15s(geq1, [2010:2020], soln0(end,:), odeset('NonNegative',1:i.nstates));
+    [t1, soln1] = ode15s(geq1, [2010:2020], soln0(end,:), odeset('NonNegative', 1:i.nstates));
     
 %     allsol = [soln0; soln1(2:end,:)];
 %     allt   = [t0; t1(2:end)];
@@ -138,5 +138,5 @@ else
         % aux.M0         = M0;
     end
     
-    %keyboard;
+   %keyboard;
 end
