@@ -35,12 +35,6 @@ for ii = 1:size(xs,1)
     TPTcov = -log(1-0.25);
     ACFcov = -log(1-0.50);
 
-    % social protection
-    % ra1 = r0; pa1 = p0;
-    % ra1.TPT = TPTcov * [0 0 0 1];
-    % pa1.TPTeff = 0.6;
-    % Ma1 = make_model(pa1, ra1, i, s, gps, prm.contmat);    
-
     % TPT in recent migrants
     ra = r0; pa = p0;
     ra.TPT = TPTcov * [0 1 0 0];
@@ -49,30 +43,13 @@ for ii = 1:size(xs,1)
     
     % TPT at point of entry
     rb = ra; pb = pa;
-    pb.migrTPT = 1;
+    pb.migrTPT = 0.25;
     Mb = make_model(pb, rb, i, s, gps, prm.contmat);
-
-    % TPT in longer-term migrants
-    % rb1 = rb; pb1 = pb;
-    % pb1.TPT = TPTcov * [0 1 1 1];
-    % Mb1 = make_model(pb1, rb1, i, s, gps, prm.contmat);
-
-    % TPT in contacts
-    % rb2 = rb1; pb2 = pb1;
-    % rb2.progression  = rb2.progression * 0.9;
-    % rb2.reactivation = rb2.reactivation * 0.9;
-    % Mb2 = make_model(pb2, rb2, i, s, gps, prm.contmat);
 
     % TPT in vulnerables
     rc = rb; pc = pb;
     rc.TPT = TPTcov * [0 1 0 1];
     Mc = make_model(pc, rc, i, s, gps, prm.contmat);
-
-    % ACF in migrants and vulnerables
-    % rd = rc; pd = pc;
-    % rd.ACF  = ACFcov * [0 1 0 1];
-    % rd.ACF2 = rd.ACF;
-    % Md = make_model(pd, rd, i, s, gps, prm.contmat);
 
     % Reducing diagnostic delay
     re = rc; pe = pc;
@@ -80,55 +57,70 @@ for ii = 1:size(xs,1)
     re.TPT = TPTcov * [0 1 0 1];
     Me = make_model(pe, re, i, s, gps, prm.contmat);
 
-    % New action plan model starting from 2027 with full intervention
+    % Full intervention plan (`Mf`)
     rf = re; pf = pe;
-    rf.ACF = -log(1-0.7) * [1 1 1 1];
-    rf.TPT = -log(1-0.7) * [1 1 1 1];
+    rf.ACF = -log(1-0.99) * [1 1 1 1];
+    rf.TPT = -log(1-0.99) * [1 1 1 1];
+    pf.migrTPT = 0.99;
     Mf = make_model(pf, rf, i, s, gps, prm.contmat);
 
+    % New action plan (`Mg`) starting from 2030
     rg = re; pg = pe;
     rg.ACF = -log(1-0.99) * [1 1 1 1];
     rg.TPT = -log(1-0.99) * [1 1 1 1];
+    pg.migrTPT = 0.99;
     rg.TPTeff = 0.8;
-    pg.migrTPT = 1;
-    rg.relapse = rg.relapse / 2;
+    rg.relapse = rg.relapse/2;
+    rg.progression = rg.progression/2;
+    rg.reactivation = rg.reactivation/2;
     Mg = make_model(pg, rg, i, s, gps, prm.contmat);
 
-    % Run M0 and Me from 2022 to 2041 with scale-up period [2024 2027]
-    models = {M0, Me};    
-    scaleup_period = [2024 2027];
+    % Store models: baseline, initial intervention, action plan, and new action plan
+    models = {M0, Me, Mf, Mg};    
     
     for mi = 1:length(models)
-        % Define the ODE system for M0 and Me
-        geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pe, scaleup_period, agg, sel, r0);
-        [t, soln] = ode15s(geq, [2022:2041], init, opts);
-        
-        % Store incidence rates for M0 and Me
+        if mi == length(models)
+            % Run Mf up to 2030, then continue with Mg from 2030 onward
+            geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi-1}, p0, pf, [2024 2030], agg, sel, r0);
+            [t1, soln1] = ode15s(geq_mf, 2022:2030, init, opts);
+
+            % Final solution for Mf at 2030
+            init_final = soln1(end,:);
+
+            % Mg from 2030 onwards
+            geq_mg = @(t,in) goveqs_scaleup(t, in, i, s, models{mi-1}, models{mi}, p0, pg, [2030 2033], agg, sel, r0);
+            [t2, soln2] = ode15s(geq_mg, 2030:2041, init_final, opts);
+
+            % Combine the solutions
+            t = [t1; t2(2:end)];
+            soln = [soln1; soln2(2:end,:)];
+        elseif mi == length(models)-1
+            % For Mf, run Me up to 2027, then continue with Mf from 2027 onward
+            geq_me = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi-1}, p0, pe, [2024 2027], agg, sel, r0);
+            [t1, soln1] = ode15s(geq_me, 2022:2027, init, opts);
+
+            % Final solution for Me at 2027
+            init_final = soln1(end,:);
+
+            % Mf from 2027 onwards
+            geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, models{mi-1}, models{mi}, p0, pf, [2027 2030], agg, sel, r0);
+            [t2, soln2] = ode15s(geq_mf, 2027:2041, init_final, opts);
+
+            % Combine the solutions
+            t = [t1; t2(2:end,:)];
+            soln = [soln1; soln2(2:end,:)];
+        else
+            % Every other scenario remains the same
+            geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
+            [t, soln] = ode15s(geq, 2022:2041, init, opts);
+        end
+
+        endsolsto(mi,:) = soln(end,:);
+
         sdiff = diff(soln, [], 1);
         incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
+        mrtsto(:, ii, mi) = sdiff(:, i.aux.mort) * 1e5;
     end
-
-    % Extract the final state of Me at 2027 as the initial condition for Mf
-    idx_2027 = find(t == 2027, 1);
-    init_mf = soln(idx_2027, :);  % Final state at 2027 for Mf
-
-    % Run Mf from 2027 to 2041 with scale-up period [2027 2030]
-    geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, M0, Mf, pe, pf, [2027 2030], agg, sel, r0);
-    [t_mf, soln_mf] = ode15s(geq_mf, [2027:2041], init_mf, opts);
-
-    % Extract the final state of Mf at 2030 as the initial condition for Mg
-    idx_2030 = find(t_mf == 2030, 1);
-    init_mg = soln_mf(idx_2030, :);  % Final state at 2030 for Mg
-
-    % Run Mg from 2030 to 2041 with scale-up period [2030 2033]
-    geq_mg = @(t,in) goveqs_scaleup(t, in, i, s, M0, Mg, pf, pg, [2030 2033], agg, sel, r0);
-    [t_mg, soln_mg] = ode15s(geq_mg, [2030:2041], init_mg, opts);
-
-    % Concatenate results from Me (up to 2026), Mf (2027-2029), and Mg (2030 onward)
-    sdiff_me = sdiff(1:idx_2027-1, i.aux.inc(1));     % Results from Me up to 2026
-    sdiff_mf = diff(soln_mf(1:idx_2030, i.aux.inc(1)));  % Results from Mf from 2027 to 2029
-    sdiff_mg = diff(soln_mg(:, i.aux.inc(1)));        % Results from Mg from 2030 onward
-    incsto(:, ii, 4) = [sdiff_me; sdiff_mf; sdiff_mg] * 1e5;  % Concatenate and scale to 100,000
 end
 fprintf('\n');
 
@@ -145,15 +137,25 @@ ff = figure('Position', [577, 190, 1029, 732]);
 hold on;
 
 % Define colors and legend entries
-colors = lines(4);  % Increase to accommodate four models
-legendEntries = {'Baseline', 'UKHSA Action Plan', 'New Action Plan', 'Additional Plan Mg'};
+colors = lines(length(models));
+legendEntries = {'Baseline', 'UKHSA Action Plan', 'Full Intervention Plan', 'New Action Plan'};
 
 % Plot each model with shaded areas
-for mi = 1:4
+for mi = 1:length(models)
     % Extract the time series for the current model
     central_estimate_model = squeeze(central_estimate(:, 1, mi));
     lower_bound_model = squeeze(lower_bound(:, 1, mi));
     upper_bound_model = squeeze(upper_bound(:, 1, mi));
+    
+    if mi == length(models)
+        % For Mg, use Mf's estimates up to 2030
+        idx_2030 = find(years == 2030);
+        
+        % Use Mf's estimates up to 2030
+        central_estimate_model(1:idx_2030) = central_estimate(1:idx_2030, 1, mi-1);
+        lower_bound_model(1:idx_2030) = lower_bound(1:idx_2030, 1, mi-1);
+        upper_bound_model(1:idx_2030) = upper_bound(1:idx_2030, 1, mi-1);
+    end
 
     % Plot shaded area for 2.5th and 97.5th percentiles
     fill([years fliplr(years)], [lower_bound_model' fliplr(upper_bound_model')], ...
