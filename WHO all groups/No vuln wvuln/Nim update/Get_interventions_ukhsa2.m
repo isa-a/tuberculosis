@@ -13,7 +13,7 @@ if midpt
     xs = x0sto(2,:);
 else
     ix0 = size(xsto,1)/2;
-    nx  = 20;
+    nx  = 200;
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
@@ -61,7 +61,7 @@ for ii = 1:size(xs,1)
     % 2027
     rf = re; pf = pe;
     rf.ACF = -log(1-0.99) * [1 1 1 1];
-    rf.TPT = -log(1-0.99) * [1 1 1 1];
+    rf.TPT = -log(1-0.5) * [1 1 1 1];
     pf.migrTPT = 0.8;
     rf.progression(:,4) = rf.progression(:,4)/2;
     rf.reactivation(:,4) = rf.reactivation(:,4)/2;
