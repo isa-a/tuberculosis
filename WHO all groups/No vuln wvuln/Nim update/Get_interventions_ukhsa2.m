@@ -71,8 +71,8 @@ for ii = 1:size(xs,1)
     pg.migrTPT = 0.99;
     rg.TPTeff = 0.8;
     rg.relapse = rg.relapse/2;
-    rg.progression = rg.progression/2;
-    rg.reactivation = rg.reactivation/2;
+    rg.progression = rg.progression/4;
+    rg.reactivation = rg.reactivation/4; 
     Mg = make_model(pg, rg, i, s, gps, prm.contmat);
 
     % Store models: baseline, initial intervention, action plan, and new action plan
@@ -140,6 +140,9 @@ hold on;
 colors = lines(length(models));
 legendEntries = {'Baseline', 'UKHSA Action Plan', 'Full Intervention Plan', 'New Action Plan'};
 
+% Initialize an array to store plot handles for the legend
+plotHandles = gobjects(length(models),1);
+
 % Plot each model with shaded areas
 for mi = 1:length(models)
     % Extract the time series for the current model
@@ -158,19 +161,27 @@ for mi = 1:length(models)
     end
 
     % Plot shaded area for 2.5th and 97.5th percentiles
-    fill([years fliplr(years)], [lower_bound_model' fliplr(upper_bound_model')], ...
+    fillHandle = fill([years fliplr(years)], [lower_bound_model' fliplr(upper_bound_model')], ...
         colors(mi, :), 'FaceAlpha', 0.2, 'EdgeColor', 'none', 'HandleVisibility', 'off'); 
     
     % Plot central estimate curve
-    plot(years, central_estimate_model, 'LineWidth', 2, 'Color', colors(mi, :)); 
+    plotHandle = plot(years, central_estimate_model, 'LineWidth', 2, 'Color', colors(mi, :)); 
+    
+    % Store the plot handle for the legend
+    plotHandles(mi) = plotHandle;
+    
+    % Update the legend to include only the plotted models so far
+    legend(plotHandles(1:mi), legendEntries(1:mi), 'FontWeight', 'bold', 'FontSize', 12);
+    
+    % Set axis labels and limits (only need to set once, but harmless to set multiple times)
+    xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
+    ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
+    xlim([years(1) years(end)]);
+    ylim([0, 9]);
+    
+    % Pause execution and wait for the user to press a key
+    disp('Press the spacebar to display the next curve...');
+    pause;  % Waits for the user to press a key
 end
 
-% Set axis labels and legend
-xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
-ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
-xlim([years(1) years(end)]);
-ylim([0, 8]);
-legend(legendEntries, 'FontWeight', 'bold', 'FontSize', 12);
-
 hold off;
-
