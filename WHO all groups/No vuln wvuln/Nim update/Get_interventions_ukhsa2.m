@@ -13,7 +13,7 @@ if midpt
     xs = x0sto(2,:);
 else
     ix0 = size(xsto,1)/2;
-    nx  = 200;
+    nx  = 20;
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
@@ -54,8 +54,8 @@ for ii = 1:size(xs,1)
     %diag delay
     re = rc; pe = pc; 
     re.ACF = ACFcov * [1 0 0 0];
-    re.TPT = TPTcov * [0 1 0 1];
-    pe.migrTPT = 0.25; 
+%     re.TPT = TPTcov * [0 1 0 1];
+%     pe.migrTPT = 0.25; 
     Me = make_model(pe, re, i, s, gps, prm.contmat);
 
     % 2027
@@ -69,9 +69,9 @@ for ii = 1:size(xs,1)
 
     % 2030
     rg = rf; pg = pf;
-    rg.ACF = -log(1-0.99) * [1 1 1 1];
-    rg.TPT = -log(1-0.99) * [1 1 1 1];
-    pg.migrTPT = 0.8;
+%     rg.ACF = -log(1-0.99) * [1 1 1 1];
+%     rg.TPT = -log(1-0.5) * [1 1 1 1];
+%     pg.migrTPT = 0.8;
     rg.TPTeff = 0.8;
     rg.relapse = rg.relapse/2;
     rg.progression(2,:) = rg.progression(2,:)*0.6;
