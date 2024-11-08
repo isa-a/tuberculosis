@@ -14,7 +14,7 @@ r.reactivation   = [tmp*x(xi.p_relrate_factor); tmp];
 p.LTBI_in_migrad = x(xi.p_LTBI_in_migrad);
 p.LTBI_in_migrch = x(xi.p_LTBI_in_migrad)/x(xi.p_relLTBI_inmigr_advch);
 
-r.vuln           = x(xi.r_vuln_sc)/500;
+r.vuln           = x(xi.r_vuln_sc)/100;
 p.relbeta_vuln   = 1;
 
 r.ageing         = x(xi.r_ageing_sc)/10;

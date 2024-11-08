@@ -124,8 +124,8 @@ else
         aux.p_migrTB   = p_migrTB;
         aux.p_migrpopn = p_migrpopn;
         aux.p_LTBI_inmigr = p_LTBI_inmigr;
-%         aux.p_vulnpopn = p_vulnpopn;
-%         aux.p_vulnTB   = p_vulnTB;
+        aux.p_vulnpopn = p_vulnpopn;
+        aux.p_vulnTB   = p_vulnTB;
         aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
         aux.p_migrect_ch  = sum(sfin(intersect(s.migr_rect,[s.ch])))/sum(sfin(s.migr_rect));
         aux.nTPT       = n_TPT2019;

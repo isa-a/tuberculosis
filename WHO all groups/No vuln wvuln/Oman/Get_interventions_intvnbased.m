@@ -35,7 +35,7 @@ for ii = 1:size(xs,1)
 
     init = aux.soln(end,:);
 
-    [p0,r0] = allocate_parameters(xx,p,r,xi);
+    [p0,r0] = allocate_parameters(xx,p,r,prm,xi);
     r0.gamma = r0.gamma_2020;
     M0 = make_model(p0,r0,i,s,gps,prm.contmat);
     
