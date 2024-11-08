@@ -1,314 +1,199 @@
-clear all; load optim_res_MAIN.mat; load Model_setup;
-
-obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
-
-set1 = {'ds','rr'};
-set2 = {'dom','migr','vuln'};
-set3 = {'L','P','R','T'};
-[inci, incs, incd, lim] = get_addresses({set3, set2, set1}, [], [], [], 0);
-opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
-
-
-
-midpt = true; 
-if midpt
-    % inds = find(outsto==max(outsto));
-    % xs = xsto(inds(1),:);
-    xs = x0sto(2,:);
-else
-    ix0 = size(xsto,1)/2;
-    nx  = 200;
-    dx  = round(ix0/nx);
-    xs  = xsto(ix0:dx:end,:);
-end
-
+% Determine model iteration checkpoints
 mk = round(size(xs,1)/25);
+
+% Initialize result storage for each simulation run
+n_years = 2041 - 2022 + 1;  % Duration from 2022 to 2041
+num_models = 9;  % Total number of models: M0, Ma, Me, Mf1, Mf2, Mf3, Mg1, Mg2, Mg3
+incsto = nan(n_years, size(xs, 1), num_models);  % Initialize with NaN
+mrtsto = nan(n_years, size(xs, 1), num_models);  % Initialize with NaN
+endsolsto = nan(num_models, size(init, 2), size(xs, 1));  % Initialize endsolsto for each model and simulation
+
+% Loop through simulations
 for ii = 1:size(xs,1)
     
-    if mod(ii,mk)==0; fprintf('%0.5g ', ii/mk); end
+    if mod(ii, mk) == 0; fprintf('%0.5g ', ii/mk); end
     
     xx = xs(ii,:);
-    [out,aux] = obj(xx);
-    
-
+    [out, aux] = obj(xx);
     init = aux.soln(end,:);
 
-    [p0,r0] = allocate_parameters(xx,p,r,xi);
+    % Define parameters and initial model M0
+    [p0, r0] = allocate_parameters(xx, p, r, prm, xi);
     r0.gamma = r0.gamma_2020;
-    M0 = make_model(p0,r0,i,s,gps,prm.contmat);
-    
-    % ---------------------------------------------------------------------
-    % --- Model intervention
-    
-    TPTcov = -log(0.8); %TPTcov = 100;
-    ACFcov = -log(0.8); %ACFcov = 100;
+    M0 = make_model(p0, r0, i, s, gps, prm.contmat);
 
-    % TPT in recent migrants
+    % Define intervention parameters for each model
+    TPTcov = -log(1 - 0.25);
+    ACFcov = -log(1 - 0.50);
+
+    % Define all models with appropriate parameters
     ra = r0; pa = p0;
-    ra.TPT = TPTcov*[0 1 0 0];
-    Ma = make_model(pa,ra,i,s,gps,prm.contmat);
+    ra.TPT = TPTcov * [0 1 0 0];
+    ra.TPTeff = 0.6;
+    Ma = make_model(pa, ra, i, s, gps, prm.contmat);
+
+    re = ra; pe = pa; 
+    re.ACF = -log(1 - 0.99) * [1 1 1 1];
+    Me = make_model(pe, re, i, s, gps, prm.contmat);
+
+    rf1 = re; pf1 = pe;
+    rf1.ACF = -log(1 - 0.99) * [1 1 1 1];
+    rf1.TPT = -log(1 - 0.5) * [1 1 1 1];
+    Mf1 = make_model(pf1, rf1, i, s, gps, prm.contmat);
+
+    rf2 = rf1; pf2 = pf1;
+    pf2.migrTPT = 0.8;
+    Mf2 = make_model(pf2, rf2, i, s, gps, prm.contmat);
+
+    rf3 = rf2; pf3 = pf2;
+    rf3.progression(:, 4) = rf3.progression(:, 4) / 2;
+    rf3.reactivation(:, 4) = rf3.reactivation(:, 4) / 2;
+    Mf3 = make_model(pf3, rf3, i, s, gps, prm.contmat);
+
+    rg1 = rf3; pg1 = pf3;
+    rg1.TPTeff = 0.8;
+    Mg1 = make_model(pg1, rg1, i, s, gps, prm.contmat);
+
+    rg2 = rg1; pg2 = pg1;
+    rg2.relapse = rg2.relapse / 2;
+    Mg2 = make_model(pg2, rg2, i, s, gps, prm.contmat);
+
+    rg3 = rg2; pg3 = pg2;
+    rg3.progression(2, :) = rg3.progression(2, :) * 0.6;
+    rg3.reactivation(2, :) = rg3.reactivation(2, :) * 0.6;
+    Mg3 = make_model(pg3, rg3, i, s, gps, prm.contmat);
+
+    % Collect all models in array
+    models = {M0, Ma, Me, Mf1, Mf2, Mf3, Mg1, Mg2, Mg3};    
     
-    % TPT at point of entry
-    rb = ra; pb = pa;
-    pb.migrTPT = 1;
-    Mb = make_model(pb,rb,i,s,gps,prm.contmat);
-
-    % TPT in longer-term migrants
-    rb1 = rb; pb1 = pb;
-    pb1.TPT = TPTcov*[0 1 1 1];
-    Mb1 = make_model(pb1,rb1,i,s,gps,prm.contmat);
-
-    % TPT in contacts
-    rb2 = rb1; pb2 = pb1;
-    rb2.progression  = rb2.progression*0.9;
-    rb2.reactivation = rb2.reactivation*0.9;
-    Mb2 = make_model(pb2,rb2,i,s,gps,prm.contmat);
-
-    % TPT in vulnerables
-    rc = rb2; pc = pb2;
-    rc.TPT = TPTcov*[0 1 1 1];
-    Mc = make_model(pc,rc,i,s,gps,prm.contmat);
-
-    % ACF in migrants and vulnerables
-    rd = rc; pd = pc;
-    rd.ACF  = ACFcov*[0 1 0 1];
-    rd.ACF2 = rd.ACF;
-    Md = make_model(pd,rd,i,s,gps,prm.contmat);
-
-    % ACF in general population
-    re = rd; pe = pd;
-    re.ACF  = ACFcov*[1 1 1 1];
-    re.ACF2 = rd.ACF;
-    re.TPT  = TPTcov*[1 1 1 1];
-    Me = make_model(pe,re,i,s,gps,prm.contmat);
-    
-
-    models = {M0, Ma, Mb, Mb1, Mb2, Mc, Md, Me};    
+    % Run simulations with updated scale-up periods and bifurcation points
     for mi = 1:length(models)
-        
-        geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
-        [t,soln] = ode15s(geq, [2022:2041], init, opts);
-        
-        endsolsto(mi,:) = soln(end,:);
-        
-        sdiff = diff(soln,[],1);
-        incsto(:,ii,mi) = sdiff(:,i.aux.inc(1))*1e5;
+        if mi == 2  % Ma: 2024 to 2027
+            geq_ma = @(t, in) goveqs_scaleup(t, in, i, s, M0, Ma, p0, pa, [2024 2027], agg, sel, r0);
+            [t, soln] = ode15s(geq_ma, 2022:2041, init, opts);
 
-        % incstoRR(:,ii,mi) = sdiff(:,i.aux.inc(3))*1e5;
-        
-        % mat = sdiff(:,i.aux.incsources)*1e5;
-        % incsto2(:,ii,mi) = sum(mat(:,[incs.L,incs.R]),2);
-        % incsto2(:,ii,mi) = sum(mat(:,:),2);
+        elseif mi == 3  % Me: 2024 to 2027
+            geq_me = @(t, in) goveqs_scaleup(t, in, i, s, M0, Me, p0, pe, [2024 2027], agg, sel, r0);
+            [t, soln] = ode15s(geq_me, 2022:2041, init, opts);
 
-        mrtsto(:,ii,mi) = sdiff(:,i.aux.mort)*1e5;
-        
-        % Get proportions from different sources
-        vec = sdiff(end,i.aux.incsources)*1e5;
-        props(ii,:,mi) = vec/sum(vec);
-        vec1 = vec;
+        elseif mi >= 4 && mi <= 6  % Mf1, Mf2, Mf3: 2027 to 2030, bifurcating from Me
+            geq_me = @(t, in) goveqs_scaleup(t, in, i, s, M0, Me, p0, pe, [2024 2027], agg, sel, r0);
+            [t1, soln1] = ode15s(geq_me, 2022:2027, init, opts);
+            
+            % Select appropriate parameter set for each Mf model
+            if mi == 4
+                geq_mf = @(t, in) goveqs_scaleup(t, in, i, s, Me, Mf1, pe, pf1, [2027 2030], agg, sel, rf1);
+            elseif mi == 5
+                geq_mf = @(t, in) goveqs_scaleup(t, in, i, s, Me, Mf2, pe, pf2, [2027 2030], agg, sel, rf2);
+            elseif mi == 6
+                geq_mf = @(t, in) goveqs_scaleup(t, in, i, s, Me, Mf3, pe, pf3, [2027 2030], agg, sel, rf3);
+            end
+            [t2, soln2] = ode15s(geq_mf, 2027:2041, soln1(end, :), opts);
+
+            t = [t1; t2(2:end)];
+            soln = [soln1; soln2(2:end, :)];
+
+        elseif mi >= 7 && mi <= 9  % Mg1, Mg2, Mg3: 2030 to 2033, bifurcating from Mf3
+            geq_me = @(t, in) goveqs_scaleup(t, in, i, s, M0, Me, p0, pe, [2024 2027], agg, sel, r0);
+            [t1, soln1] = ode15s(geq_me, 2022:2027, init, opts);
+            
+            geq_mf = @(t, in) goveqs_scaleup(t, in, i, s, Me, Mf3, pe, pf3, [2027 2030], agg, sel, rf3);
+            [t2, soln2] = ode15s(geq_mf, 2027:2030, soln1(end, :), opts);
+
+            % Select appropriate parameter set for each Mg model
+            if mi == 7
+                geq_mg = @(t, in) goveqs_scaleup(t, in, i, s, Mf3, Mg1, pf3, pg1, [2030 2033], agg, sel, rg1);
+            elseif mi == 8
+                geq_mg = @(t, in) goveqs_scaleup(t, in, i, s, Mf3, Mg2, pf3, pg2, [2030 2033], agg, sel, rg2);
+            elseif mi == 9
+                geq_mg = @(t, in) goveqs_scaleup(t, in, i, s, Mf3, Mg3, pf3, pg3, [2030 2033], agg, sel, rg3);
+            end
+            [t3, soln3] = ode15s(geq_mg, 2030:2041, soln2(end, :), opts);
+
+            t = [t1; t2(2:end); t3(2:end)];
+            soln = [soln1; soln2(2:end, :); soln3(2:end, :)];
+        else
+            % Baseline model
+            geq = @(t, in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pe, [2024 2027], agg, sel, r0);
+            [t, soln] = ode15s(geq, 2022:2041, init, opts);
+        end
+
+        endsolsto(mi, :, ii) = soln(end, :);  % Store solutions with () indexing
+        sdiff = diff(soln, [], 1);
+        incsto(1:size(sdiff, 1), ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
+        mrtsto(1:size(sdiff, 1), ii, mi) = sdiff(:, i.aux.mort) * 1e5;
     end
 end
 fprintf('\n');
 
-figure; plot(squeeze(incsto)); yl = ylim; yl(1) = 0; ylim(yl);
-legend('Baseline','TPT, recent migrants','TPT, pre-entry','TPT, long-term migrants','TPT, contacts','TPT, vulnerables','ACF, migrants and vulnerables','ACF, general population');
+% Plotting
+% Define the years and calculate central estimates and percentiles
+% Plotting
+% Define the years and calculate central estimates and percentiles
+years = 2022:(2022 + size(incsto, 1) - 1);
+central_estimate = mean(incsto, 2, 'omitnan');              
+lower_bound = prctile(incsto, 2.5, 2);          
+upper_bound = prctile(incsto, 97.5, 2);          
 
-return;
+figure('Position', [577, 190, 1029, 732]); 
+hold on;
 
+% Plot styles
+baseline_color = [0 0 1];  
+ma_me_color = [1 0 0];  
+mf1_mf2_mf3_color = [1 0.5 0];  
+mg1_mg2_mg3_color = [0.5 0 0.5];
+solid_models = [1, 3, 6, 9];
+legendEntries = {'Baseline', 'maT', 'me', 'Mf1', 'Mf2', 'Mf3', 'Mg1', 'Mg2', 'Mg3'};
+plotHandles = gobjects(length(models),1);
 
-incmat   = permute(prctile(incsto,[2.5,50,97.5],2),[2,1,3]);
-incmat2  = permute(prctile(incsto2,[2.5,50,97.5],2),[2,1,3]);
-incmatRR = permute(prctile(incstoRR,[2.5,50,97.5],2),[2,1,3]);
-
-mrtmat = permute(prctile(mrtsto,[2.5,50,97.5],2),[2,1,3]);
-
-
-% -------------------------------------------------------------------------
-% --- Plot figure of incidence and mortality impacts ----------------------
-
-ff=figure('Position', [577,   190 ,   1029 ,732]); lw = 1.5; fs = 14;
-% allmat = cat(4,incmat,incmat2);
-allmat = cat(4,incmat,incmat2,incmatRR);
-
-cols = linspecer(size(allmat,3));
-cols1 = linspecer(size(mrtmat, 3));
-xx = [2022:2040];
-
-lgs = {'Baseline (continuation of existing TB services)','TPT, in-country migrants, 90% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in contacts','+ TPT in vulnerable population, 90% annually','+ Find and treat active TB in migrants and vulnerable', '+ TPT in general population, 90% annually'};
-
-
-plotopts = {'All incidence','RR incidence','Alternative incidence'};
-plotopt  = plotopts{1};
-
-
-
-
-if strcmp(plotopt, 'All incidence')
+% Plot each model
+for mi = 1:length(models)
+    central_estimate_model = squeeze(central_estimate(:,1,mi));
+    lower_bound_model = squeeze(lower_bound(:,1,mi));
+    upper_bound_model = squeeze(upper_bound(:,1,mi));
     
-    % --- Single incidence plot, showing one by one
-    hold on;
-    for ii = 1:size(allmat,3)
-        plt = allmat(:,:,ii,1);
-        lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-        %jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
-        
-        ylim([0 7.5]);
-        xlim([2022 2040]);
-        set(gca,'fontsize',fs);
-        
-        yline(1,'k--'); yline(0.1,'k--');
-        ylabel('Incidence rate per 100,000 population');
-        xlabel('Year');
-        
-        legend(lg,lgs(1:ii),'Location','Southwest');
-        pause;
+    % Determine plot color based on model
+    if mi == 1
+        plot_color = baseline_color; 
+    elseif ismember(mi, [2, 3])
+        plot_color = ma_me_color;
+    elseif ismember(mi, [4, 5, 6])
+        plot_color = mf1_mf2_mf3_color;
+    elseif ismember(mi, [7, 8, 9])
+        plot_color = mg1_mg2_mg3_color;
     end
     
-elseif strcmp(plotopt, 'RR incidence')
-    
-    % --- Incidence of RR-TB
-    hold on;
-    
-    selinds = [1:7];
-    allplt = squeeze(allmat(:,:,selinds,3));
-    lgsel  = lgs(selinds);
-
-    
-    cols(1,:) = [0.545, 0, 0]; % Dark Red for Baseline
-    cols(2,:) = [0, 0, 1]; % Blue for TPT, in-country migrants, 90% annually
-    cols(3,:) = [0, 0.75, 0]; % GREEN
-    
-    for ii = 1:size(allplt,3)
-        plt = allplt(:,:,ii);
-        if ii == 2
-            lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-        else
-            lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-        end
+    % If the model is one of the specified models, add shading
+    if ismember(mi, [1, 3, 6, 9])
+        % Create coordinates for the shaded area
+        x_shade = [years, fliplr(years)];
+        y_shade = [upper_bound_model', fliplr(lower_bound_model')];
         
-        xlim([2022 2040]);
-        set(gca,'fontsize',fs);
-        ylim([0.08 0.125])
-        yline(0.1,'k--');
-        ylabel('Incidence rate per 100,000 population');
-        %title('Additional coverage of TPT', 'FontWeight', 'bold');
-        xlabel('Year', 'FontWeight', 'bold');
-        set(gca, 'FontWeight', 'bold');
-        
-                
-        legend(lg,lgsel(1:ii),'Location','NorthEast');
+        % Plot the shaded area
+        fill_handle = fill(x_shade, y_shade, plot_color, 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+        uistack(fill_handle, 'bottom');  % Ensure shading is behind the lines
     end
     
-elseif strcmp(plotopt, 'Alternative incidence')
-    
-    % --- Two ways of counting
-    tis = {'All incidence','Incidence without treatment history'};
-    for is = 1:2
-        subplot(1,2,is); hold on;
-    
-        for ii = 1:size(allmat,3)
-            plt = allmat(:,:,ii,is);
-            lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-            jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
-        end
-        yl = ylim; yl(1) = 0; ylim(yl); ylims(is,:) = ylim;
-        xlim([2022 2040]);
-        set(gca,'fontsize',fs);
-    
-        title(tis{is});
-        
-        yline(1,'k--');
-        yline(0.1,'k--');
-    
+    % Determine line style
+    line_style = '-'; 
+    if ~ismember(mi, solid_models)
+        line_style = '--'; 
     end
-    subplot(1,2,2);
-    ylim(ylims(1,:));
     
-    % legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
-    legend(lg,'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually');
-    subplot(1,2,1);
-    ylabel('Rate per 100,000 population');
-
+    % Plot the central estimate line
+    plotHandle = plot(years, central_estimate_model, 'LineWidth', 2, 'Color', plot_color, 'LineStyle', line_style);
+    plotHandles(mi) = plotHandle;
 end
 
+% Finalize the plot
+legend(plotHandles, legendEntries, 'FontWeight', 'bold', 'FontSize', 12);
+xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
+ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
+xlim([years(1) 2040]);
+ylim([0, 9]);
+yline(1, 'k--', 'LineWidth', 2, 'HandleVisibility', 'off');
+yline(0.1, 'k--', 'LineWidth', 2, 'HandleVisibility', 'off');
 
+hold off;
 
-
-
-
-
-
-
-
-
-
-
-return;
-
-tis = {'All incidence','Incidence without treatment history'};
-for is = 1:2
-    subplot(1,2,is); hold on;
-
-    for ii = 1:size(allmat,3)
-        plt = allmat(:,:,ii,is);
-        lg(ii,:) = plot(xx, plt(2,:), 'Color', cols(ii,:), 'linewidth', lw); hold on;
-        jbfill(xx, plt(3,:), plt(1,:), cols(ii,:), 'None', 1, 0.1); hold on;
-    end
-    yl = ylim; yl(1) = 0; ylim(yl); ylims(is,:) = ylim;
-    xlim([2022 2040]);
-    set(gca,'fontsize',fs);
-
-    title(tis{is});
-
-    yline(1,'k--');
-    yline(0.1,'k--');
-
-end
-subplot(1,2,2);
-ylim(ylims(1,:));
-
-% legend(lg, 'Baseline','TPT, recent migrants','+ Case-finding, active TB','+ TPT, new migrants (hypothetical)','+ TPT, domestic (hypothetical)', 'Elimination target','location','SouthWest');
-legend(lg,'Baseline','TPT, in-country migrants, 50% annually','+ TPT in 100% of migrants, pre-arrival','+ TPT in vulnerable population, 50% annually','+ ACF in migrants and vulnerable', '+ TPT in general population, 50% annually');
-subplot(1,2,1);
-ylabel('Rate per 100,000 population');
-
-
-% --- Find remaining sources of incidence
-vec = squeeze(props(end,:,end));
-tmp  = abs(vec)/sum(abs(vec));
-tmp2 = sortrows([tmp; 1:length(tmp)]',-1);
-
-lbls = {}; ind = 1;
-set1 = {'ds','rr'};
-set2 = {'dom','migr','vuln'};
-set3 = {'L','P','R','T'};
-for is3 = 1:length(set3)
-    for is2 = 1:length(set2)
-        for is1 = 1:length(set1)
-            lbls{ind} = [set1{is1}, ' ', set2{is2}, ' ', set3{is3}];
-            ind = ind+1;
-        end
-    end
-end
-
-inds = tmp2(1:6,2)'
-tmp2(1:6,1)'
-lbls(inds)
-
-
-
-
-
-return;
-
-% -------------------------------------------------------------------------
-% --- Plot figure of incidence components as of 2030 ----------------------
-
-tmp1 = reshape(props(:,:,end),3,5);                                        % Dims: 1.Dom/migr_rect/migr_long, 2.Lf,Pf,Ls,Ps,R
-tmp2 = [tmp1(1,:); sum([tmp1(2,:); tmp1(3,:)],1)];                         % Dims: 1.Dom/all migr, 2.Lf,Pf,Ls,Ps,R
-tmp3 = [sum(tmp2(:,[1,3]),2), sum(tmp2(:,[2,4]),2), tmp2(:,end)];          % Dims: 1.Dom/all migr, 2.All L, All P, R
-tmp4 = [tmp3(1,:), tmp3(2,:)];
-labels = {'UK-born without treatment history', 'UK-born after TPT', 'UK-born after TB Rx', 'Migrants without treatment history', 'Migrants after TPT', 'Migrants after TB Rx'};
-figure; pie(tmp4);
-legend(labels,'Location','NorthWest','Orientation','vertical');
-title('Sources of incidence in 2035 with all interventions combined')
