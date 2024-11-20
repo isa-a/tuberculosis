@@ -8,7 +8,7 @@ states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
 gps.born    = {'dom','migr_rect','migr_long','vuln'};
 gps.strains = {'ds'};
-gps.hiv     = {'pos'};                                                      % negative group might not be needed here right?
+gps.hiv     = {'neg', 'pos', 'art'};                                                      % negative group might not be needed here right, instead ART?
 
 [i, s, d, lim] = get_addresses({states1, gps.age, gps.born}, [], [], [], 0);
 [i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains, gps.hiv}, i, s, d, lim);
@@ -19,7 +19,7 @@ s.allI       = [s.I, s.I2];
 % s.migrstates = [i.U.migr_rect, i.Lf.migr_rect, i.Ls.migr_rect, i.Pf.migr_rect, i.Ps.migr_rect];
 s.migrstates = intersect([s.U, s.Lf, s.Ls, s.Pf, s.Ps],s.migr_rect);
 s.infectious = [s.allI, (s.Tx)];
-s.hiv        = [s.allI, s.pos];                                             % this would be hiv with tb
+s.hiv        = [s.allI, intersect(s.pos,s.art)];                                             % this would be hiv with tb
 
 
 % Include the auxiliaries
@@ -50,14 +50,21 @@ tmp(s.allI,:) = 1;
 % Remove transitions due to changing migrant status
 tmp(s.migr_rect, s.migr_long) = 0;
 tmp(s.migr_long, s.migr_rect) = 0;
-% Remove transitions due to changing drug resistance status
 
 % Remove transitions due to change in vulnerability status
 tmp(s.dom, s.vuln) = 0;
 tmp(s.vuln, s.dom) = 0;
+
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
+
+% Remove transitions due to change in HIV status
+tmp(s.neg, s.pos) = 0;
+tmp(s.pos, s.neg) = 0;
+tmp(s.pos, s.art) = 0;
+tmp(s.art, s.pos) = 0;
+
 sel.inc = tmp - diag(diag(tmp));
 
 
@@ -73,7 +80,7 @@ sel.inc = tmp - diag(diag(tmp));
 set1 = {s.dom, s.migr, s.vuln};
 % set1 = {s.dom, s.migr};
 set2 = {s.ds};
-set3 = {s.pos};
+set3 = {s.neg, s.pos, s.art};
 
 tmp  = zeros(length(set1)*length(set2)*length(set3),i.nstates);
 row  = 1;
@@ -131,6 +138,11 @@ tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
+% Remove transitions due to change in HIV status
+tmp(s.neg, s.pos) = 0;
+tmp(s.pos, s.neg) = 0;
+tmp(s.pos, s.art) = 0;
+tmp(s.art, s.pos) = 0;
 sel.ch_notifs = tmp - diag(diag(tmp));
 
 
@@ -220,6 +232,7 @@ prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
 prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];
+prm.contmat_hiv  = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];                   %hiv contact matrix - placeholder values
 
 prm.contmat      = zeros(6, 6);
 % go through each element

@@ -165,6 +165,12 @@ destins = s.ad;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + r.ageing;
 
+% Transition from HIV positive onto art
+sources = s.pos;
+destins = s.art;
+inds = sub2ind([i.nstates, i.nstates], destins, sources);
+m(inds) = m(inds) + r.HIVprog;    
+
 M.lin = sparse(m - diag(sum(m,1)));
 
 
