@@ -192,7 +192,7 @@ for ia = 1:length(gps.age)
                 hiv = gps.hiv{ih};
     
                 m = zeros(i.nstates);
-                susinds = intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born));
+                susinds = intersect(intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born)), s.(hiv));
                 m(i.Lf.(age).(born).(strain).(hiv), susinds) = 1;
                 
                 imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
@@ -257,12 +257,12 @@ M.migrentries = sparse(m);
 getinds = @(st1, st2, st3) intersect(intersect(intersect(s.infectious, s.(st1)), s.(st2)), s.(st3));
 contmat(end,end) = contmat(end,end);
 
-m = zeros(6,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
+m = zeros(18,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
                                                                             % no RR Rows: 1.Dom DS 2.Migr DS 3.Vuln DS   
 % for ii = 1:6
 %     m(ii,getinds('ch', 'dom', 'ds')) = contmat(ii,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS
 %     m(ii,getinds('ad', 'dom', 'ds')) = contmat(ii,2);
-%     m(ii,getinds('ch', 'migr','ds')) = contmat(ii,3);
+%     m(ii,getinds('ch', 'migr','ds')) = contmat(ii,3);                     % Rows  with HIV: SEE GOV EQS BASIS                          
 %     m(ii,getinds('ad', 'migr','ds')) = contmat(ii,4);
 %     m(ii,getinds('ch', 'vuln','ds')) = contmat(ii,5);
 %     m(ii,getinds('ad', 'vuln','ds')) = contmat(ii,6);
@@ -360,7 +360,7 @@ m = m*r.beta;
 M.lam = sparse(m);
 
 % Additional matrix to help keep track of numbers in each group 
-m = zeros(6,i.nstates);
+m = zeros(6,i.nstates);                                                     % does this need to change also?
 m(1, intersect(s.ch, s.dom))  = 1;  
 m(2, intersect(s.ad, s.dom))  = 1; 
 m(3, intersect(s.ch, s.migr)) = 1; 

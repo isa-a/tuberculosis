@@ -23,16 +23,22 @@ r.ageing         = x(xi.r_ageing_sc)/10;
 tmp_c = prm.contmat_age;
 prm.contmat_age = [tmp_c(1, :) * x(xi.contmat_factor); tmp_c(2, :)];
 
-prm.contmat = zeros(4, 4); % Adjust size if needed
-for age_row = 1:2 % rows in age
-    for age_col = 1:2 % cols in age
-        for born_row = 1:3 % rows in born
-            for born_col = 1:3 % cols in born
-                % Calculate position in combined matrix
-                row = (born_row - 1) * 2 + age_row;
-                col = (born_col - 1) * 2 + age_col;
-                % Multiply
-                prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col);
+prm.contmat      = zeros(18, 18);
+% go through each element
+for age_row = 1:2                                                           % rows in age
+    for age_col = 1:2                                                       % cols in age
+        for born_row = 1:3                                                  % rows in born
+            for born_col = 1:3                                              % cols in born
+                for hiv_row = 1:3
+                    for hiv_col = 1:3
+                        % calc position in combined matrix
+                        row = (born_row-1)*6 + (age_row-1)*3 + hiv_row;                            % correctly scale current rows into new matrix
+                        col = (born_col-1)*6 + (age_col-1)*3 + hiv_col;                            % correctly scale current cols into new matrix
+                        % multiply
+                        prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col) * ...
+                                                prm.contmat_hiv(hiv_row, hiv_col);
+                    end
+                end
             end
         end
     end
