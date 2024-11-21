@@ -101,7 +101,7 @@ for ia = 1:length(gps.age)
                 % Relapse
                 sources = [Rlo Rhi R];
                 destin  = I2;
-                rates   = r.relapse;
+                rates   = r.relapse;                                        % would HIV positve group relapse faster?
                 m(destin, sources) = m(destin, sources) + rates;
         
                 % Stabilisation of relapse risk
@@ -165,11 +165,17 @@ destins = s.ad;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + r.ageing;
 
-% Transition from HIV positive onto art
+% Transition from HIV negative to positive, not on art
+sources = s.neg;
+destins = s.pos;
+inds = sub2ind([i.nstates, i.nstates], destins, sources);
+m(inds) = m(inds) + r.HIVincd;    
+
+% Transition from HIV positive, to being on ART
 sources = s.pos;
 destins = s.art;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
-m(inds) = m(inds) + r.HIVprog;    
+m(inds) = m(inds) + r.ART;    
 
 M.lin = sparse(m - diag(sum(m,1)));
 
@@ -182,15 +188,18 @@ for ia = 1:length(gps.age)
         strain = gps.strains{is};
         for ib = 1:length(gps.born)
             born = gps.born{ib};
+            for ih = 1:length(gps.hiv)
+                hiv = gps.hiv{ih};
     
-            m = zeros(i.nstates);
-            susinds = intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born));
-            m(i.Lf.(age).(born).(strain), susinds) = 1;
-            
-            imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
-            m(:,imminds) = m(:,imminds)*(1-p.imm);
-            
-            M.nlin.(age).(born).(strain) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
+                m = zeros(i.nstates);
+                susinds = intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born));
+                m(i.Lf.(age).(born).(strain).(hiv), susinds) = 1;
+                
+                imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
+                m(:,imminds) = m(:,imminds)*(1-p.imm);
+                
+                M.nlin.(age).(born).(strain).(hiv) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
+            end
         end
     end
 end
@@ -368,6 +377,8 @@ m(s.ad,1)         = 1/72;
 %m(:,1)            = 1/83;
 m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
+m(s.pos,1)        = r.muHIV;                                                 %set free for now
+m(s.hiv,1)        = r.muHIVTB;                                                 %mortality for people with tb and HIV (incl. on art)
 M.mort            = sparse(m);
 
 % --- Mortality -----------------------------------------------------------

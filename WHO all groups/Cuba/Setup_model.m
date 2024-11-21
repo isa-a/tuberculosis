@@ -8,7 +8,7 @@ states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
 gps.born    = {'dom','migr_rect','migr_long','vuln'};
 gps.strains = {'ds'};
-gps.hiv     = {'neg', 'pos', 'art'};                                                      % negative group might not be needed here right, instead ART?
+gps.hiv     = {'neg', 'pos', 'art'};                                       
 
 [i, s, d, lim] = get_addresses({states1, gps.age, gps.born}, [], [], [], 0);
 [i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains, gps.hiv}, i, s, d, lim);
@@ -179,6 +179,8 @@ r.ACF2         = [0 0 0 0];
 p.migrect_popn = 0.0419;
 r.migr         = 0.0847;                                                   % https://doi.org/10.1007/s44197-022-00040-w
 
+r.HIVincd      = 0;                                                       % HIV incidence placeholder
+r.ART          = 0;                                                       % uptake of ART
 % p.LTBI_in_migrad = 0.17;
 % p.LTBI_in_migrch = 0.03;
 
@@ -234,21 +236,27 @@ prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
 prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];
 prm.contmat_hiv  = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];                   %hiv contact matrix - placeholder values
 
-prm.contmat      = zeros(6, 6);
+prm.contmat      = zeros(18, 18);
 % go through each element
 for age_row = 1:2                                                           % rows in age
     for age_col = 1:2                                                       % cols in age
         for born_row = 1:3                                                  % rows in born
             for born_col = 1:3                                              % cols in born
-                % calc position in combined matrix
-                row = (born_row-1)*2 + age_row;                             % correctly scale current rows into new matrix
-                col = (born_col-1)*2 + age_col;                             % correctly scale current cols into new matrix
-                % multiply
-                prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col);
+                for hiv_row = 1:3
+                    for hiv_col = 1:3
+                        % calc position in combined matrix
+                        row = (born_row-1)*6 + (age_row-1)*3 + hiv_row;                            % correctly scale current rows into new matrix
+                        col = (born_col-1)*6 + (age_col-1)*3 + hiv_col;                            % correctly scale current cols into new matrix
+                        % multiply
+                        prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col) * ...
+                                                prm.contmat_hiv(hiv_row, hiv_col);
+                    end
+                end
             end
         end
     end
 end
+
 
 
 
