@@ -21,7 +21,7 @@ s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    4,          12,     1,     1,           1];
+lgths = [    5,          12,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -34,7 +34,7 @@ i.nx = lim;
 % --- Set up selectors and aggregators
 
 % --- Incidence
-tmp = zeros(4,i.nstates); 
+tmp = zeros(5,i.nstates); 
 tmp(1,s.allI) = 1;
 tmp(2,intersect(s.allI,s.migr)) = 1;
 tmp(3,intersect(s.allI,s.vuln)) = 1;
@@ -186,7 +186,7 @@ r.migr         = 0.0847;                                                   % htt
 % lgths =      [1,      1,      2,                  1,          2,                  1,        1,         1,                 1];
 
 names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'ageing_ad2el'};      
-lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1];
+lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1,                           1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -272,9 +272,10 @@ data.p_vulnTB       = [5 7 9]/100;                                          % Pr
 data.nTPT2019       = 1.3*[0.9 1 1.1];                                      % Number of TPT initiations in 2019, per 10^5 population
 %data.incd_ch2020    = [0.05 0.11 0.16];                                    % incidence in children
 data.propincd_ch    = [0.006 0.014 0.025];
-data.p_chpopn       = [0.188 0.2284 0.29];                                    % proportion of country thats children
-data.p_adpopn       = [0.675 0.7716 0.8275];                                  % proportion of country thats adults
-data.ch_notifs      = [410 450 490]/90608707*1e5;                             % notifications in the country  
+data.p_chpopn       = [0.188 0.224 0.29];                                    % proportion of country thats children
+data.p_adpopn       = [0.675 0.694 0.8275];                                  % proportion of country thats adults
+data.p_elpopn       = [0.675 0.082 0.8275];                                  % proportion of country thats elderly
+data.ch_notifs      = [410 450 490]/91567738*1e5;                             % notifications in the country  
 % data.vuln_prev      = [10 12 14]/100;                                     
 % data.vuln_relrisk   = [2 3 4];                                         
 
@@ -293,7 +294,8 @@ f7  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
 f9  = get_distribution_fns(data.propincd_ch,'beta', show);
 f10  = get_distribution_fns(data.p_chpopn,  'beta',    show);
 f11  = get_distribution_fns(data.p_adpopn,  'beta',    show);
-f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
+f12  = get_distribution_fns(data.p_elpopn,  'beta',    show);
+f13  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
 % f13  = get_distribution_fns(data.vuln_prev, 'beta', show);
 % f14  = get_distribution_fns(data.vuln_relrisk, 'lognorm', show);
 

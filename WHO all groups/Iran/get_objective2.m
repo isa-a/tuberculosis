@@ -98,6 +98,9 @@ else
     % Proportion of population thats adults
     p_adpopn = sum(sfin(s.ad))/sum(sfin(1:i.nstates));
 
+    % Proportion of population thats elderly
+    p_elpopn = sum(sfin(s.el))/sum(sfin(1:i.nstates));
+
     % Notifications
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
 
@@ -132,10 +135,11 @@ else
         aux.propincd_ch = propincd_ch;
         aux.chpopn     = p_chpopn;
         aux.adpopn     = p_adpopn;
+        p_elpopn       = p_elpopn;
         aux.ch_notifs  = ch_notifs;
 %         aux.vuln_prev  = vuln_prev;
 %         aux.vuln_relrisk    = vuln_relrisk;
-        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs];
+        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, p_elpopn, ch_notifs];
     else
         out = -Inf;
         aux = NaN;
