@@ -10,7 +10,7 @@ gps.born    = {'dom','migr_rect','migr_long','vuln'};
 gps.strains = {'ds'};
 gps.hiv     = {'neg', 'pos', 'art'};                                       
 
-[i, s, d, lim] = get_addresses({states1, gps.age, gps.born}, [], [], [], 0);
+[i, s, d, lim] = get_addresses({states1, gps.age, gps.born, gps.hiv}, [], [], [], 0);
 [i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains, gps.hiv}, i, s, d, lim);
 d = char(d);
 
@@ -42,7 +42,7 @@ tmp(1,s.allI) = 1;
 tmp(2,intersect(s.allI, s.migr)) = 1;
 tmp(3,intersect(s.allI, s.vuln)) = 1;
 tmp(4,intersect(s.allI, s.ch))   = 1;
-tmp(5,intersect(s.allI, s.pos))  = 1;
+tmp(5,intersect(s.allI, [s.pos, s.art]))  = 1;
 agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);
@@ -199,8 +199,8 @@ r.ART          = 0;                                                       % upta
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
 % lgths =      [1,      1,      2,                  1,          2,                  1,        1,         1,                 1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor'};      
-lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor'};      
+lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -227,6 +227,10 @@ bds(xi.r_ageing_sc,:)            = [0 1];
 %bds(xi.ch_mort,:)          = [0, 0.01];
 bds(xi.p_relrate_factor,:) = [1, 10];
 bds(xi.contmat_factor,:)    = [0, 1];
+bds(xi.HIVincdpeak,:)    = [0, 10];
+bds(xi.HIVincdnow,:)    = [0, 10];
+bds(xi.r_ARTnow,:)    = [0, 1];
+bds(xi.HIVfactor,:)   = [1, 50];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
@@ -236,22 +240,20 @@ prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
 prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];
 prm.contmat_hiv  = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];                   %hiv contact matrix - placeholder values
 
-prm.contmat      = zeros(18, 18);
+prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
+prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];
+
+prm.contmat      = zeros(6, 6);
 % go through each element
 for age_row = 1:2                                                           % rows in age
     for age_col = 1:2                                                       % cols in age
         for born_row = 1:3                                                  % rows in born
             for born_col = 1:3                                              % cols in born
-                for hiv_row = 1:3
-                    for hiv_col = 1:3
-                        % calc position in combined matrix
-                        row = (born_row-1)*6 + (age_row-1)*3 + hiv_row;                            % correctly scale current rows into new matrix
-                        col = (born_col-1)*6 + (age_col-1)*3 + hiv_col;                            % correctly scale current cols into new matrix
-                        % multiply
-                        prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col) * ...
-                                                prm.contmat_hiv(hiv_row, hiv_col);
-                    end
-                end
+                % calc position in combined matrix
+                row = (born_row-1)*2 + age_row;                             % correctly scale current rows into new matrix
+                col = (born_col-1)*2 + age_col;                             % correctly scale current cols into new matrix
+                % multiply
+                prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col);
             end
         end
     end
@@ -295,6 +297,8 @@ data.propincd_ch    = [0.006 0.014 0.025];
 data.p_chpopn       = [0.188 0.2284 0.29];                                    % proportion of country thats children
 data.p_adpopn       = [0.675 0.7716 0.8275];                                  % proportion of country thats adults
 data.ch_notifs      = [410 450 490]/90608707*1e5;                             % notifications in the country  
+data.HIVincdpeak    = [19 23 27];                                           % hiv incd peak in cuba - 2010  - unaids
+data.HIVincdnow     = [13 18 22];                                           % hiv incd  in cuba - 2022  - unaids
 % data.vuln_prev      = [10 12 14]/100;                                     
 % data.vuln_relrisk   = [2 3 4];                                         
 
