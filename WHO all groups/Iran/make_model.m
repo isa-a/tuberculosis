@@ -161,6 +161,11 @@ destins = s.ad;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + r.ageing;
 
+sources = s.ad;
+destins = s.el;
+inds = sub2ind([i.nstates, i.nstates], destins, sources);
+m(inds) = m(inds) + r.ageing_ad2el;
+
 M.lin = sparse(m - diag(sum(m,1)));
 
 
@@ -189,6 +194,7 @@ end
 
 getindsch = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(st2)),s.ch);
 getindsad = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(st2)),s.ad);
+getindsel = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(st2)),s.el);
 m = zeros(i.nstates,1);
 
 m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch)*p.ch_in_migr;
@@ -238,7 +244,7 @@ M.migrentries = sparse(m);
 getinds = @(st1, st2, st3) intersect(intersect(intersect(s.infectious, s.(st1)), s.(st2)), s.(st3));
 contmat(end,end) = contmat(end,end);
 
-m = zeros(6,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
+m = zeros(9,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
                                                                             % no RR Rows: 1.Dom DS 2.Migr DS 3.Vuln DS   
 % for ii = 1:6
 %     m(ii,getinds('ch', 'dom', 'ds')) = contmat(ii,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS
@@ -250,11 +256,94 @@ m = zeros(6,i.nstates);                                                   % Rows
 % end
 
 m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
-m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  
-m(1,getinds('ch', 'migr','ds')) = contmat(1,3);
-m(1,getinds('ad', 'migr','ds')) = contmat(1,4);
-m(1,getinds('ch', 'vuln','ds')) = contmat(1,5);
-m(1,getinds('ad', 'vuln','ds')) = contmat(1,6);
+m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);   
+m(1,getinds('el', 'dom', 'ds')) = contmat(1,3); 
+m(1,getinds('ch', 'migr','ds')) = contmat(1,4);
+m(1,getinds('ad', 'migr','ds')) = contmat(1,5);
+m(1,getinds('el', 'migr','ds')) = contmat(1,6);
+m(1,getinds('ch', 'vuln','ds')) = contmat(1,7);
+m(1,getinds('ad', 'vuln','ds')) = contmat(1,8);
+m(1,getinds('el', 'vuln','ds')) = contmat(1,9);
+
+m(2,getinds('ch', 'dom', 'ds')) = contmat(2,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(2,getinds('ad', 'dom', 'ds')) = contmat(2,2);   
+m(2,getinds('el', 'dom', 'ds')) = contmat(2,3); 
+m(2,getinds('ch', 'migr','ds')) = contmat(2,4);
+m(2,getinds('ad', 'migr','ds')) = contmat(2,5);
+m(2,getinds('el', 'migr','ds')) = contmat(2,6);
+m(2,getinds('ch', 'vuln','ds')) = contmat(2,7);
+m(2,getinds('ad', 'vuln','ds')) = contmat(2,8);
+m(2,getinds('el', 'vuln','ds')) = contmat(2,9);
+
+m(3,getinds('ch', 'dom', 'ds')) = contmat(3,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(3,getinds('ad', 'dom', 'ds')) = contmat(3,2);   
+m(3,getinds('el', 'dom', 'ds')) = contmat(3,3); 
+m(3,getinds('ch', 'migr','ds')) = contmat(3,4);
+m(3,getinds('ad', 'migr','ds')) = contmat(3,5);
+m(3,getinds('el', 'migr','ds')) = contmat(3,6);
+m(3,getinds('ch', 'vuln','ds')) = contmat(3,7);
+m(3,getinds('ad', 'vuln','ds')) = contmat(3,8);
+m(3,getinds('el', 'vuln','ds')) = contmat(3,9);
+
+m(4,getinds('ch', 'dom', 'ds')) = contmat(4,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(4,getinds('ad', 'dom', 'ds')) = contmat(4,2);   
+m(4,getinds('el', 'dom', 'ds')) = contmat(4,3); 
+m(4,getinds('ch', 'migr','ds')) = contmat(4,4);
+m(4,getinds('ad', 'migr','ds')) = contmat(4,5);
+m(4,getinds('el', 'migr','ds')) = contmat(4,6);
+m(4,getinds('ch', 'vuln','ds')) = contmat(4,7);
+m(4,getinds('ad', 'vuln','ds')) = contmat(4,8);
+m(4,getinds('el', 'vuln','ds')) = contmat(4,9);
+
+m(5,getinds('ch', 'dom', 'ds')) = contmat(5,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(5,getinds('ad', 'dom', 'ds')) = contmat(5,2);   
+m(5,getinds('el', 'dom', 'ds')) = contmat(5,3); 
+m(5,getinds('ch', 'migr','ds')) = contmat(5,4);
+m(5,getinds('ad', 'migr','ds')) = contmat(5,5);
+m(5,getinds('el', 'migr','ds')) = contmat(5,6);
+m(5,getinds('ch', 'vuln','ds')) = contmat(5,7);
+m(5,getinds('ad', 'vuln','ds')) = contmat(5,8);
+m(5,getinds('el', 'vuln','ds')) = contmat(5,9);
+
+m(6,getinds('ch', 'dom', 'ds')) = contmat(6,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(6,getinds('ad', 'dom', 'ds')) = contmat(6,2);   
+m(6,getinds('el', 'dom', 'ds')) = contmat(6,3); 
+m(6,getinds('ch', 'migr','ds')) = contmat(6,4);
+m(6,getinds('ad', 'migr','ds')) = contmat(6,5);
+m(6,getinds('el', 'migr','ds')) = contmat(6,6);
+m(6,getinds('ch', 'vuln','ds')) = contmat(6,7);
+m(6,getinds('ad', 'vuln','ds')) = contmat(6,8);
+m(6,getinds('el', 'vuln','ds')) = contmat(6,9);
+
+m(7,getinds('ch', 'dom', 'ds')) = contmat(7,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(7,getinds('ad', 'dom', 'ds')) = contmat(7,2);   
+m(7,getinds('el', 'dom', 'ds')) = contmat(7,3); 
+m(7,getinds('ch', 'migr','ds')) = contmat(7,4);
+m(7,getinds('ad', 'migr','ds')) = contmat(7,5);
+m(7,getinds('el', 'migr','ds')) = contmat(7,6);
+m(7,getinds('ch', 'vuln','ds')) = contmat(7,7);
+m(7,getinds('ad', 'vuln','ds')) = contmat(7,8);
+m(7,getinds('el', 'vuln','ds')) = contmat(7,9);
+
+m(8,getinds('ch', 'dom', 'ds')) = contmat(8,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(8,getinds('ad', 'dom', 'ds')) = contmat(8,2);   
+m(8,getinds('el', 'dom', 'ds')) = contmat(8,3); 
+m(8,getinds('ch', 'migr','ds')) = contmat(8,4);
+m(8,getinds('ad', 'migr','ds')) = contmat(8,5);
+m(8,getinds('el', 'migr','ds')) = contmat(8,6);
+m(8,getinds('ch', 'vuln','ds')) = contmat(8,7);
+m(8,getinds('ad', 'vuln','ds')) = contmat(8,8);
+m(8,getinds('el', 'vuln','ds')) = contmat(8,9);
+
+m(9,getinds('ch', 'dom', 'ds')) = contmat(9,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(9,getinds('ad', 'dom', 'ds')) = contmat(9,2);   
+m(9,getinds('el', 'dom', 'ds')) = contmat(9,3); 
+m(9,getinds('ch', 'migr','ds')) = contmat(9,4);
+m(9,getinds('ad', 'migr','ds')) = contmat(9,5);
+m(9,getinds('el', 'migr','ds')) = contmat(9,6);
+m(9,getinds('ch', 'vuln','ds')) = contmat(9,7);
+m(9,getinds('ad', 'vuln','ds')) = contmat(9,8);
+m(9,getinds('el', 'vuln','ds')) = contmat(9,9);
 
 % m(2,getinds('ch', 'dom', 'rr')) = contmat(1,1);
 % m(2,getinds('ad', 'dom','rr')) = contmat(1,2);
@@ -263,75 +352,75 @@ m(1,getinds('ad', 'vuln','ds')) = contmat(1,6);
 % m(2,getinds('ch', 'vuln','rr')) = contmat(1,5);
 % m(2,getinds('ad', 'vuln','rr')) = contmat(1,6);
 
-m(2,getinds('ch', 'dom', 'ds')) = contmat(2,1);
-m(2,getinds('ad', 'dom','ds')) = contmat(2,2);
-m(2,getinds('ch', 'migr','ds')) = contmat(2,3);
-m(2,getinds('ad', 'migr','ds')) = contmat(2,4);
-m(2,getinds('ch', 'vuln','ds')) = contmat(2,5);
-m(2,getinds('ad', 'vuln','ds')) = contmat(2,6);
-
-% m(4,getinds('ch', 'dom', 'rr')) = contmat(2,1);
-% m(4,getinds('ad', 'dom','rr')) = contmat(2,2);
-% m(4,getinds('ch', 'migr','rr')) = contmat(2,3);
-% m(4,getinds('ad', 'migr','rr')) = contmat(2,4);
-% m(4,getinds('ch', 'vuln','rr')) = contmat(2,5);
-% m(4,getinds('ad', 'vuln','rr')) = contmat(2,6);
-
-m(3,getinds('ch', 'dom', 'ds')) = contmat(3,1);
-m(3,getinds('ad', 'dom','ds')) = contmat(3,2);
-m(3,getinds('ch', 'migr','ds')) = contmat(3,3);
-m(3,getinds('ad', 'migr','ds')) = contmat(3,4);
-m(3,getinds('ch', 'vuln','ds')) = contmat(3,5);
-m(3,getinds('ad', 'vuln','ds')) = contmat(3,6);
-
-% m(6,getinds('ch', 'dom', 'rr')) = contmat(3,1);
-% m(6,getinds('ad', 'dom','rr')) = contmat(3,2);
-% m(6,getinds('ch', 'migr','rr')) = contmat(3,3);
-% m(6,getinds('ad', 'migr','rr')) = contmat(3,4);
-% m(6,getinds('ch', 'vuln','rr')) = contmat(3,5);
-% m(6,getinds('ad', 'vuln','rr')) = contmat(3,6);
-
-m(4,getinds('ch', 'dom', 'ds')) = contmat(4,1);
-m(4,getinds('ad', 'dom','ds')) = contmat(4,2);
-m(4,getinds('ch', 'migr','ds')) = contmat(4,3);
-m(4,getinds('ad', 'migr','ds')) = contmat(4,4);
-m(4,getinds('ch', 'vuln','ds')) = contmat(4,5);
-m(4,getinds('ad', 'vuln','ds')) = contmat(4,6);
-
-% m(8,getinds('ch', 'dom', 'rr')) = contmat(4,1);
-% m(8,getinds('ad', 'dom','rr')) = contmat(4,2);
-% m(8,getinds('ch', 'migr','rr')) = contmat(4,3);
-% m(8,getinds('ad', 'migr','rr')) = contmat(4,4);
-% m(8,getinds('ch', 'vuln','rr')) = contmat(4,5);
-% m(8,getinds('ad', 'vuln','rr')) = contmat(4,6);
-
-m(5,getinds('ch', 'dom', 'ds')) = contmat(5,1);
-m(5,getinds('ad', 'dom','ds')) = contmat(5,2);
-m(5,getinds('ch', 'migr','ds')) = contmat(5,3);
-m(5,getinds('ad', 'migr','ds')) = contmat(5,4);
-m(5,getinds('ch', 'vuln','ds')) = contmat(5,5);
-m(5,getinds('ad', 'vuln','ds')) = contmat(5,6);
-
-% m(10,getinds('ch', 'dom', 'rr')) = contmat(5,1);
-% m(10,getinds('ad', 'dom','rr')) = contmat(5,2);
-% m(10,getinds('ch', 'migr','rr')) = contmat(5,3);
-% m(10,getinds('ad', 'migr','rr')) = contmat(5,4);
-% m(10,getinds('ch', 'vuln','rr')) = contmat(5,5);
-% m(10,getinds('ad', 'vuln','rr')) = contmat(5,6);
-
-m(6,getinds('ch', 'dom', 'ds')) = contmat(6,1);
-m(6,getinds('ad', 'dom','ds')) = contmat(6,2);
-m(6,getinds('ch', 'migr','ds')) = contmat(6,3);
-m(6,getinds('ad', 'migr','ds')) = contmat(6,4);
-m(6,getinds('ch', 'vuln','ds')) = contmat(6,5);
-m(6,getinds('ad', 'vuln','ds')) = contmat(6,6);
-
-% m(12,getinds('ch', 'dom', 'rr')) = contmat(6,1);
-% m(12,getinds('ad', 'dom','rr')) = contmat(6,2);
-% m(12,getinds('ch', 'migr','rr')) = contmat(6,3);
-% m(12,getinds('ad', 'migr','rr')) = contmat(6,4);
-% m(12,getinds('ch', 'vuln','rr')) = contmat(6,5);
-% m(12,getinds('ad', 'vuln','rr')) = contmat(6,6);
+% m(2,getinds('ch', 'dom', 'ds')) = contmat(2,1);
+% m(2,getinds('ad', 'dom','ds')) = contmat(2,2);
+% m(2,getinds('ch', 'migr','ds')) = contmat(2,3);
+% m(2,getinds('ad', 'migr','ds')) = contmat(2,4);
+% m(2,getinds('ch', 'vuln','ds')) = contmat(2,5);
+% m(2,getinds('ad', 'vuln','ds')) = contmat(2,6);
+% 
+% % m(4,getinds('ch', 'dom', 'rr')) = contmat(2,1);
+% % m(4,getinds('ad', 'dom','rr')) = contmat(2,2);
+% % m(4,getinds('ch', 'migr','rr')) = contmat(2,3);
+% % m(4,getinds('ad', 'migr','rr')) = contmat(2,4);
+% % m(4,getinds('ch', 'vuln','rr')) = contmat(2,5);
+% % m(4,getinds('ad', 'vuln','rr')) = contmat(2,6);
+% 
+% m(3,getinds('ch', 'dom', 'ds')) = contmat(3,1);
+% m(3,getinds('ad', 'dom','ds')) = contmat(3,2);
+% m(3,getinds('ch', 'migr','ds')) = contmat(3,3);
+% m(3,getinds('ad', 'migr','ds')) = contmat(3,4);
+% m(3,getinds('ch', 'vuln','ds')) = contmat(3,5);
+% m(3,getinds('ad', 'vuln','ds')) = contmat(3,6);
+% 
+% % m(6,getinds('ch', 'dom', 'rr')) = contmat(3,1);
+% % m(6,getinds('ad', 'dom','rr')) = contmat(3,2);
+% % m(6,getinds('ch', 'migr','rr')) = contmat(3,3);
+% % m(6,getinds('ad', 'migr','rr')) = contmat(3,4);
+% % m(6,getinds('ch', 'vuln','rr')) = contmat(3,5);
+% % m(6,getinds('ad', 'vuln','rr')) = contmat(3,6);
+% 
+% m(4,getinds('ch', 'dom', 'ds')) = contmat(4,1);
+% m(4,getinds('ad', 'dom','ds')) = contmat(4,2);
+% m(4,getinds('ch', 'migr','ds')) = contmat(4,3);
+% m(4,getinds('ad', 'migr','ds')) = contmat(4,4);
+% m(4,getinds('ch', 'vuln','ds')) = contmat(4,5);
+% m(4,getinds('ad', 'vuln','ds')) = contmat(4,6);
+% 
+% % m(8,getinds('ch', 'dom', 'rr')) = contmat(4,1);
+% % m(8,getinds('ad', 'dom','rr')) = contmat(4,2);
+% % m(8,getinds('ch', 'migr','rr')) = contmat(4,3);
+% % m(8,getinds('ad', 'migr','rr')) = contmat(4,4);
+% % m(8,getinds('ch', 'vuln','rr')) = contmat(4,5);
+% % m(8,getinds('ad', 'vuln','rr')) = contmat(4,6);
+% 
+% m(5,getinds('ch', 'dom', 'ds')) = contmat(5,1);
+% m(5,getinds('ad', 'dom','ds')) = contmat(5,2);
+% m(5,getinds('ch', 'migr','ds')) = contmat(5,3);
+% m(5,getinds('ad', 'migr','ds')) = contmat(5,4);
+% m(5,getinds('ch', 'vuln','ds')) = contmat(5,5);
+% m(5,getinds('ad', 'vuln','ds')) = contmat(5,6);
+% 
+% % m(10,getinds('ch', 'dom', 'rr')) = contmat(5,1);
+% % m(10,getinds('ad', 'dom','rr')) = contmat(5,2);
+% % m(10,getinds('ch', 'migr','rr')) = contmat(5,3);
+% % m(10,getinds('ad', 'migr','rr')) = contmat(5,4);
+% % m(10,getinds('ch', 'vuln','rr')) = contmat(5,5);
+% % m(10,getinds('ad', 'vuln','rr')) = contmat(5,6);
+% 
+% m(6,getinds('ch', 'dom', 'ds')) = contmat(6,1);
+% m(6,getinds('ad', 'dom','ds')) = contmat(6,2);
+% m(6,getinds('ch', 'migr','ds')) = contmat(6,3);
+% m(6,getinds('ad', 'migr','ds')) = contmat(6,4);
+% m(6,getinds('ch', 'vuln','ds')) = contmat(6,5);
+% m(6,getinds('ad', 'vuln','ds')) = contmat(6,6);
+% 
+% % m(12,getinds('ch', 'dom', 'rr')) = contmat(6,1);
+% % m(12,getinds('ad', 'dom','rr')) = contmat(6,2);
+% % m(12,getinds('ch', 'migr','rr')) = contmat(6,3);
+% % m(12,getinds('ad', 'migr','rr')) = contmat(6,4);
+% % m(12,getinds('ch', 'vuln','rr')) = contmat(6,5);
+% % m(12,getinds('ad', 'vuln','rr')) = contmat(6,6);
 
 % Include infectiousness
 m = m*r.beta;
@@ -344,10 +433,13 @@ M.lam = sparse(m);
 m = zeros(6,i.nstates);
 m(1, intersect(s.ch, s.dom))  = 1;  
 m(2, intersect(s.ad, s.dom))  = 1; 
-m(3, intersect(s.ch, s.migr)) = 1; 
-m(4, intersect(s.ad, s.migr)) = 1; 
-m(5, intersect(s.ch, s.vuln)) = 1; 
-m(6, intersect(s.ad, s.vuln)) = 1;  
+m(3, intersect(s.el, s.dom))  = 1; 
+m(4, intersect(s.ch, s.migr)) = 1; 
+m(5, intersect(s.ad, s.migr)) = 1; 
+m(6, intersect(s.el, s.migr)) = 1; 
+m(7, intersect(s.ch, s.vuln)) = 1; 
+m(8, intersect(s.ad, s.vuln)) = 1;  
+m(9, intersect(s.el, s.vuln)) = 1; 
 M.denvec = sparse(m);
 
 
@@ -358,6 +450,7 @@ m(s.ad,1)         = 1/72;
 %m(:,1)            = 1/83;
 m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
+m(s.ad,1)         = 0;
 M.mort            = sparse(m);
 
 % --- Mortality -----------------------------------------------------------

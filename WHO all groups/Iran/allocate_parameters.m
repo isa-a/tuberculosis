@@ -38,7 +38,7 @@ for age_row = 1:2 % rows in age
     end
 end
 
-
+r.ageing_ad2el         = x(xi.ageing_ad2el);
 
 
 % r.progression = [

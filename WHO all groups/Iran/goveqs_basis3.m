@@ -34,6 +34,17 @@ lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
 % 5. ch vuln ds
 % 6. ad vuln ds
 
+% Indices for elderly grp lambda entries
+% 1. ch dom  ds
+% 2. ad dom  ds
+% 3. el dom  ds
+% 4. ch migr ds
+% 5. ad migr ds
+% 6. el migr ds
+% 7. ch vuln ds
+% 8. ad vuln ds
+% 9. el vuln ds
+
 
 % Indices for NO RR NO VULN lambda entries
 % 1. ch dom  ds
@@ -48,10 +59,10 @@ lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
 %         lam(3)*M.nlin.ch.migr_long.ds     + lam(4)*M.nlin.ad.migr_long.ds;
 
 allmat = M.lin + ...
-        lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + ...
-        lam(3)*M.nlin.ch.migr_rect.ds     + lam(4)*M.nlin.ad.migr_rect.ds + ...
-        lam(3)*M.nlin.ch.migr_long.ds     + lam(4)*M.nlin.ad.migr_long.ds + ...
-        lam(5)*M.nlin.ch.vuln.ds          + lam(6)*M.nlin.ad.vuln.ds;
+        lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + lam(3)*M.nlin.el.dom.ds + ...
+        lam(4)*M.nlin.ch.migr_rect.ds     + lam(5)*M.nlin.ad.migr_rect.ds + lam(6)*M.nlin.el.migr_rect.ds + ...
+        lam(4)*M.nlin.ch.migr_long.ds     + lam(5)*M.nlin.ad.migr_long.ds + lam(6)*M.nlin.el.migr_long.ds + ...
+        lam(7)*M.nlin.ch.vuln.ds         + lam(8)*M.nlin.ad.vuln.ds + lam(9)*M.nlin.el.vuln.ds;
 
 % Full model
 % allmat = M.lin + ...

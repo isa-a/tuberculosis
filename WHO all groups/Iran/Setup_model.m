@@ -5,7 +5,7 @@ clear all;
 
 states1     = {'U'};
 states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
-gps.age     = {'ch','ad'};                                                  % added age here before other groups
+gps.age     = {'ch','ad','el'};                                                  % added age here before other groups
 gps.born    = {'dom','migr_rect','migr_long','vuln'};
 gps.strains = {'ds'};
 
@@ -39,6 +39,7 @@ tmp(1,s.allI) = 1;
 tmp(2,intersect(s.allI,s.migr)) = 1;
 tmp(3,intersect(s.allI,s.vuln)) = 1;
 tmp(4,intersect(s.allI,s.ch))   = 1;
+tmp(5,intersect(s.allI,s.el))   = 1;
 agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);
@@ -54,6 +55,9 @@ tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
+
+tmp(s.ad, s.el) = 0;
+tmp(s.el, s.ad) = 0;
 sel.inc = tmp - diag(diag(tmp));
 
 
@@ -124,6 +128,9 @@ tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
+
+tmp(s.ad, s.el) = 0;
+tmp(s.el, s.ad) = 0;
 sel.ch_notifs = tmp - diag(diag(tmp));
 
 
@@ -178,7 +185,7 @@ r.migr         = 0.0847;                                                   % htt
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_relrate','p_LTBI_in_migr', 'ageing', 'ch_mort', 'p_relrate_factor'};      
 % lgths =      [1,      1,      2,                  1,          2,                  1,        1,         1,                 1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor'};      
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'ageing_ad2el'};      
 lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1];
 
 lim = 0; xi = [];
@@ -206,23 +213,24 @@ bds(xi.r_ageing_sc,:)            = [0 1];
 %bds(xi.ch_mort,:)          = [0, 0.01];
 bds(xi.p_relrate_factor,:) = [1, 10];
 bds(xi.contmat_factor,:)    = [0, 1];
+bds(xi.ageing_ad2el,:)    = [0.02, 3];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
-prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];
+prm.contmat_age  = [0.2830 0.2525 0.2; 0.0692 0.3953 0.2; 0.0692 0.3953 0.2];
 
-prm.contmat      = zeros(6, 6);
+prm.contmat      = zeros(9, 9);
 % go through each element
-for age_row = 1:2                                                           % rows in age
-    for age_col = 1:2                                                       % cols in age
+for age_row = 1:3                                                           % rows in age
+    for age_col = 1:3                                                      % cols in age
         for born_row = 1:3                                                  % rows in born
             for born_col = 1:3                                              % cols in born
                 % calc position in combined matrix
-                row = (born_row-1)*2 + age_row;                             % correctly scale current rows into new matrix
-                col = (born_col-1)*2 + age_col;                             % correctly scale current cols into new matrix
+                row = (born_row-1)*3 + age_row;                             % correctly scale current rows into new matrix
+                col = (born_col-1)*3 + age_col;                             % correctly scale current cols into new matrix
                 % multiply
                 prm.contmat(row, col) = prm.contmat_born(born_row, born_col) * prm.contmat_age(age_row, age_col);
             end
