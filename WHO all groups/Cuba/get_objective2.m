@@ -46,8 +46,21 @@ else
     r2.gamma = r.gamma_2020;
     M2 = make_model(p2, r2, i, s, gps, prm.contmat);
 
+    % >2015: scaleup of ART 
+    p3 = p; r3 = r; 
+    %r3.TPT = [0 r.TPT2020rec 0 0];
+    r3.ARTnow = r.ARTnow;
+    M3 = make_model(p3, r3, i, s, gps, prm.contmat);
+
+    %Introduction of HIV from 1990
+    p4 = p; r4 = r; 
+    M4 = make_model(p4, r4, i, s, gps, prm.contmat);
+
+
+
     % --- Now simulate them all
     options = odeset('RelTol', 1e-9, 'AbsTol', 1e-9, 'NonNegative', 1:i.nstates);
+
 
     geq0 = @(t,in) goveqs_basis3(t, in, i, s, M0, agg, sel, r0, p0);
     [t0, soln0] = ode15s(geq0, [0:5e3], init, options);
@@ -56,9 +69,13 @@ else
     %geq0b = @(t,in) goveqs_basis3(t, in, i, s, M0b, agg, sel, r0b, p0b);
     %[t0b, soln0b] = ode15s(geq0b, [1970:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
 
+        %HIV scaled up to peak year
+    geq0a = @(t,in) goveqs_basis3(t, in, i, s, M4, agg, sel, p4, r4);
+    [t0a, soln0a] = ode15s(geq0a, [1990:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
+
     % Increased TPT and case-finding
     geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, [2015 2020; 2010 2020], i, s, p2, r2, prm, sel, agg);
-    [t1, soln1] = ode15s(geq1, [2010:2020], soln0(end,:), options);
+    [t1, soln1] = ode15s(geq1, [2010:2020], soln0a(end,:), options);
     
 %     allsol = [soln0; soln1(2:end,:)];
 %     allt   = [t0; t1(2:end)];
@@ -101,6 +118,8 @@ else
     % Notifications
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
 
+    incdTBHIV = dsol(end,i.aux.inc(5))*1e5;
+
     % prevalence of diabetes
 %     vuln_prev = sum(sfin(s.vuln)) / sum(sfin(1:i.nstates));
 % 
@@ -135,7 +154,8 @@ else
         aux.ch_notifs  = ch_notifs;
 %         aux.vuln_prev  = vuln_prev;
 %         aux.vuln_relrisk    = vuln_relrisk;
-        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs];
+        aux.incdTBHIV = incdTBHIV;
+        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs, incdTBHIV];
     else
         out = -Inf;
         aux = NaN;
