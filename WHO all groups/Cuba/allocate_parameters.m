@@ -6,11 +6,11 @@ r.gamma_2015     = x(xi.gamma(1))*[x(xi.p_relrate_gamma_chvad), 1];
 r.gamma_2020     = x(xi.gamma(2))*[x(xi.p_relrate_gamma_chvad), 1];
 
 tmp              = r.progression0*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
-r.progression    = [tmp * x(xi.p_relrate_factor); tmp] * [1, x(xi.HIVfactor), 1 * 0.4];
+r.progression    = [tmp * x(xi.p_relrate_factor); tmp] * [1, x(xi.HIVfactor), x(xi.HIVfactor) * 0.4];
 % r.progression    = [tmp*x(xi.p_relrate_factor); tmp];
 
 tmp              = r.reactivation0*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
-r.reactivation   = [tmp * x(xi.p_relrate_factor); tmp] * [1, x(xi.HIVfactor), 1 * 0.4];
+r.reactivation   = [tmp * x(xi.p_relrate_factor); tmp] * [1, x(xi.HIVfactor), x(xi.HIVfactor) * 0.4];
 %r.reactivation   = [tmp*x(xi.p_relrate_factor); tmp];
 
 

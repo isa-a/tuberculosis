@@ -169,7 +169,7 @@ m(inds) = m(inds) + r.ageing;
 sources = s.neg;
 destins = s.pos;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
-m(inds) = m(inds) + r.HIVincd;    
+m(inds) = m(inds) + r.HIV;    
 
 % Transition from HIV positive, to being on ART
 sources = s.pos;
@@ -257,7 +257,7 @@ M.migrentries = sparse(m);
 getinds = @(st1, st2, st3) intersect(intersect(intersect(s.infectious, s.(st1)), s.(st2)), s.(st3));
 contmat(end,end) = contmat(end,end);
 
-m = zeros(18,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
+m = zeros(6,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
                                                                             % no RR Rows: 1.Dom DS 2.Migr DS 3.Vuln DS   
 % for ii = 1:6
 %     m(ii,getinds('ch', 'dom', 'ds')) = contmat(ii,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS
@@ -378,7 +378,7 @@ m(s.ad,1)         = 1/72;
 m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
 m(s.pos,1)        = r.muHIV;                                                 %set free for now
-m(s.hiv,1)        = r.muHIVTB;                                                 %mortality for people with tb and HIV (incl. on art)
+m(s.hiv,1)        = 0.15;                                                       %mortality for people with tb and HIV (incl. on art)
 M.mort            = sparse(m);
 
 % --- Mortality -----------------------------------------------------------

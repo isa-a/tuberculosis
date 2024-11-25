@@ -46,16 +46,21 @@ else
     r2.gamma = r.gamma_2020;
     M2 = make_model(p2, r2, i, s, gps, prm.contmat);
 
-    % >2015: scaleup of ART 
+    % >2010: scaleup of ART 
     p3 = p; r3 = r; 
     %r3.TPT = [0 r.TPT2020rec 0 0];
-    r3.ARTnow = r.ARTnow;
+    r3.ART = r.ARTnow;
     M3 = make_model(p3, r3, i, s, gps, prm.contmat);
 
-    %Introduction of HIV from 1990
-    p4 = p; r4 = r; 
-    M4 = make_model(p4, r4, i, s, gps, prm.contmat);
+    %Introduction of HIV from 1990 to 2010
+    p4a = p; r4a = r; 
+    r4a.HIV = r.HIVincdpeak;
+    M4a = make_model(p4a, r4a, i, s, gps, prm.contmat);
 
+    %decay of HIV peak from 2010 until 2020
+    p4b = p; r4b = r; 
+    r4b.HIV = r.HIVincdnow;
+    M4b = make_model(p4b, r4b, i, s, gps, prm.contmat);
 
 
     % --- Now simulate them all
@@ -118,6 +123,7 @@ else
     % Notifications
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
 
+    % incidence of tb amongst HIV positive and on ART
     incdTBHIV = dsol(end,i.aux.inc(5))*1e5;
 
     % prevalence of diabetes

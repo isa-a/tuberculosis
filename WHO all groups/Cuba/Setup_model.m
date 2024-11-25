@@ -19,7 +19,7 @@ s.allI       = [s.I, s.I2];
 % s.migrstates = [i.U.migr_rect, i.Lf.migr_rect, i.Ls.migr_rect, i.Pf.migr_rect, i.Ps.migr_rect];
 s.migrstates = intersect([s.U, s.Lf, s.Ls, s.Pf, s.Ps],s.migr_rect);
 s.infectious = [s.allI, (s.Tx)];
-s.hiv        = [s.allI, intersect(s.pos,s.art)];                                             % this would be hiv with tb
+s.hiv        = [s.allI, intersect(s.pos,s.art)];                            % this would be hiv with tb
 
 
 % Include the auxiliaries
@@ -300,6 +300,7 @@ data.ch_notifs      = [410 450 490]/90608707*1e5;                               
 data.HIVincdpeak    = [19 23 27];                                               % hiv incd peak in cuba - 2010  - unaids
 data.HIVincdnow     = [13 18 22];                                               % hiv incd  in cuba - 2022  - unaids
 data.incdTBHIV      = [0.44 0.61 0.8];                                          % incidence of tb in those with hiv
+data.ARTcov         = [0.56 0.65 0.73];                                         % percentage coverage of art in cuba
 % data.vuln_prev      = [10 12 14]/100;                                     
 % data.vuln_relrisk   = [2 3 4];                                         
 
