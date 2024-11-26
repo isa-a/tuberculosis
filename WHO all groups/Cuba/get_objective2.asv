@@ -79,7 +79,7 @@ else
     [t0a, soln0a] = ode15s(geq0a, [1990:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
 
     % Increased TPT and case-finding
-    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, M3, M4a, M4b, [2015 2020; 2010 2023; 2010 2023; 1990 2010; 2010 2023], i, s, p4b, r4b, prm, sel, agg);
+    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, M3, M4a, M4b, [2015 2020; 2010 2023; 2010 2023; ], i, s, p2, r2, prm, sel, agg);
     [t1, soln1] = ode15s(geq1, [2010:2020], soln0a(end,:), options);
     
 %     allsol = [soln0; soln1(2:end,:)];
@@ -139,7 +139,7 @@ else
 %     vuln_relrisk = vuln_with_TB / no_vuln_with_TB;
 
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, incdTBHIV);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
