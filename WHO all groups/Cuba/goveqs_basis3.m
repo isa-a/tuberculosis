@@ -72,11 +72,15 @@ lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
 %         lam(3)*M.nlin.ch.migr_long.ds     + lam(4)*M.nlin.ad.migr_long.ds + ...
 %         lam(5)*M.nlin.ch.vuln.ds          + lam(6)*M.nlin.ad.vuln.ds;
 
+% allmat = M.lin + ...
+%         lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + ...
+%         lam(3)*M.nlin.ch.migr_rect.ds     + lam(4)*M.nlin.ad.migr_rect.ds + ...
+%         lam(3)*M.nlin.ch.migr_long.ds     + lam(4)*M.nlin.ad.migr_long.ds + ...
+%         lam(5)*M.nlin.ch.vuln.ds          + lam(6)*M.nlin.ad.vuln.ds;
+
 allmat = M.lin + ...
         lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + ...
-        lam(3)*M.nlin.ch.migr_rect.ds     + lam(4)*M.nlin.ad.migr_rect.ds + ...
-        lam(3)*M.nlin.ch.migr_long.ds     + lam(4)*M.nlin.ad.migr_long.ds + ...
-        lam(5)*M.nlin.ch.vuln.ds          + lam(6)*M.nlin.ad.vuln.ds;
+        lam(3)*M.nlin.ch.vuln.ds          + lam(4)*M.nlin.ad.vuln.ds;
 
 
 % Full model
@@ -106,15 +110,15 @@ out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
 % method 1 ----------------------------------------------------------------
 
 % Migration out of UK
-outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
-out(s.migr) = out(s.migr) - outmigr;
-%disp('out');
-%disp(sum(out));
-
-% Migration into UK (balance the migration out and migrant mortality)
-migrmorts = sum(sum(morts(s.migr,:)));
-totalout = sum(outmigr) + migrmorts;
-out(1:i.nstates) = out(1:i.nstates) + totalout.*M.migrentries;
+% outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
+% out(s.migr) = out(s.migr) - outmigr;
+% %disp('out');
+% %disp(sum(out));
+% 
+% % Migration into UK (balance the migration out and migrant mortality)
+% migrmorts = sum(sum(morts(s.migr,:)));
+% totalout = sum(outmigr) + migrmorts;
+% out(1:i.nstates) = out(1:i.nstates) + totalout.*M.migrentries;
 
 % keyboard;
 

@@ -18,8 +18,8 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.ad.dom)       = 1 - 0.0419 - seed;
-    init(i.U.ad.migr_rect) = p.migrect_popn;
+    init(i.U.ad.dom)       = 1 - seed;
+    %init(i.U.ad.migr_rect) = p.migrect_popn;
     init(i.I.ad.dom.ds)    = seed;
     
     % Equlibrium model, without RR-TB
@@ -74,13 +74,13 @@ else
     %geq0b = @(t,in) goveqs_basis3(t, in, i, s, M0b, agg, sel, r0b, p0b);
     %[t0b, soln0b] = ode15s(geq0b, [1970:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
 
-        %HIV scaled up to peak year
+     % HIV scaled up to peak year
     geq0a = @(t,in) goveqs_basis3(t, in, i, s, M4, agg, sel, p4, r4);
     [t0a, soln0a] = ode15s(geq0a, [1990:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
 
-    % Increased TPT and case-finding
-    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, M3, M4a, M4b, [2015 2020; 2010 2023; 2010 2023; 1990 2010; 2010 2023], i, s, p4b, r4b, prm, sel, agg);
-    [t1, soln1] = ode15s(geq1, [2010:2020], soln0a(end,:), options);
+    % Increased TPT and case-finding and all HIV related
+    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, M3, M4a, M4b, [2015 2023; 2010 2023; 2010 2023; 1990 2010; 2010 2023], i, s, p4b, r4b, prm, sel, agg);
+    [t1, soln1] = ode15s(geq1, [2010:2023], soln0a(end,:), options);
     
 %     allsol = [soln0; soln1(2:end,:)];
 %     allt   = [t0; t1(2:end)];
@@ -92,11 +92,11 @@ else
     %incdRR2020 = dsol(end,i.aux.inc(3))*1e5;
     incd       = dsol(end,i.aux.inc)*1e5;
     mort       = dsol(end,i.aux.mort)*1e5;
-    p_migrTB   = incd(2)/incd(1);
+    %p_migrTB   = incd(2)/incd(1);
     
     %p_LTBI     = sum(sfin(intersect(s.migr_rect,[s.Lf, s.Ls])))/sum(sfin(s.migr_rect));
-    p_LTBI_inmigr = p.LTBI_in_migrch*p.ch_in_migr + p.LTBI_in_migrad*(1-p.ch_in_migr);
-    p_migrpopn    = sum(sfin(s.migr))/sum(sfin(1:i.nstates));
+%     p_LTBI_inmigr = p.LTBI_in_migrch*p.ch_in_migr + p.LTBI_in_migrad*(1-p.ch_in_migr);
+%     p_migrpopn    = sum(sfin(s.migr))/sum(sfin(1:i.nstates));
 
     % Proportion of population being vulnerable
     p_vulnpopn = sum(sfin(s.vuln))/sum(sfin(1:i.nstates));
@@ -139,20 +139,20 @@ else
 %     vuln_relrisk = vuln_with_TB / no_vuln_with_TB;
 
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, incdTBHIV);
+        out  = calfn.fn(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, incdTBHIV);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
         aux.incd2010   = incd2010;
         aux.incd2020   = incd2020;
         aux.mort       = mort;
-        aux.p_migrTB   = p_migrTB;
-        aux.p_migrpopn = p_migrpopn;
-        aux.p_LTBI_inmigr = p_LTBI_inmigr;
+%         aux.p_migrTB   = p_migrTB;
+%         aux.p_migrpopn = p_migrpopn;
+%         aux.p_LTBI_inmigr = p_LTBI_inmigr;
         aux.p_vulnpopn = p_vulnpopn;
         aux.p_vulnTB   = p_vulnTB;
-        aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
-        aux.p_migrect_ch  = sum(sfin(intersect(s.migr_rect,[s.ch])))/sum(sfin(s.migr_rect));
+%         aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
+%         aux.p_migrect_ch  = sum(sfin(intersect(s.migr_rect,[s.ch])))/sum(sfin(s.migr_rect));
         aux.nTPT       = n_TPT2019;
         aux.propincd_ch = propincd_ch;
         aux.chpopn     = p_chpopn;
@@ -161,7 +161,7 @@ else
 %         aux.vuln_prev  = vuln_prev;
 %         aux.vuln_relrisk    = vuln_relrisk;
         aux.incdTBHIV = incdTBHIV;
-        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs, incdTBHIV];
+        aux.sim        = [incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs, incdTBHIV];
     else
         out = -Inf;
         aux = NaN;
