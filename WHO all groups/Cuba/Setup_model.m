@@ -23,8 +23,8 @@ s.hiv        = [s.allI, intersect(s.pos,s.art)];                            % th
 
 
 % Include the auxiliaries
-names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    4,          12,     1,     1,           1];
+names = {'inc','incsources','mort','nTPT', 'ch_notifs', 'HIVinc'};
+lgths = [    4,          12,     1,     1,           1,        1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -144,6 +144,10 @@ tmp(s.pos, s.neg) = 0;
 tmp(s.pos, s.art) = 0;
 tmp(s.art, s.pos) = 0;
 sel.ch_notifs = tmp - diag(diag(tmp));
+
+% --- HIV incidence
+tmp = zeros(i.nstates);
+tmp(s.neg, s.pos) = 1;
 
 
 % -- Natural history parameters -------------------------------------------
@@ -331,9 +335,9 @@ f16  = get_distribution_fns(data.ARTcov, 'beta', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, incdTBHIV) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                     f2(mort) + ...
-                                                                                                     f6(p_vulnpopn) + f7(p_vulnTB) + f10(p_chpopn) +f12(ch_notifs) + f13(incdTBHIV);
+lhd.fn = @(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, HIVincdpeak, HIVincdnow, incdTBHIV) f1a(incd2010) + f1b(incd2020) + ...
+                                                                                                     f2(mort) + f6(p_vulnpopn) + f7(p_vulnTB) + f10(p_chpopn) + ...
+                                                                                                     f12(ch_notifs) + f13(HIVincdpeak) + f14(HIVincdnow)+ f15(incdTBHIV) + f16(ARTcov);
 
 save Model_setup;
 

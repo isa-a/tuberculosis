@@ -29,6 +29,11 @@ else
     p0.relbeta = 0; r0.RR_acqu = 0;
     M0 = make_model(p0, r0, i, s, gps, prm.contmat);
 
+    %Introduction of HIV from 1990 to 2010
+    p1 = p; r1 = r; 
+    r1.HIV = r.HIVincdpeak;
+    M1 = make_model(p1, r1, i, s, gps, prm.contmat);
+
     % Introduction of RR-TB from 1970
 %     p0b = p; r0b = r; 
 %     p0b.betadec = 0;
@@ -36,31 +41,26 @@ else
 %     M0b = make_model(p0b, r0b, i, s, gps, contmat);
     
     % >2015: scaleup of TPT 
-    p1 = p; r1 = r; 
-    r1.TPT = [0 r.TPT2020rec 0 0];
-    r1.gamma = r.gamma_2015;
-    M1 = make_model(p1, r1, i, s, gps, prm.contmat);
+    p2 = p; r2 = r; 
+    r2.TPT = [0 r.TPT2020rec 0 0];
+    r2.gamma = r.gamma_2015;
+    M2 = make_model(p2, r2, i, s, gps, prm.contmat);
     
     % >2010: increase in case-finding
-    p2 = p; r2 = r; 
-    r2.gamma = r.gamma_2020;
-    M2 = make_model(p2, r2, i, s, gps, prm.contmat);
-
-    % >2010: scaleup of ART 
     p3 = p; r3 = r; 
-    %r3.TPT = [0 r.TPT2020rec 0 0];
-    r3.ART = r.ARTnow;
+    r3.gamma = r.gamma_2020;
     M3 = make_model(p3, r3, i, s, gps, prm.contmat);
 
-    %Introduction of HIV from 1990 to 2010
-    p4a = p; r4a = r; 
-    r4a.HIV = r.HIVincdpeak;
-    M4a = make_model(p4a, r4a, i, s, gps, prm.contmat);
+    % >2010: scaleup of ART 
+    p4 = p; r4 = r; 
+    %r3.TPT = [0 r.TPT2020rec 0 0];
+    r4.ART = r.ARTnow;
+    M4 = make_model(p4, r4, i, s, gps, prm.contmat);
 
     %decay of HIV peak from 2010 until 2020
-    p4b = p; r4b = r; 
-    r4b.HIV = r.HIVincdnow;
-    M4b = make_model(p4b, r4b, i, s, gps, prm.contmat);
+    p5 = p; r5 = r; 
+    r5.HIV = r.HIVincdnow;
+    M5 = make_model(p5, r5, i, s, gps, prm.contmat);
 
 
     % --- Now simulate them all
@@ -75,11 +75,11 @@ else
     %[t0b, soln0b] = ode15s(geq0b, [1970:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
 
      % HIV scaled up to peak year
-    geq0a = @(t,in) goveqs_basis3(t, in, i, s, M4, agg, sel, p4, r4);
+    geq0a = @(t,in) goveqs_scaleup1D(t, in, M0, M1, [1990:2010], i, s, p1, r1, prm, sel, agg);
     [t0a, soln0a] = ode15s(geq0a, [1990:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
 
-    % Increased TPT and case-finding and all HIV related
-    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, M3, M4a, M4b, [2015 2023; 2010 2023; 2010 2023; 1990 2010; 2010 2023], i, s, p4b, r4b, prm, sel, agg);
+    % Increased TPT and case-finding and  HIV decay
+    geq1 = @(t,in) goveqs_scaleup2D(t, in, M1, M2, M3, M4, M5, [2015 2023; 2010 2023; 2010 2023; 2010 2023], i, s, p5, r5, prm, sel, agg);
     [t1, soln1] = ode15s(geq1, [2010:2023], soln0a(end,:), options);
     
 %     allsol = [soln0; soln1(2:end,:)];
@@ -123,23 +123,16 @@ else
     % Notifications
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
 
+    HIVincdpeak = dsol(t1==2010,i.aux.HIVinc)*1e5;
+    HIVincdnow  = dsol(t1==2023,i.aux.HIVinc)*1e5;
+
     % incidence of tb amongst HIV positive and on ART
     incdTBHIV = dsol(end,i.aux.inc(5))*1e5;
 
-    % prevalence of diabetes
-%     vuln_prev = sum(sfin(s.vuln)) / sum(sfin(1:i.nstates));
-% 
-%     % amount of tb in people who dont have diabetes
-%     no_vuln_with_TB = sum(sfin(intersect(s.allI, setdiff(1:i.nstates, s.vuln)))) / sum(sfin(setdiff(1:i.nstates, s.vuln)));
-% 
-%     % amount of tb in the diabetic
-%     vuln_with_TB = sum(sfin(intersect(s.allI, s.vuln))) / sum(sfin(s.vuln));
-% 
-%     % risk of two groups should be 3 fold
-%     vuln_relrisk = vuln_with_TB / no_vuln_with_TB;
+
 
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, incdTBHIV);
+        out  = calfn.fn(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, HIVincdpeak, HIVincdnow, incdTBHIV);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
@@ -160,8 +153,10 @@ else
         aux.ch_notifs  = ch_notifs;
 %         aux.vuln_prev  = vuln_prev;
 %         aux.vuln_relrisk    = vuln_relrisk;
+        aux.HIVincdpeak = HIVincdpeak;
+        aux.HIVincdnow  = HIVincdnow;
         aux.incdTBHIV = incdTBHIV;
-        aux.sim        = [incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs, incdTBHIV];
+        aux.sim        = [incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs, HIVincdpeak, HIVincdnow, incdTBHIV];
     else
         out = -Inf;
         aux = NaN;

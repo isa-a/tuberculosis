@@ -157,3 +157,4 @@ out(i.aux.incsources) = [tmp1; tmp2; tmp3; tmp4];
 out(i.aux.mort)       = sum(morts(:,2));
 out(i.aux.nTPT)       = sum((sel.nTPT.*allmat)*invec);
 out(i.aux.ch_notifs)  = sum((sel.ch_notifs.*allmat)*invec);
+out(i.aux.HIVinc)     = sum((sel.HIVinc.*allmat)*invec);
