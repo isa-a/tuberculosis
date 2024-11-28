@@ -18,9 +18,9 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.ad.dom)       = 1 - seed;
+    init(i.U.ad.dom.neg)       = 1 - seed;
     %init(i.U.ad.migr_rect) = p.migrect_popn;
-    init(i.I.ad.dom.ds)    = seed;
+    init(i.I.ad.dom.ds.neg)    = seed;
     
     % Equlibrium model, without RR-TB
     p0 = p; r0 = r; 
@@ -129,6 +129,8 @@ else
     % incidence of tb amongst HIV positive and on ART
     incdTBHIV = dsol(end,i.aux.inc(5))*1e5;
 
+    %coverage of ART
+    ARTcov = sum(sfin(s.art))/sum(sfin([s.pos, s.art]));
 
 
     if incd > 0.1
@@ -156,7 +158,8 @@ else
         aux.HIVincdpeak = HIVincdpeak;
         aux.HIVincdnow  = HIVincdnow;
         aux.incdTBHIV = incdTBHIV;
-        aux.sim        = [incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs, HIVincdpeak, HIVincdnow, incdTBHIV];
+        aux.ARTcov    = ARTcov;
+        aux.sim        = [incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs, HIVincdpeak, HIVincdnow, incdTBHIV, ARTcov];
     else
         out = -Inf;
         aux = NaN;

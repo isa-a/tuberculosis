@@ -85,12 +85,12 @@ for ia = 1:length(gps.age)
                 m(destins, source) = m(destins, source) + rates';
         
                 % Acquisition of drug resistance while on first-line treatment
-                if ~ismdr
-                    source = Tx;
-                    destin = i.Tx.(age).(born).rr.(hiv);                                   % <--- Include age stratification
-                    rate   = r.RR_acqu;
-                    m(destin, source) = m(destin, source) + rate;
-                end
+%                 if ~ismdr
+%                     source = Tx;
+%                     destin = i.Tx.(age).(born).rr.(hiv);                                   % <--- Include age stratification
+%                     rate   = r.RR_acqu;
+%                     m(destin, source) = m(destin, source) + rate;
+%                 end
         
                 % Second-line treatment
                 source  = Tx2;
@@ -378,7 +378,7 @@ m(s.ad,1)         = 1/72;
 m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
 m(s.pos,1)        = r.muHIV;                                                 %set free for now
-m(s.hiv,1)        = 0.15;                                                       %mortality for people with tb and HIV (incl. on art)
+m(s.hiv,1)        = r.muTBHIV;                                                       %mortality for people with tb and HIV (incl. on art)
 M.mort            = sparse(m);
 
 % --- Mortality -----------------------------------------------------------

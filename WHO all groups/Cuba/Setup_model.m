@@ -183,8 +183,6 @@ r.ACF2         = [0 0 0 0];
 p.migrect_popn = 0.0419;
 r.migr         = 0.0847;                                                   % https://doi.org/10.1007/s44197-022-00040-w
 
-r.HIVincd      = 0;                                                       % HIV incidence placeholder
-r.ART          = 0;                                                       % uptake of ART
 % p.LTBI_in_migrad = 0.17;
 % p.LTBI_in_migrch = 0.03;
 
@@ -206,8 +204,8 @@ r.ART          = 0;                                                       % upta
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor'};      
 % lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor'};      
-lgths =      [1,        1,      2,                      1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor', 'muHIV', 'muTBHIV', 'HIV', 'ART'};      
+lgths =      [1,        1,      2,                      1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1,     1,          1,      1       1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -238,6 +236,10 @@ bds(xi.HIVincdpeak,:)    = [0, 10];
 bds(xi.HIVincdnow,:)    = [0, 10];
 bds(xi.r_ARTnow,:)    = [0, 1];
 bds(xi.HIVfactor,:)   = [1, 50];
+bds(xi.muHIV,:)   = [0, 1];
+bds(xi.muTBHIV,:)   = [0, 1];
+bds(xi.HIV,:)   = [0, 1];
+bds(xi.ART,:)   = [0, 1];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
