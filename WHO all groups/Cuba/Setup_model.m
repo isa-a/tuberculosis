@@ -147,7 +147,8 @@ sel.ch_notifs = tmp - diag(diag(tmp));
 
 % --- HIV incidence
 tmp = zeros(i.nstates);
-tmp(s.neg, s.pos) = 1;
+tmp(s.neg, s.pos) = 0;
+tmp(s.pos, s.neg) = 0;
 sel.HIVinc = tmp - diag(diag(tmp));
 
 
@@ -292,10 +293,10 @@ end
 % data.p_adpopn       = [0.688 0.708 0.728];                                 % proportion of country thats adults
 % data.ch_notifs      = [310 360 420]/4.5e6*1e5;                             % notifications in the country   
 
-data.incd2010       = [15 18 21];                                           % With broader uncertainty intervals
-data.incd2020       = [10 12  14];                                             
+data.incd2010       = [6.5 8.5  10.5];                                           % With broader uncertainty intervals
+data.incd2020       = [5.5  7.9  10.5];                                             
 %data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
-data.mort           = [0.8 1.1 1.5];                                        % TB mortality, 2020
+data.mort           = [0.28 0.48 0.68];                                        % TB mortality, 2020
 % data.p_migrTB       = [0.5  0.6  0.7];                                      % Proportion contribution of migrants to overall incidence
 % data.p_migrpopn     = [0.02 0.0419 0.07];                                   % Proportion of population that is migrants
 % data.p_LTBI_inmigr  = [0.16 0.20 0.24];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
@@ -306,7 +307,7 @@ data.nTPT2019       = 1.3*[0.9 1 1.1];                                      % Nu
 data.propincd_ch    = [0.006 0.014 0.025];
 data.p_chpopn       = [0.188 0.2284 0.29];                                      % proportion of country thats children
 data.p_adpopn       = [0.675 0.7716 0.8275];                                    % proportion of country thats adults
-data.ch_notifs      = [410 450 490]/90608707*1e5;                               % notifications in the country  
+data.ch_notifs      = [11 15 19]/11000000*1e5;                               % notifications in the country  
 data.HIVincdpeak    = [19 23 27];                                               % hiv incd peak in cuba - 2010  - unaids
 data.HIVincdnow     = [13 18 22];                                               % hiv incd  in cuba - 2022  - unaids
 data.incdTBHIV      = [0.44 0.61 0.8];                                          % incidence of tb in those with hiv
