@@ -24,7 +24,7 @@ s.hiv        = [s.allI, intersect(s.pos,s.art)];                            % th
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs', 'HIVinc'};
-lgths = [    4,          12,     1,     1,           1,        1];
+lgths = [    4,          24,     1,     1,           1,        1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -148,6 +148,7 @@ sel.ch_notifs = tmp - diag(diag(tmp));
 % --- HIV incidence
 tmp = zeros(i.nstates);
 tmp(s.neg, s.pos) = 1;
+sel.HIVinc = tmp - diag(diag(tmp));
 
 
 % -- Natural history parameters -------------------------------------------
@@ -204,7 +205,7 @@ r.migr         = 0.0847;                                                   % htt
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor'};      
 % lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor', 'muHIV', 'muTBHIV', 'HIV', 'ART'};      
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','vuln','relbeta_vuln', 'p_relrate', 'ageing','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor', 'muHIV', 'muTBHIV', 'HIV', 'ART'};      
 lgths =      [1,        1,      2,                      1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1,     1,          1,      1       1];
 
 lim = 0; xi = [];
@@ -224,11 +225,11 @@ bds(xi.p_relrate_gamma_chvad,:)  = [0 1];
 % bds(xi.p_relLTBI_inmigr_advch,:) = [3 7];                                % Estimated using simple ARTI calculation
 bds(xi.p_relrate,:)              = repmat([1 20],2,1);
 %bds(xi.r_migr,:)           = [0 1];
-% bds(xi.r_vuln,:)                 = [0 2];
-bds(xi.r_vuln_sc,:)              = [0 1];
+bds(xi.vuln,:)                 = [0 2];
+%bds(xi.r_vuln_sc,:)              = [0 1];
 bds(xi.relbeta_vuln,:)           = [0.1 20];
-% bds(xi.ageing,:)                 = [0.02 0.3];
-bds(xi.r_ageing_sc,:)            = [0 1];
+bds(xi.ageing,:)                 = [0.02 0.3];
+%bds(xi.r_ageing_sc,:)            = [0 1];
 %bds(xi.ch_mort,:)          = [0, 0.01];
 bds(xi.p_relrate_factor,:) = [1, 10];
 bds(xi.contmat_factor,:)    = [0, 1];
@@ -337,7 +338,7 @@ f16  = get_distribution_fns(data.ARTcov, 'beta', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, HIVincdpeak, HIVincdnow, incdTBHIV) f1a(incd2010) + f1b(incd2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, HIVincdpeak, HIVincdnow, incdTBHIV, ARTcov) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f6(p_vulnpopn) + f7(p_vulnTB) + f10(p_chpopn) + ...
                                                                                                      f12(ch_notifs) + f13(HIVincdpeak) + f14(HIVincdnow)+ f15(incdTBHIV) + f16(ARTcov);
 

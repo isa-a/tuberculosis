@@ -26,16 +26,16 @@ r.reactivation = tmp2 .* hiv_factors;
 % p.LTBI_in_migrad = x(xi.p_LTBI_in_migrad);
 % p.LTBI_in_migrch = x(xi.p_LTBI_in_migrad)/x(xi.p_relLTBI_inmigr_advch);
 
-r.vuln           = x(xi.r_vuln_sc)/500;
+r.vuln           = x(xi.vuln);
 p.relbeta_vuln   = 1;
 
-r.ageing         = x(xi.r_ageing_sc)/10;
+r.ageing         = x(xi.ageing);
 %r.ch_mort        = x(xi.ch_mort);
 
 tmp_c = prm.contmat_age;
 prm.contmat_age = [tmp_c(1, :) * x(xi.contmat_factor); tmp_c(2, :)];
 
-prm.contmat      = zeros(6, 6);
+prm.contmat      = zeros(4, 4);
 % go through each element
 for age_row = 1:2                                                           % rows in age
     for age_col = 1:2                                                       % cols in age

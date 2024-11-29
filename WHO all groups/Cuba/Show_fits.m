@@ -10,8 +10,8 @@ dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(xs,1)
-    [out, aux] = obj(xs(ii,:));
+for ii = 1:size(x0,1)
+    [out, aux] = obj(x0);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
@@ -20,7 +20,7 @@ sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
 %alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.propincd_ch; data.p_chpopn; data.p_adpopn; data.ch_notifs; data.vuln_prev; data.vuln_relrisk;];
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_vulnpopn; data.p_vulnTB; data.propincd_ch; data.p_chpopn; data.p_adpopn; data.ch_notifs];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_vulnpopn; data.p_vulnTB; data.propincd_ch; data.p_chpopn; data.p_adpopn; data.ch_notifs; data.HIVincdpeak; data.HIVincdnow; data.incdTBHIV; data.ARTcov];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;

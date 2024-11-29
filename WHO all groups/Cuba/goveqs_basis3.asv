@@ -60,7 +60,7 @@ lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
 % 3. ch migr ds
 % 4. ad migr ds
 
-
+keyboard;
 % allmat = M.lin + ...
 %         lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + ...
 %         lam(3)*M.nlin.ch.migr_rect.ds     + lam(4)*M.nlin.ad.migr_rect.ds + ...
@@ -79,12 +79,9 @@ lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
 %         lam(5)*M.nlin.ch.vuln.ds          + lam(6)*M.nlin.ad.vuln.ds;
 
 allmat = M.lin + ...
-        lam(1)*M.nlin.ch.dom.ds.neg           + lam(1)*M.nlin.ch.dom.ds.pos + ...
-        lam(1)*M.nlin.ch.dom.ds.art              + lam(2)*M.nlin.ad.dom.ds.neg + ...
-        lam(2)*M.nlin.ad.dom.ds.pos          + lam(2)*M.nlin.ad.dom.ds.art + ...
-        lam(3)*M.nlin.ch.vuln.ds.neg           + lam(3)*M.nlin.ch.vuln.ds.pos + ...
-        lam(3)*M.nlin.ch.vuln.ds.art           +  lam(4)*M.nlin.ad.vuln.ds.neg + ...
-        lam(4)*M.nlin.ad.vuln.ds.pos          + lam(4)*M.nlin.ad.vuln.ds.art;
+        lam(1)*M.nlin.ch.dom.ds.neg           + lam(2)*M.nlin.ch.dom.pos + ...
+        lam(3)*M.nlin.ch.dom.art                + 
+        lam(3)*M.nlin.ch.vuln.ds          + lam(4)*M.nlin.ad.vuln.ds;
 
 
 % Full model
@@ -109,7 +106,7 @@ out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
 % out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
 
 dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
-out(i.U.ch.dom.neg) = out(i.U.ch.dom.neg) + dom_morts;
+out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
 
 % method 1 ----------------------------------------------------------------
 
