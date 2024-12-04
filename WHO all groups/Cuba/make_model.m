@@ -377,8 +377,8 @@ m(s.ad,1)         = 1/72;
 %m(:,1)            = 1/83;
 m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
-m(s.pos,1)        = r.muHIV;                                                 %set free for now
-m(s.hiv,1)        = r.muTBHIV;                                                       %mortality for people with tb and HIV (incl. on art)
+m(s.pos,1)        = 0;                                                 %set free for now
+m(s.hiv,1)        = 0;                                                       %mortality for people with tb and HIV (incl. on art)
 M.mort            = sparse(m);
 
 % --- Mortality -----------------------------------------------------------

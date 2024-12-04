@@ -147,8 +147,7 @@ sel.ch_notifs = tmp - diag(diag(tmp));
 
 % --- HIV incidence
 tmp = zeros(i.nstates);
-tmp(s.neg, s.pos) = 0;
-tmp(s.pos, s.neg) = 0;
+tmp(s.pos, s.neg) = 1;
 sel.HIVinc = tmp - diag(diag(tmp));
 
 
@@ -207,7 +206,7 @@ r.migr         = 0.0847;                                                   % htt
 % lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1];
 
 names = {'beta','betadec','gamma','p_relrate_gamma_chvad','vuln','relbeta_vuln', 'p_relrate', 'ageing','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor', 'muHIV', 'muTBHIV', 'HIV', 'ART'};      
-lgths =      [1,        1,      2,                      1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1,     1,          1,      1       1];
+lgths =      [1,        1,      2,                      1,       1,             1,           1,        1,            1,                1,                          1,           1,          1            1,     1,          1,      1       1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -224,7 +223,8 @@ bds(xi.gamma,:)                  = repmat([1e-4 10],2,1);
 bds(xi.p_relrate_gamma_chvad,:)  = [0 1];
 % bds(xi.p_LTBI_in_migrad,:)       = [0.1 0.6];
 % bds(xi.p_relLTBI_inmigr_advch,:) = [3 7];                                % Estimated using simple ARTI calculation
-bds(xi.p_relrate,:)              = repmat([1 20],2,1);
+% bds(xi.p_relrate,:)              = repmat([1 20],2,1);
+bds(xi.p_relrate,:)              = [1 20];
 %bds(xi.r_migr,:)           = [0 1];
 bds(xi.vuln,:)                 = [0 2];
 %bds(xi.r_vuln_sc,:)              = [0 1];
@@ -234,8 +234,8 @@ bds(xi.ageing,:)                 = [0.02 0.3];
 %bds(xi.ch_mort,:)          = [0, 0.01];
 bds(xi.p_relrate_factor,:) = [1, 10];
 bds(xi.contmat_factor,:)    = [0, 1];
-bds(xi.HIVincdpeak,:)    = [0, 10];
-bds(xi.HIVincdnow,:)    = [0, 10];
+bds(xi.HIVincdpeak,:)    = [15, 30];
+bds(xi.HIVincdnow,:)    = [15, 30];
 bds(xi.r_ARTnow,:)    = [0, 1];
 bds(xi.HIVfactor,:)   = [1, 50];
 bds(xi.muHIV,:)   = [0, 1];
@@ -247,9 +247,6 @@ prm.bounds = bds';
 ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
-prm.contmat_born = [1, 0.2; 0.5, 0.2; 0.2 1];
-prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];
-prm.contmat_hiv  = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];                   %hiv contact matrix - placeholder values
 
 prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2, 0.2, 1];
 prm.contmat_age  = [0.2830 0.2525; 0.0692 0.3953];

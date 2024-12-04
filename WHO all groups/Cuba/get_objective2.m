@@ -21,6 +21,9 @@ else
     init(i.U.ad.dom.neg)       = 1 - seed;
     %init(i.U.ad.migr_rect) = p.migrect_popn;
     init(i.I.ad.dom.ds.neg)    = seed;
+    init(i.U.ad.dom.pos) = seed;
+
+
     
     % Equlibrium model, without RR-TB
     p0 = p; r0 = r; 
