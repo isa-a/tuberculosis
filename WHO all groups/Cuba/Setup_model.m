@@ -147,7 +147,7 @@ sel.ch_notifs = tmp - diag(diag(tmp));
 
 % --- HIV incidence
 tmp = zeros(i.nstates);
-tmp(s.pos, s.neg) = 1;
+tmp([s.pos], [s.neg]) = 1;
 sel.HIVinc = tmp - diag(diag(tmp));
 
 
