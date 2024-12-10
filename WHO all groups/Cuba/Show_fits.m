@@ -14,7 +14,7 @@ for ii = 1:size(x0,1)
     [out, aux] = obj(x0);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
-    pp(ii)     = aux.p_migrect;
+    %pp(ii)     = aux.p_migrect;
 end
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
@@ -38,7 +38,7 @@ xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI',  'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
+set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI',  'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs', 'HIVincdpeak', 'HIVincdnow', 'incdTBHIV', 'ARTcov'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 return
