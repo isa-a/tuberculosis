@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 1; 
+nsam = 100; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 % obj(xsam(1,:));
@@ -81,16 +81,17 @@ cov0 = cov(xsto);
 
 
 nreps = 4;
-niter = [1, 1, 1, 5]*1e4;
+niter = [1, 1, 1, 5]*2e3;
 for ii = 1:nreps
+    [xsto, outsto] = MCMC_adaptive2(obj, x2, niter(ii), 1, [], 1);
     inds = find(outsto==max(outsto));
-    x0 = xsto(inds(1),:);
+    x2 = xsto(inds(1),:);
     cov0 = cov(xsto);
-    [xsto, outsto] = MCMC_adaptive33(obj, x0, niter(ii), 1, [], [], cov0, 1);
+    fprintf('\n');
 end
 
 
-save calibration_res_isa_new_2;
+save calibration_res_december;
 return;
 
 x0 = fminsearch(nobj,xord(1,:),optimset('Display','iter'));

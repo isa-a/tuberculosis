@@ -18,10 +18,9 @@ if cond1
 else
     init = zeros(1,i.nx);
     seed = 1e-5;
-    init(i.U.ad.dom)       = 1 - 0.168 - p.asylum_popn - seed;
+    init(i.U.ad.dom)       = 1 - 0.168 - seed;
     init(i.U.ad.migr_rect) = p.migrect_popn;
     init(i.I.ad.dom.ds)    = seed;
-    init(i.U.ad.aslm)    = p.asylum_popn;
     
     % Equlibrium model, without RR-TB
     p0 = p; r0 = r; 
@@ -38,7 +37,7 @@ else
     
     % >2015: scaleup of TPT 
     p1 = p; r1 = r; 
-    r1.TPT = [0 r.TPT2020rec 0 0 0];
+    r1.TPT = [0 r.TPT2020rec 0 0];
     r1.gamma = r.gamma_2015;
     M1 = make_model(p1, r1, i, s, gps, contmat);
     
@@ -50,9 +49,8 @@ else
     % --- Now simulate them all
 
     geq0 = @(t,in) goveqs_basis3(t, in, i, s, M0, agg, sel, r0, p0);
-    [t0, soln0] = ode15s(geq0, [0:5e3], init, odeset('NonNegative', 1:i.nstates,'RelTol', 1e-5, 'AbsTol', 1e-7));
-    keyboard;
-    
+    [t0, soln0] = ode15s(geq0, [0:5e3], init, odeset('NonNegative', 1:i.nstates));
+
     % Emergence of RR-TB
     %geq0b = @(t,in) goveqs_basis3(t, in, i, s, M0b, agg, sel, r0b, p0b);
     %[t0b, soln0b] = ode15s(geq0b, [1970:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
@@ -97,14 +95,9 @@ else
 
     % Notifications
     ch_notifs = dsol(end,i.aux.ch_notifs)*1e5;
-
-    % Notifications
-    p_asylum = sum(sfin(s.aslm))/sum(sfin(1:i.nstates));
-
-    p_asylumTB = incd(5)/incd(1);
-
+    
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs, p_asylum, p_asylumTB);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
@@ -122,9 +115,7 @@ else
         aux.chpopn     = p_chpopn;
         aux.adpopn     = p_adpopn;
         aux.ch_notifs  = ch_notifs;
-        aux.p_asylum     = p_asylum;
-        aux.p_asylumTB  = p_asylumTB;
-        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs, p_asylum, p_asylumTB];
+        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs];
     else
         out = -Inf;
         aux = NaN;
