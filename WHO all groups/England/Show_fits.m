@@ -4,14 +4,14 @@ load optim_res_MAIN;
 
 x0 = x0sto(5,:);
 
-% ix0 = size(xsto,1)/2;
-% nx  = 200;
-% dx  = round(ix0/nx);
-% xs  = xsto(ix0:dx:end,:);
+ix0 = size(xsto,1)/2;
+nx  = 200;
+dx  = round(ix0/nx);
+xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(x2,1)
-    [out, aux] = obj(x2);
+for ii = 1:size(xs,1)
+    [out, aux] = obj(xs(ii,:));
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;

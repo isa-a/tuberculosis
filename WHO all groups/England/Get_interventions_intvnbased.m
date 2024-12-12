@@ -11,14 +11,14 @@ opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
 
 
-midpt = true; 
+midpt = false; 
 if midpt
     % inds = find(outsto==max(outsto));
     % xs = xsto(inds(1),:);
     xs = x0sto(5,:);
 else
     ix0 = size(xsto,1)/2;
-    nx  = 200;
+    nx  = 10;
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
