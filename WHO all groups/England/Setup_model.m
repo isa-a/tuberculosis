@@ -22,7 +22,7 @@ s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    5,          16,     1,     1,           1];
+lgths = [    5,          12,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -35,7 +35,7 @@ i.nx = lim;
 % --- Set up selectors and aggregators
 
 % --- Incidence
-tmp = zeros(5,i.nstates); 
+tmp = zeros(3,i.nstates); 
 tmp(1,s.allI) = 1;
 tmp(2,intersect(s.allI,s.migr)) = 1;
 tmp(3,intersect(s.allI,s.vuln)) = 1;
@@ -155,14 +155,13 @@ p.ch_in_migr   = 0.07;                                                      % GU
 p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
 % p.TPTeff       = [0.6 0.1];                                                % Effectiveness of TPT
 p.TPTeff       = 0.6;                                                % Effectiveness of TPT
-r.TPT          = [0 0 0 0 0];                                                % Uptake of TPT amongst: 1.domestic, 2.recent migrants, 3.long-term migrants
+r.TPT          = [0 0 0 0];                                                % Uptake of TPT amongst: 1.domestic, 2.recent migrants, 3.long-term migrants
 r.TPT2020rec   = 0.004;
-r.ACF          = [0 0 0 0 0];
-r.ACF2         = [0 0 0 0 0];
+r.ACF          = [0 0 0 0];
+r.ACF2         = [0 0 0 0];
 
 p.migrect_popn = 0.168;
 r.migr         = 1/10;
-p.asylum_popn  = 0.0032;
 
 % p.LTBI_in_migrad = 0.17;
 % p.LTBI_in_migrch = 0.03;
@@ -290,7 +289,7 @@ f14  = get_distribution_fns(data.p_asylumTB, 'beta', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs, p_asylum, p_asylumTB) f1a(incd2010) + f1b(incd2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs, p_asylum) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + f5(p_LTBI_inmigr) + ...
                                                                                                      f6(p_vulnpopn) + f7(p_vulnTB) + ...
                                                                                                      f8(incd_ch2020) + ...
