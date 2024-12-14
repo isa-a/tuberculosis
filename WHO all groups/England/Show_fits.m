@@ -5,7 +5,7 @@ load optim_res_MAIN;
 x0 = x0sto(5,:);
 
 ix0 = size(xsto,1)/2;
-nx  = 200;
+nx  = 20;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
