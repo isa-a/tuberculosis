@@ -70,7 +70,7 @@ x3 = fminsearch(nobj,x2,options);
 
 
 % Perform MCMC
-[xsto, outsto] = MCMC_adaptive33(obj, x0, 1e4, 1, [], [], cov0, 1);
+[xsto, outsto] = MCMC_adaptive2(obj, x_new, 1e4, 1, cov0, 1);
 
 inds = find(outsto==max(outsto));
 x_new = xsto(inds(1),:);
@@ -83,9 +83,9 @@ cov0 = cov(xsto);
 nreps = 4;
 niter = [1, 1, 1, 5]*2e3;
 for ii = 1:nreps
-    [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, [], 1);
+    [xsto, outsto] = MCMC_adaptive2(obj, x_new, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));
-    x2 = xsto(inds(1),:);
+    x_new = xsto(inds(1),:);
     cov0 = cov(xsto);
     fprintf('\n');
 end

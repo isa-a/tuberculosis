@@ -1,4 +1,4 @@
-clear all; load optim_res_MAIN.mat; load Model_setup;
+%clear all; load optim_res_MAIN.mat; load Model_setup;
 
 obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 
@@ -38,7 +38,7 @@ for ii = 1:size(xs,1)
     % TPT in recent migrants
     ra = r0; pa = p0;
     ra.TPT = TPTcov * [0 1 0 0];
-    ra.TPTeff = 0.6;
+    ra.TPTeff = 0.81;
     Ma = make_model(pa, ra, i, s, gps, prm.contmat);
     
     % TPT at point of entry
@@ -72,7 +72,7 @@ for ii = 1:size(xs,1)
 %     rg.ACF = -log(1-0.99) * [1 1 1 1];
 %     rg.TPT = -log(1-0.5) * [1 1 1 1];
 %     pg.migrTPT = 0.8;
-    rg.TPTeff = 0.8;
+    rg.TPTeff = 0.9;
     rg.relapse = rg.relapse/2;
     rg.progression(2,:) = rg.progression(2,:)*0.6;
     rg.reactivation(2,:) = rg.reactivation(2,:)*0.6; 
