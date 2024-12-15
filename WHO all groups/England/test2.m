@@ -31,14 +31,14 @@ for ii = 1:size(xs, 1)
     % Define all models
     ra = r0; pa = p0;
     ra.TPT = TPTcov * [0 1 0 0];
-    ra.TPTeff = 0.6;
+    ra.TPTeff = 0.81;
     Ma = make_model(pa, ra, i, s, gps, prm.contmat);
 
-    rb = ra; pb = pa;
-    pb.migrTPT = 0.25;
-    Mb = make_model(pb, rb, i, s, gps, prm.contmat);
+%     rb = ra; pb = pa;
+%     pb.migrTPT = 0.25;
+%     Mb = make_model(pb, rb, i, s, gps, prm.contmat);
 
-    rc = rb; pc = pb;
+    rc = ra; pc = pa;
     rc.TPT = TPTcov * [0 1 0 1];
     Mc = make_model(pc, rc, i, s, gps, prm.contmat);
 
@@ -73,8 +73,8 @@ for ii = 1:size(xs, 1)
     rg3.reactivation(2, :) = rg3.reactivation(2, :) * 0.6;
     Mg3 = make_model(pg3, rg3, i, s, gps, prm.contmat);
 
-    % Collect all models in array, excluding Mg1
-    models = {M0, Ma, Mb, Me, Mf1, Mf2, Mf3, Mg1, Mg2, Mg3};
+
+    models = {M0, Ma, Me, Mf1, Mf2, Mf3, Mg1, Mg2, Mg3};
 
     % Run simulations for all models
     for mi = 1:length(models)
@@ -93,7 +93,7 @@ for ii = 1:size(xs, 1)
 
                 soln = [soln1; soln2(2:end, :)];
 
-            elseif mi >= 8 && mi <= 10  % Mg2, Mg3: 2030 to 2033
+            elseif mi >= 8 && mi <= 9  % Mg2, Mg3: 2030 to 2033
                 geq_me = @(t, in) goveqs_scaleup(t, in, i, s, M0, Me, p0, pe, [2024 2027], agg, sel, r0);
                 [~, soln1] = ode15s(geq_me, 2022:2027, init, opts);
 
@@ -130,84 +130,77 @@ fprintf('\n');
 
 % Plotting code remains unchanged except `Mg1` is excluded from the legend setup
 
-% Plotting code remains unchanged except `Mb` is excluded from the legend setup
-% Define the years and calculate central estimates and percentiles
 % Define the years and calculate central estimates and percentiles
 years = 2022:(2022 + size(incsto, 1) - 1);
 central_estimate = mean(incsto, 2);              
 lower_bound = prctile(incsto, 2.5, 2);          
 upper_bound = prctile(incsto, 97.5, 2);          
 
+% Create figure
 ff = figure('Position', [577, 190, 1029, 732]); 
 hold on;
 
 % Set colors for model groups
-baseline_color = [0 0 1];          % Blue for Baseline (M0)
-ma_me_color = [1 0 0];             % Red for Ma and Me
-mf1_mf2_mf3_color = [1 0.5 0];     % Orange for Mf1, Mf2, Mf3
-mg1_mg2_mg3_color = [0.4940 0.1840 0.5560]; % MATLAB purple for Mg1, Mg2, Mg3
+baseline_color = [0 0 1];                        % Blue for Baseline (M0)
+ma_me_color = [1 0, 0];                           % Red for Ma and Me
+mf1_mf2_mf3_color = [1 0.5, 0];                   % Orange for Mf1, Mf2, Mf3
+mg1_mg2_mg3_color = [0.4940, 0.1840, 0.5560];     % MATLAB purple for Mg1, Mg2, Mg3
 
-% Define the models for which we want to shade percentiles
-shaded_models = [1, 4, 7, 10];  % Indices for Baseline (M0), Me, Mf3, Mg3
-legendEntries = {'Baseline', 'Ma', 'Me', 'Mf1', 'Mf2', 'Mf3', 'Mg1', 'Mg2', 'Mg3'};  % Exclude Mb
-plotHandles = gobjects(length(models) - 1, 1);  % Adjusted for one less model in legend
+% Define the legend entries
+legendEntries = {'Baseline', 'Ma', 'Me', 'Mf1', 'Mf2', 'Mf3', 'Mg1', 'Mg2', 'Mg3'};
 
-legend_idx = 1;  % Legend index for proper assignment
+% Initialize plot handle array
+plotHandles = gobjects(length(models), 1);
 
+% Iterate over models
 for mi = 1:length(models)
-    if mi == 3  % Skip Mb
-        continue;
-    end
-
     % Assign color based on model group
-    if mi == 1
-        plot_color = baseline_color;              % Baseline (M0)
-    elseif ismember(mi, [2, 4])
-        plot_color = ma_me_color;                % Ma and Me
-    elseif ismember(mi, [5, 6, 7])
-        plot_color = mf1_mf2_mf3_color;          % Mf1, Mf2, Mf3
-    elseif ismember(mi, [8, 9, 10])
-        plot_color = mg1_mg2_mg3_color;          % Mg1, Mg2, Mg3
+    if mi == 1  % Baseline (M0)
+        plot_color = baseline_color;
+    elseif mi == 2 || mi == 3  % Ma or Me
+        plot_color = ma_me_color;
+    elseif mi >= 4 && mi <= 6  % Mf1, Mf2, Mf3
+        plot_color = mf1_mf2_mf3_color;
+    elseif mi >= 7 && mi <= 9  % Mg1, Mg2, Mg3
+        plot_color = mg1_mg2_mg3_color;
     end
 
-    % Determine line style and shading
-    if mi == 10  % Mg3: Solid curve with shading
-        fill([years fliplr(years)], [lower_bound(:, 1, mi)' fliplr(upper_bound(:, 1, mi)')], ...
-            plot_color, 'FaceAlpha', 0.2, 'EdgeColor', 'none', 'HandleVisibility', 'off');
-        line_style = '-';  % Solid line
-    elseif mi == 8 || mi == 9  % Mg1 and Mg2: Dashed line with adjusted dash pattern
-        line_style = '--';
-        dash_pattern = {'LineStyle', '--', 'LineWidth', 2, 'Marker', 'none'};  % Longer dashes
-    else  % All other models follow their default logic
-        if ismember(mi, shaded_models)
-            fill([years fliplr(years)], [lower_bound(:, 1, mi)' fliplr(upper_bound(:, 1, mi)')], ...
-                plot_color, 'FaceAlpha', 0.2, 'EdgeColor', 'none', 'HandleVisibility', 'off');
-            line_style = '-';  % Solid line for shaded models
-        else
-            line_style = '--';  % Dashed line for unshaded models
-        end
-    end
-
-    % Plot the central estimate with specified line style and color
-    if mi == 8 || mi == 9
-        plotHandle = plot(years, central_estimate(:, 1, mi), 'Color', plot_color, dash_pattern{:});
+    % Assign line style
+    if mi == 1 || mi == 3 || mi == 6 || mi == 9  % Baseline, Me, Mf3, Mg3
+        line_style = '-';  % Solid
     else
-        plotHandle = plot(years, central_estimate(:, 1, mi), 'LineWidth', 2, 'Color', plot_color, 'LineStyle', line_style);
+        line_style = '--';  % Dashed
     end
-    plotHandles(legend_idx) = plotHandle;
-    legend_idx = legend_idx + 1;
+
+    % Extract data for the current model
+    central_estimate_model = central_estimate(:, mi);
+    lower_bound_model = lower_bound(:, mi);
+    upper_bound_model = upper_bound(:, mi);
+
+    % Add shading for Baseline, Me, Mf3, Mg3
+    if mi == 1 || mi == 3 || mi == 6 || mi == 9  % Baseline, Me, Mf3, Mg3
+        fill([years fliplr(years)], ...
+             [lower_bound_model' fliplr(upper_bound_model')], ...
+             plot_color, 'FaceAlpha', 0.2, 'EdgeColor', 'none', 'HandleVisibility', 'off');
+    end
+
+    % Plot the central estimate
+    plotHandles(mi) = plot(years, central_estimate_model, 'LineWidth', 2, ...
+                           'Color', plot_color, 'LineStyle', line_style);
 end
 
-% Add legend and labels
-legend(plotHandles, legendEntries, 'FontWeight', 'bold', 'FontSize', 12);
+% Add legend
+legend(plotHandles, legendEntries, 'FontWeight', 'bold', 'FontSize', 12, 'Location', 'best');
+
+% Add labels and axis limits
 xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
 ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
 xlim([years(1) years(end)]);
 ylim([0, 10]);
+
+% Add horizontal reference lines
 yline(1, 'k--', 'LineWidth', 2, 'HandleVisibility', 'off');
 yline(0.1, 'k--', 'LineWidth', 2, 'HandleVisibility', 'off');
 
 hold off;
-
-
 
