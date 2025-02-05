@@ -205,7 +205,7 @@ r.migr         = 0.0847;                                                   % htt
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor'};      
 % lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,            1,                1,                          1,           1,          1            1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','vuln','relbeta_vuln', 'p_relrate', 'ageing','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ARTnow', 'HIVfactor', 'muHIV', 'muTBHIV', 'HIV', 'ART'};      
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','vuln','relbeta_vuln', 'p_relrate', 'ageing','p_relrate_factor', 'contmat_factor', 'HIVincdpeak', 'HIVincdnow', 'r_ART_init', 'HIVfactor', 'muHIV', 'muTBHIV', 'HIV', 'ART'};      
 lgths =      [1,        1,      2,                      1,       1,             1,           1,        1,            1,                1,                          1,           1,          1            1,     1,          1,      1       1];
 
 lim = 0; xi = [];
@@ -236,7 +236,7 @@ bds(xi.p_relrate_factor,:) = [1, 10];
 bds(xi.contmat_factor,:)    = [0, 1];
 bds(xi.HIVincdpeak,:)    = [15, 30];
 bds(xi.HIVincdnow,:)    = [15, 30];
-bds(xi.r_ARTnow,:)    = [0, 1];
+bds(xi.r_ART_init,:)    = [0, 10];
 bds(xi.HIVfactor,:)   = [1, 50];
 bds(xi.muHIV,:)   = [0, 1];
 bds(xi.muTBHIV,:)   = [0, 10];

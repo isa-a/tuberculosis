@@ -24,46 +24,14 @@ else
     %init(i.U.ad.dom.neg) = seed;
 
 
-    
+    % --- Set up the necessary models -------------------------------------
     % Equlibrium model, without RR-TB
     p0 = p; r0 = r; 
     p0.betadec = 0;
     r0.gamma   = r.gamma_2015;
+    r0.ART_init = 0;
     p0.relbeta = 0; r0.RR_acqu = 0;
     M0 = make_model(p0, r0, i, s, gps, prm.contmat);
-
-%     %Introduction of HIV from 1990 to 2010
-%     p1 = p; r1 = r; 
-%     r1.HIV = r.HIVincdpeak;
-%     M1 = make_model(p1, r1, i, s, gps, prm.contmat);
-% 
-%     % Introduction of RR-TB from 1970
-% %     p0b = p; r0b = r; 
-% %     p0b.betadec = 0;
-% %     r0b.gamma   = r.gamma_2015;
-% %     M0b = make_model(p0b, r0b, i, s, gps, contmat);
-%     
-%     % >2015: scaleup of TPT 
-%     p2 = p; r2 = r; 
-%     r2.TPT = [0 r.TPT2020rec 0 0];
-%     r2.gamma = r.gamma_2015;
-%     M2 = make_model(p2, r2, i, s, gps, prm.contmat);
-%     
-%     % >2010: increase in case-finding
-%     p3 = p; r3 = r; 
-%     r3.gamma = r.gamma_2020;
-%     M3 = make_model(p3, r3, i, s, gps, prm.contmat);
-% 
-%     % >2010: scaleup of ART 
-%     p4 = p; r4 = r; 
-%     %r3.TPT = [0 r.TPT2020rec 0 0];
-%     r4.ART = r.ARTnow;
-%     M4 = make_model(p4, r4, i, s, gps, prm.contmat);
-% 
-%     %decay of HIV peak from 2010 until 2020
-%     p5 = p; r5 = r; 
-%     r5.HIV = r.HIVincdnow;
-%     M5 = make_model(p5, r5, i, s, gps, prm.contmat);
 
     % >2015: scaleup of TPT 
     p1 = p; r1 = r; 

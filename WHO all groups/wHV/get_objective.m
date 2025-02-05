@@ -32,8 +32,10 @@ else
     % --- Simulate the models
     
     % Equilibrium model
-    init = zeros(1,i.nx); seed = 1e-6;
-    init(i.U.v0.h0) = (1-seed); init(i.I.v0.h0) = seed;
+    init = zeros(1,i.nx); 
+    seed = 1e-6;
+    init(i.U.v0.h0) = (1-seed); 
+    init(i.I.v0.h0) = seed;
     geq = @(t,in)goveqs_basis2(t, in, M0, i, prm, sel, agg);
     [t0, soln0] = ode15s(geq, [0:2e3], init, odeset('NonNegative',[1:i.nstates],'RelTol',1e-10,'AbsTol',1e-10));
     

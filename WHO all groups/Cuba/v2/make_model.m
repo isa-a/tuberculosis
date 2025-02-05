@@ -175,7 +175,8 @@ m(inds) = m(inds) + r.HIV;
 sources = s.pos;
 destins = s.art;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
-m(inds) = m(inds) + r.ART;    
+rates   = r.ART_init;
+m(inds) = m(inds) + rates;    
 
 M.lin = sparse(m - diag(sum(m,1)));
 

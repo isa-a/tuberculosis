@@ -220,7 +220,7 @@ m(:,1)            = r.mort;
 m(s.h1,1)         = r.HIV_mort;                                             % HIV+ve, no TB
 inds = intersect(s.h0,s.symptomatic);
 m(inds,2) = r.mort_TB(1);                                                   % HIV-ve, untreated TB
-inds = intersect([s.h1,s.hart],s.symptomatic);
+inds = intersect([s.h1,s.hart],s.*ptomatic);
 m(inds,3) = r.mort_TB(2);                                                   % HIV+ve, untreated TB
 
 inds = intersect(s.h0,s.Tx);
