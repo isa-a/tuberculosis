@@ -1,6 +1,3 @@
-% UPDATE vuln data following most recent discussion with Sharon
-% Tidy contact matrix and how it's implemented
-
 clear all;
 
 states1     = {'U'};
@@ -8,9 +5,10 @@ states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
 gps.born    = {'dom','vuln'};
 gps.strains = {'ds'};
+gps.hiv     = {'neg','pos','art'};
 
-[i, s, d, lim] = get_addresses({states1, gps.age, gps.born}, [], [], [], 0);
-[i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains}, i, s, d, lim);
+[i, s, d, lim] = get_addresses({states1, gps.age, gps.born, gps.hiv}, [], [], [], 0);
+[i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains, gps.hiv}, i, s, d, lim);
 d = char(d);
 
 %s.migr       = [s.migr_rect, s.migr_long];
@@ -21,7 +19,7 @@ s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    3,          8,     1,     1,           1];
+lgths = [    4,          12,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -39,6 +37,7 @@ tmp(1,s.allI) = 1;
 %tmp(2,intersect(s.allI,s.migr)) = 1;
 tmp(2,intersect(s.allI,s.vuln)) = 1;
 tmp(3,intersect(s.allI,s.ch))   = 1;
+tmp(4,intersect(s.allI,s.ch))   = 1;
 agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);

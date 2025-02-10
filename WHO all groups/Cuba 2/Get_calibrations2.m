@@ -43,7 +43,7 @@ for ii = 1:nreps
 end
 
 
-save optim_res_OMAN5;
+save optim_res;
 % [xsto, outsto] = MCMC_adaptive2(obj, x0sto(2,:), 1000, 1, [], true);
 
 
