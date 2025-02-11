@@ -8,59 +8,31 @@ tmp = M.denvec*invec;
 den = sum(tmp.*M.denvec,1)';
 den(den==0) = Inf;
 
+if t<1980                                                                  
+    rHIV = 0;
+else
+    rHIV = interp1(0:length(prm.rHIV)-1, prm.rHIV, (t-1980)); 
+end
+
+try
+% Normalise by populations
+lam = M.lambda*invec/sum(invec);
+allmat = M.lin + M.Dxlin + rHIV*M.linHIV + lam*M.nlin;                     
+out = allmat*invec;
+catch
+   keyboard; 
+end
+
 % New infections
 lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
-% lam = M.lam*(invec./sum(invec))*(1-p.betadec)^(max((t-2010),0));
-
-% Indices for lambda entries
-% 1. ch dom  ds
-% 2. ch dom  rr
-% 3. ad dom  ds
-% 4. ad dom  rr
-% 5. ch migr ds
-% 6. ch migr rr
-% 7. ad migr ds
-% 8. ad migr rr
-% 9. ch vuln ds
-% 10.ch vuln rr
-% 11.ad vuln ds
-% 12.ad vuln rr
-
-% Indices for NO RR lambda entries
-% 1. ch dom  ds
-% 2. ad dom  ds
-% 3. ch migr ds
-% 4. ad migr ds
-% 5. ch vuln ds
-% 6. ad vuln ds
 
 
-% Indices for NO RR NO VULN lambda entries
-% 1. ch dom  ds
-% 2. ad dom  ds
-% 3. ch migr ds
-% 4. ad migr ds
-
-
-% allmat = M.lin + ...
-%         lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + ...
-%         lam(3)*M.nlin.ch.migr_rect.ds     + lam(4)*M.nlin.ad.migr_rect.ds + ...
-%         lam(3)*M.nlin.ch.migr_long.ds     + lam(4)*M.nlin.ad.migr_long.ds;
 
 allmat = M.lin + ...
         lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + ...
         lam(3)*M.nlin.ch.vuln.ds          + lam(4)*M.nlin.ad.vuln.ds;
 
-% Full model
-% allmat = M.lin + ...
-%         lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ch.dom.rr + ...
-%         lam(3)*M.nlin.ad.dom.ds           + lam(4)*M.nlin.ad.dom.rr + ...
-%         lam(5)*M.nlin.ch.migr_rect.ds     + lam(6)*M.nlin.ch.migr_rect.rr + ...
-%         lam(5)*M.nlin.ch.migr_long.ds     + lam(6)*M.nlin.ch.migr_long.rr + ...
-%         lam(7)*M.nlin.ad.migr_rect.ds     + lam(8)*M.nlin.ad.migr_rect.rr + ...
-%         lam(7)*M.nlin.ad.migr_long.ds     + lam(8)*M.nlin.ad.migr_long.rr + ...
-%         lam(9)*M.nlin.ch.vuln.ds          + lam(10)*M.nlin.ch.vuln.rr + ...
-%         lam(11)*M.nlin.ad.vuln.ds         + lam(12)*M.nlin.ad.vuln.rr;
+
 
 out(1:i.nstates) = allmat*invec;
 
@@ -68,42 +40,8 @@ out(1:i.nstates) = allmat*invec;
 morts = M.mort.*invec;
 out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
 
-% Births into UK population
-% dom_morts = sum(sum(morts([s.dom],:)));
-% out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
-
 dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
 out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
-
-% method 1 ----------------------------------------------------------------
-
-% Migration out of UK
-% outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
-% out(s.migr) = out(s.migr) - outmigr;
-%disp('out');
-%disp(sum(out));
-
-% Migration into UK (balance the migration out and migrant mortality)
-% migrmorts = sum(sum(morts(s.migr,:)));
-% totalout = sum(outmigr) + migrmorts;
-% out(1:i.nstates) = out(1:i.nstates) + totalout.*M.migrentries;
-
-% keyboard;
-
-% %disp('in');
-% %disp(sum(out));
-
-% method 2 ----------------------------------------------------------------
-
-% % Migration out of UK
-% outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
-% out(s.migr) = out(s.migr) - outmigr;
-% 
-% % Migration into UK
-% migrmorts = sum(sum(morts(s.migr,:)));
-% totalout = sum(outmigr) + migrmorts;
-% % migration into migr recent states only
-% out(s.migr_rect) = out(s.migr_rect) + (totalout / length(s.migr_rect));
 
 
 if sum(invec)>5
@@ -111,8 +49,6 @@ if sum(invec)>5
 end
 
 
-% % Migration
-% out(1:i.nstates) = out(1:i.nstates) + M.migration;
 
 % Auxiliaries
 out(i.aux.inc)        = agg.inc*(sel.inc.*allmat)*invec;

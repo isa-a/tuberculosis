@@ -33,9 +33,15 @@ agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);
 tmp(s.Isc,:) = 1;
-tmp(s.h1,s.h0) = 0;   tmp(s.h0,s.h1) = 0; 
-tmp(s.hart,s.h1) = 0; tmp(s.h1,s.hart) = 0;
-tmp(s.v1,s.v0) = 0; tmp(s.vw,s.v1) = 0;
+
+tmp(s.h1,s.h0) = 0;   
+tmp(s.h0,s.h1) = 0; 
+
+tmp(s.hart,s.h1) = 0; 
+tmp(s.h1,s.hart) = 0;
+
+tmp(s.v1,s.v0) = 0; 
+tmp(s.vw,s.v1) = 0;
 sel.inc = tmp - diag(diag(tmp));
 
 % Selectors for notifications

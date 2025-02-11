@@ -217,6 +217,7 @@ end
 
 
 
+load data_AFR data;
 load data_Thembisa_AFR.mat;
 
 % -------------------------------------------------------------------------
@@ -232,36 +233,26 @@ data.propincd_ch    = [0.006 0.014 0.025];
 data.p_chpopn       = [0.198 0.2471 0.3];                                    % proportion of country thats children
 data.p_adpopn       = [0.65 0.7529 0.85];                                  % proportion of country thats adults
 data.ch_notifs      = [3 3.69 4.2]/4.576e6*1e5;                             % notifications in the country  
-data.HIV_prev       = HIVprev_2019;
-data.ART_covg       = ARTcovg_2019;
-prm.ART_start       = ART_start;
-
-ys1 = HIV_incd(:,2);
-xs1 = 1:length(ys1);
-xs2 = 1:length(ys1)+30;
-ys2 = max(interp1(xs1,ys1,xs2,'linear','extrap'),0);
-prm.rHIV = ys2;
+data.HIV_prev   = HIVprev_2019;
+data.ART_covg = ARTcovg_2019;
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
 f1b = get_distribution_fns(data.incd2020,   'lognorm', show);
 f2  = get_distribution_fns(data.mort,       'lognorm', show);
-f3  = get_distribution_fns(data.p_vulnpopn, 'beta',    show);
-f4  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
-f5  = get_distribution_fns(data.propincd_ch,'beta', show);
-f6  = get_distribution_fns(data.p_chpopn,  'beta',    show);
-f7  = get_distribution_fns(data.p_adpopn,  'beta',    show);
-f8  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
-f9 = get_distribution_fns(data.ART_covg,    'beta', show);
-f10 = get_distribution_fns(data.HIV_prev,    'lognorm', show);
+f6  = get_distribution_fns(data.p_vulnpopn, 'beta',    show);
+f7  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
+f9  = get_distribution_fns(data.propincd_ch,'beta', show);
+f10  = get_distribution_fns(data.p_chpopn,  'beta',    show);
+f11  = get_distribution_fns(data.p_adpopn,  'beta',    show);
+f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
 
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, ART_covg, HIV_prev) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                    f2(mort) + f3(p_vulnpopn) + f4(p_vulnTB) ...
-                                                                                                    + f6(p_chpopn) + f8(ch_notifs) ...
-                                                                                                    + f9(ART_covg) + f10(HIV_prev);
+lhd.fn = @(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
+                                                                                                     f2(mort) + ...
+                                                                                                     f6(p_vulnpopn) + f7(p_vulnTB) + f10(p_chpopn) +f12(ch_notifs);
 
 save Model_setup;
 
