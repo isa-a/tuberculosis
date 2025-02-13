@@ -20,7 +20,7 @@ s.prev       = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    6,          12,     1,     1,           1];
+lgths = [    6,          36,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -176,16 +176,10 @@ bds(xi.beta,:)                   = [0 40];
 bds(xi.betadec,:)                = [0 0.15];
 bds(xi.gamma,:)                  = repmat([1e-4 10],2,1);
 bds(xi.p_relrate_gamma_chvad,:)  = [0 1];
-% bds(xi.p_LTBI_in_migrad,:)       = [0.1 0.6];
-% bds(xi.p_relLTBI_inmigr_advch,:) = [3 7];                                % Estimated using simple ARTI calculation
 bds(xi.p_relrate,:)              = repmat([1 20],2,1);
-%bds(xi.r_migr,:)           = [0 1];
-% bds(xi.r_vuln,:)                 = [0 2];
 bds(xi.r_vuln_sc,:)              = [0 1];
 bds(xi.relbeta_vuln,:)           = [0.1 20];
-% bds(xi.ageing,:)                 = [0.02 0.3];
 bds(xi.r_ageing_sc,:)            = [0 1];
-%bds(xi.ch_mort,:)          = [0, 0.01];
 bds(xi.p_relrate_factor,:) = [1, 10];
 bds(xi.contmat_factor,:)    = [0, 1];
 bds(xi.r_ART_init,:)    = [0 10];

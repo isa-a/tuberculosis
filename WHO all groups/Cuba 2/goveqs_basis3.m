@@ -16,32 +16,23 @@ end
 
 try
 % Normalise by populations
-lam = M.lambda*invec/sum(invec);
-allmat = M.lin + M.Dxlin + rHIV*M.linHIV + lam*M.nlin;                     
+lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
+linmat = M.lin + ...
+        lam(1)*M.nlin.ch.dom.ds.neg + lam(1)*M.nlin.ch.dom.ds.pos + lam(1)*M.nlin.ch.dom.ds.art           + lam(2)*M.nlin.ad.dom.ds.neg + lam(2)*M.nlin.ad.dom.ds.pos + lam(2)*M.nlin.ad.dom.ds.art ...
+        + lam(3)*M.nlin.ch.vuln.ds.neg + lam(3)*M.nlin.ch.vuln.ds.pos + lam(3)*M.nlin.ch.vuln.ds.art          + lam(4)*M.nlin.ad.vuln.ds.neg + lam(4)*M.nlin.ad.vuln.ds.pos + lam(4)*M.nlin.ad.vuln.ds.art;
+allmat = rHIV*M.linHIV + linmat;                     
 out = allmat*invec;
 catch
    keyboard; 
 end
 
-% New infections
-lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
 
-
-
-allmat = M.lin + ...
-        lam(1)*M.nlin.ch.dom.ds           + lam(2)*M.nlin.ad.dom.ds + ...
-        lam(3)*M.nlin.ch.vuln.ds          + lam(4)*M.nlin.ad.vuln.ds;
-
-
-
-out(1:i.nstates) = allmat*invec;
-
-% Mortality
+% Mortality and births
 morts = M.mort.*invec;
 out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
 
 dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
-out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
+out(i.U.ch.dom.neg) = out(i.U.ch.dom.neg) + dom_morts;
 
 
 if sum(invec)>5
@@ -49,10 +40,8 @@ if sum(invec)>5
 end
 
 
-
 % Auxiliaries
 out(i.aux.inc)        = agg.inc*(sel.inc.*allmat)*invec;
-
 tmp1                  = agg.incsources*((sel.L2I.*allmat)*invec);
 tmp2                  = agg.incsources*((sel.P2I.*allmat)*invec);
 tmp3                  = agg.incsources*((sel.R2I.*allmat)*invec);

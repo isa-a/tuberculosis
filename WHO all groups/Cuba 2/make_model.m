@@ -28,7 +28,7 @@ for ia = 1:length(gps.age)
                 Rlo = geti('Rlo');
                 Rhi = geti('Rhi');
                 R   = geti('R');
-        
+                
                 % Progression from 'fast' latent
                 source  = Lf;
                 destin  = I;
@@ -195,7 +195,7 @@ for ia = 1:length(gps.age)
             for ih = 1:length(gps.hiv)
                 hiv = gps.hiv{ih};
     
-                m = zeros(i.nstates);
+                m = zeros(i.nstates); % put this in line 190
                 susinds = intersect(intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born)), s.(hiv));
                 m(i.Lf.(age).(born).(strain).(hiv), susinds) = 1;
                 
@@ -257,9 +257,11 @@ M.denvec = sparse(m);
 m = zeros(i.nstates,2);
 m(s.ch,1)         = 0;
 m(s.ad,1)         = 1/72;
+m(s.pos,1)        = m(s.pos,1) + r_HIV_mort;
 %m(:,1)            = 1/83;
 m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
+
 M.mort            = sparse(m);
 
 % --- Mortality -----------------------------------------------------------
