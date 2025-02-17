@@ -188,21 +188,21 @@ M.linHIV = sparse(m2 - diag(sum(m2,1)));
 
 for ia = 1:length(gps.age)
     age = gps.age{ia};
+    m = zeros(i.nstates); % new added here instead of after hiv
     for is = 1:length(gps.strains)
         strain = gps.strains{is};
         for ib = 1:length(gps.born)
             born = gps.born{ib};
             for ih = 1:length(gps.hiv)
                 hiv = gps.hiv{ih};
-    
-                m = zeros(i.nstates); % put this in line 190
+
                 susinds = intersect(intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born)), s.(hiv));
                 m(i.Lf.(age).(born).(strain).(hiv), susinds) = 1;
                 
                 imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
                 m(:,imminds) = m(:,imminds)*(1-p.imm);
                 
-                M.nlin.(age).(born).(strain).(hiv) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
+                M.nlin.(age).(strain) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
             end
         end
     end
@@ -214,28 +214,28 @@ end
 getinds = @(st1, st2, st3) intersect(intersect(intersect(s.infectious, s.(st1)), s.(st2)), s.(st3));
 contmat(end,end) = contmat(end,end);
 
-m = zeros(4,i.nstates);                                                   % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
+m = zeros(4,i.nstates);                                                     % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
                                                                             % no RR Rows: 1.Dom DS 2.Migr DS 3.Vuln DS   
 
-m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                              % no vuln Rows: 1.Dom DS 2.Migr DS 
-m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  
-m(1,getinds('ch', 'vuln','ds')) = contmat(1,3);
-m(1,getinds('ad', 'vuln','ds')) = contmat(1,4);
+m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                             % no vuln Rows: 1.Dom DS 2.Migr DS 
+% m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  
+% m(1,getinds('ch', 'vuln','ds')) = contmat(1,3);
+% m(1,getinds('ad', 'vuln','ds')) = contmat(1,4);
 
 m(2,getinds('ch', 'dom', 'ds')) = contmat(2,1);
-m(2,getinds('ad', 'dom','ds')) = contmat(2,2);
-m(2,getinds('ch', 'vuln','ds')) = contmat(2,3);
-m(2,getinds('ad', 'vuln','ds')) = contmat(2,4);
+% m(2,getinds('ad', 'dom','ds')) = contmat(2,2);
+% m(2,getinds('ch', 'vuln','ds')) = contmat(2,3);
+% m(2,getinds('ad', 'vuln','ds')) = contmat(2,4);
 
-m(3,getinds('ch', 'dom', 'ds')) = contmat(3,1);
-m(3,getinds('ad', 'dom','ds')) = contmat(3,2);
-m(3,getinds('ch', 'vuln','ds')) = contmat(3,3);
-m(3,getinds('ad', 'vuln','ds')) = contmat(3,4);
-
-m(4,getinds('ch', 'dom', 'ds')) = contmat(4,1);
-m(4,getinds('ad', 'dom','ds')) = contmat(4,2);
-m(4,getinds('ch', 'vuln','ds')) = contmat(4,3);
-m(4,getinds('ad', 'vuln','ds')) = contmat(4,4);
+% m(3,getinds('ch', 'dom', 'ds')) = contmat(3,1);
+% m(3,getinds('ad', 'dom','ds')) = contmat(3,2);
+% m(3,getinds('ch', 'vuln','ds')) = contmat(3,3);
+% m(3,getinds('ad', 'vuln','ds')) = contmat(3,4);
+% 
+% m(4,getinds('ch', 'dom', 'ds')) = contmat(4,1);
+% m(4,getinds('ad', 'dom','ds')) = contmat(4,2);
+% m(4,getinds('ch', 'vuln','ds')) = contmat(4,3);
+% m(4,getinds('ad', 'vuln','ds')) = contmat(4,4);
 
 
 % Include infectiousness
@@ -257,7 +257,7 @@ M.denvec = sparse(m);
 m = zeros(i.nstates,2);
 m(s.ch,1)         = 0;
 m(s.ad,1)         = 1/72;
-m(s.pos,1)        = m(s.pos,1) + r_HIV_mort;
+m(s.pos,1)        = m(s.pos,1) + r.HIV_mort;
 %m(:,1)            = 1/83;
 m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;

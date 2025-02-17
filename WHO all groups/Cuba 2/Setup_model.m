@@ -20,7 +20,7 @@ s.prev       = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    6,          36,     1,     1,           1];
+lgths = [    6,          14,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -234,7 +234,7 @@ ys1 = HIV_incd(:,2);
 xs1 = 1:length(ys1);
 xs2 = 1:length(ys1)+30;
 ys2 = max(interp1(xs1,ys1,xs2,'linear','extrap'),0);
-prm.rHIV = ys2;
+r.rHIV = ys2;
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);

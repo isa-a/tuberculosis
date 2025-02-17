@@ -11,15 +11,12 @@ den(den==0) = Inf;
 if t<1980                                                                  
     rHIV = 0;
 else
-    rHIV = interp1(0:length(prm.rHIV)-1, prm.rHIV, (t-1980)); 
+    rHIV = interp1(0:length(r.rHIV)-1, r.rHIV, (t-1980)); 
 end
-
 try
 % Normalise by populations
 lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
-linmat = M.lin + ...
-        lam(1)*M.nlin.ch.dom.ds.neg + lam(1)*M.nlin.ch.dom.ds.pos + lam(1)*M.nlin.ch.dom.ds.art           + lam(2)*M.nlin.ad.dom.ds.neg + lam(2)*M.nlin.ad.dom.ds.pos + lam(2)*M.nlin.ad.dom.ds.art ...
-        + lam(3)*M.nlin.ch.vuln.ds.neg + lam(3)*M.nlin.ch.vuln.ds.pos + lam(3)*M.nlin.ch.vuln.ds.art          + lam(4)*M.nlin.ad.vuln.ds.neg + lam(4)*M.nlin.ad.vuln.ds.pos + lam(4)*M.nlin.ad.vuln.ds.art;
+linmat = M.lin + lam(1)*M.nlin.ch.ds + lam(2)*M.nlin.ad.ds;
 allmat = rHIV*M.linHIV + linmat;                     
 out = allmat*invec;
 catch
@@ -46,7 +43,7 @@ tmp1                  = agg.incsources*((sel.L2I.*allmat)*invec);
 tmp2                  = agg.incsources*((sel.P2I.*allmat)*invec);
 tmp3                  = agg.incsources*((sel.R2I.*allmat)*invec);
 tmp4                  = agg.incsources*((sel.T2I.*allmat)*invec);
-out(i.aux.incsources) = [tmp1; tmp2; tmp3; tmp4];
+%out(i.aux.incsources) = [tmp1; tmp2; tmp3; tmp4];
 out(i.aux.mort)       = sum(morts(:,2));
 out(i.aux.nTPT)       = sum((sel.nTPT.*allmat)*invec);
 out(i.aux.ch_notifs)  = sum((sel.ch_notifs.*allmat)*invec);
