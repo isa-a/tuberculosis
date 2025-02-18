@@ -234,7 +234,7 @@ ys1 = HIV_incd(:,2);
 xs1 = 1:length(ys1);
 xs2 = 1:length(ys1)+30;
 ys2 = max(interp1(xs1,ys1,xs2,'linear','extrap'),0);
-r.rHIV = ys2;
+prm.rHIV = ys2;
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);

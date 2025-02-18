@@ -202,7 +202,7 @@ for ia = 1:length(gps.age)
                 imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
                 m(:,imminds) = m(:,imminds)*(1-p.imm);
                 
-                M.nlin.(age).(strain) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
+                M.nlin.(age) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
             end
         end
     end
