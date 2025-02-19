@@ -24,7 +24,7 @@ else
     p0.betadec = 0;
     r0.gamma   = r.gamma_2015;
     p0.relbeta = 0; r0.RR_acqu = 0;
-    prm.rHIV = 0;   r.ART_init = 0;    
+    r.ART_init = 0;    
     M0 = make_model(p0, r0, i, s, gps, prm.contmat);
 
     % HIV starts but no ART 
@@ -45,15 +45,15 @@ else
     init = zeros(1,i.nx);
     seed = 1e-5;
     init(i.U.ad.dom.neg)       = 1 - seed;
-    init(i.I.ad.dom.ds.neg)    = seed;
+    init(i.I.ad.dom.neg)    = seed;
     options = odeset('RelTol', 1e-10, 'AbsTol', 1e-10, 'NonNegative', 1:i.nstates);
     geq0 = @(t,in) goveqs_basisnonHIV(t, in, i, s, M0, agg, sel, r0, p0);
     [t0, soln0] = ode15s(geq0, [0:5e3], init, options);
 
     % HIV decline/ART scaleup model
     init = soln0(end, :);
-    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, [2007 2020; 2010 2020], i, s, p2, r2, prm, sel, agg);
-    [t1, soln1] = ode15s(geq1, [2007:2020], init, options);
+    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, [2015 2020; 2010 2020], i, s, p2, r2, prm, sel, agg);
+    [t1, soln1] = ode15s(geq1, [2015:2020], init, options);
     
     dsol   = diff(soln1,[],1);
     sfin   = soln1(end,:);

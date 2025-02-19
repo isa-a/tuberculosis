@@ -5,144 +5,131 @@ m2 = zeros(i.nstates);
 
 for ia = 1:length(gps.age)
     age = gps.age{ia};
-
-    for is = 1:length(gps.strains)
-        strain = gps.strains{is};
-        ismdr = strcmp(strain,'rr');
     
-        for ib = 1:length(gps.born)
-            born = gps.born{ib};
+    for ib = 1:length(gps.born)
+        born = gps.born{ib};
 
-            for ih = 1:length(gps.hiv)
-                hiv = gps.hiv{ih};
-                geti = @(st) i.(st).(age).(born).(strain).(hiv);
+        for ih = 1:length(gps.hiv)
+            hiv = gps.hiv{ih};
+            geti = @(st) i.(st).(age).(born).(hiv);
+        
+            Lf  = geti('Lf');
+            Ls  = geti('Ls');
+            Pf  = geti('Pf');
+            Ps  = geti('Ps');
+            I   = geti('I');
+            I2  = geti('I2');
+            Tx  = geti('Tx');
+            Tx2 = geti('Tx2');
+            Rlo = geti('Rlo');
+            Rhi = geti('Rhi');
+            R   = geti('R');
             
-                Lf  = geti('Lf');
-                Ls  = geti('Ls');
-                Pf  = geti('Pf');
-                Ps  = geti('Ps');
-                I   = geti('I');
-                I2  = geti('I2');
-                Tx  = geti('Tx');
-                Tx2 = geti('Tx2');
-                Rlo = geti('Rlo');
-                Rhi = geti('Rhi');
-                R   = geti('R');
-                
-                % Progression from 'fast' latent
-                source  = Lf;
-                destin  = I;
-                % rate    = r.progression(ib);
-                rate    = r.progression(ia, ib, ih);
-                m(destin, source) = m(destin, source) + rate;
-        
-                source  = Pf;
-                destin  = I2;
-                %rate    = r.progression(ib)*(1-p.TPTeff(is));
-                rate    = r.progression(ia, ib, ih)*(1-p.TPTeff(is));
-                m(destin, source) = m(destin, source) + rate;
-        
-                % Stabilisation of 'fast' to 'slow' latent
-                source = Lf;
-                destin = Ls;
-                rate   = r.LTBI_stabil;
-                m(destin, source) = m(destin, source) + rate;
-        
-                source = Pf;
-                destin = Ps;
-                rate   = r.LTBI_stabil;
-                m(destin, source) = m(destin, source) + rate;
-        
-                % Reactivation of 'slow' latent
-                source  = Ls;
-                destin  = I;
-                %rate    = r.reactivation(ib);
-                rate    = r.reactivation(ia, ib, ih);
-                m(destin, source) = m(destin, source) + rate;
-        
-                source  = Ps;
-                destin  = I;
-                %rate    = r.reactivation(ib)*(1-p.TPTeff(is));
-                rate    = r.reactivation(ia, ib, ih)*(1-p.TPTeff(is));
-                m(destin, source) = m(destin, source) + rate;
-        
-                % Initiation of treatment
-                pSLinit = ismdr*p.RRrec;
-                source  = I;
-                destins =                      [Tx,                 Tx2,         Rhi];
-                rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
-                m(destins, source) = m(destins, source) + rates';
-        
-                source  = I2;
-                destins =                      [Tx,                 Tx2,         Rhi];
-                rates   = [r.gamma(ia)*(1-pSLinit), r.gamma(ia)*pSLinit, r.self_cure];
-                m(destins, source) = m(destins, source) + rates';
-        
-                % Treatment completion or interruption
-                source  = Tx;
-                destins = [Rlo Rhi];
-                rates   = [r.Tx, r.ltfu];
-                m(destins, source) = m(destins, source) + rates';
-        
-    %             % Acquisition of drug resistance while on first-line treatment
-    %             if ~ismdr
-    %                 source = Tx;
-    %                 destin = i.Tx.(age).(born).rr;                                   % <--- Include age stratification
-    %                 rate   = r.RR_acqu;
-    %                 m(destin, source) = m(destin, source) + rate;
-    %             end
-        
-                % Second-line treatment
-                source  = Tx2;
-                destins = [Rlo Rhi];
-                rates   = [r.Tx2, r.ltfu2];
-                m(destins, source) = m(destins, source) + rates';
-        
-                % Relapse
-                sources = [Rlo Rhi R];
-                destin  = I2;
-                rates   = r.relapse;
-                m(destin, sources) = m(destin, sources) + rates;
-        
-                % Stabilisation of relapse risk
-                sources = [Rlo Rhi];
-                destin  = R;
-                rates   = 0.5;
-                m(destin, sources) = m(destin, sources) + rates;
-        
-                % Initiation of TPT
-                source = Lf;
-                destin = Pf;
-                rate   = r.TPT(ib);
-                m(destin, source) = m(destin, source) + rate;
-        
-                source = Ls;
-                destin = Ps;
-                rate   = r.TPT(ib);
-                m(destin, source) = m(destin, source) + rate;
-        
-                % Case-finding
-                sources = [I I2];
-                destin  = Tx;
-                rate    = r.ACF(ib)*(1-pSLinit);
-                m(destin, sources) = m(destin, sources) + rate;
-        
-                sources = [I I2];
-                destin  = Tx2;
-                rate    = r.ACF(ib)*pSLinit;
-                m(destin, sources) = m(destin, sources) + rate;
-        
-        
-                source = I2;
-                destin = Tx;
-                rate   = r.ACF2(ib)*(1-pSLinit);
-                m(destin, source) = m(destin, source) + rate;
-        
-                source = I2;
-                destin = Tx2;
-                rate   = r.ACF2(ib)*pSLinit;
-                m(destin, source) = m(destin, source) + rate;
-            end
+            % Progression from 'fast' latent
+            source  = Lf;
+            destin  = I;
+            % rate    = r.progression(ib);
+            rate    = r.progression(ia, ib, ih);
+            m(destin, source) = m(destin, source) + rate;
+    
+            source  = Pf;
+            destin  = I2;
+            %rate    = r.progression(ib)*(1-p.TPTeff(is));
+            rate    = r.progression(ia, ib, ih)*(1-p.TPTeff);
+            m(destin, source) = m(destin, source) + rate;
+    
+            % Stabilisation of 'fast' to 'slow' latent
+            source = Lf;
+            destin = Ls;
+            rate   = r.LTBI_stabil;
+            m(destin, source) = m(destin, source) + rate;
+    
+            source = Pf;
+            destin = Ps;
+            rate   = r.LTBI_stabil;
+            m(destin, source) = m(destin, source) + rate;
+    
+            % Reactivation of 'slow' latent
+            source  = Ls;
+            destin  = I;
+            %rate    = r.reactivation(ib);
+            rate    = r.reactivation(ia, ib, ih);
+            m(destin, source) = m(destin, source) + rate;
+    
+            source  = Ps;
+            destin  = I;
+            %rate    = r.reactivation(ib)*(1-p.TPTeff(is));
+            rate    = r.reactivation(ia, ib, ih)*(1-p.TPTeff);
+            m(destin, source) = m(destin, source) + rate;
+    
+            % Initiation of treatment
+            source  = I;
+            destins = [Tx,                 Tx2,         Rhi];
+            rates   = [r.gamma(ia), r.gamma(ia), r.self_cure];
+            m(destins, source) = m(destins, source) + rates';
+    
+            source  = I2;
+            destins = [Tx,                 Tx2,         Rhi];
+            rates   = [r.gamma(ia), r.gamma(ia), r.self_cure];
+            m(destins, source) = m(destins, source) + rates';
+    
+            % Treatment completion or interruption
+            source  = Tx;
+            destins = [Rlo Rhi];
+            rates   = [r.Tx, r.ltfu];
+            m(destins, source) = m(destins, source) + rates';
+
+    
+            % Second-line treatment
+            source  = Tx2;
+            destins = [Rlo Rhi];
+            rates   = [r.Tx2, r.ltfu2];
+            m(destins, source) = m(destins, source) + rates';
+    
+            % Relapse
+            sources = [Rlo Rhi R];
+            destin  = I2;
+            rates   = r.relapse;
+            m(destin, sources) = m(destin, sources) + rates;
+    
+            % Stabilisation of relapse risk
+            sources = [Rlo Rhi];
+            destin  = R;
+            rates   = 0.5;
+            m(destin, sources) = m(destin, sources) + rates;
+    
+            % Initiation of TPT
+            source = Lf;
+            destin = Pf;
+            rate   = r.TPT(ib);
+            m(destin, source) = m(destin, source) + rate;
+    
+            source = Ls;
+            destin = Ps;
+            rate   = r.TPT(ib);
+            m(destin, source) = m(destin, source) + rate;
+    
+            % Case-finding
+            sources = [I I2];
+            destin  = Tx;
+            rate    = r.ACF(ib);
+            m(destin, sources) = m(destin, sources) + rate;
+    
+            sources = [I I2];
+            destin  = Tx2;
+            rate    = r.ACF(ib);
+            m(destin, sources) = m(destin, sources) + rate;
+    
+    
+            source = I2;
+            destin = Tx;
+            rate   = r.ACF2(ib);
+            m(destin, source) = m(destin, source) + rate;
+    
+            source = I2;
+            destin = Tx2;
+            rate   = r.ACF2(ib);
+            m(destin, source) = m(destin, source) + rate;
         end
     end
 end
@@ -189,21 +176,18 @@ M.linHIV = sparse(m2 - diag(sum(m2,1)));
 for ia = 1:length(gps.age)
     age = gps.age{ia};
     m = zeros(i.nstates); % new added here instead of after hiv
-    for is = 1:length(gps.strains)
-        strain = gps.strains{is};
-        for ib = 1:length(gps.born)
-            born = gps.born{ib};
-            for ih = 1:length(gps.hiv)
-                hiv = gps.hiv{ih};
+    for ib = 1:length(gps.born)
+        born = gps.born{ib};
+        for ih = 1:length(gps.hiv)
+            hiv = gps.hiv{ih};
 
-                susinds = intersect(intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born)), s.(hiv));
-                m(i.Lf.(age).(born).(strain).(hiv), susinds) = 1;
-                
-                imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
-                m(:,imminds) = m(:,imminds)*(1-p.imm);
-                
-                M.nlin.(age) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
-            end
+            susinds = intersect(intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born)), s.(hiv));
+            m(i.Lf.(age).(born).(hiv), susinds) = 1;
+            
+            imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
+            m(:,imminds) = m(:,imminds)*(1-p.imm);
+            
+            M.nlin.(age) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
         end
     end
 end
@@ -211,18 +195,18 @@ end
 
 % --- Force of infection --------------------------------------------------
 
-getinds = @(st1, st2, st3) intersect(intersect(intersect(s.infectious, s.(st1)), s.(st2)), s.(st3));
+getinds = @(st1, st2) intersect(intersect(s.infectious, s.(st1)), s.(st2));
 contmat(end,end) = contmat(end,end);
 
 m = zeros(4,i.nstates);                                                     % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
                                                                             % no RR Rows: 1.Dom DS 2.Migr DS 3.Vuln DS   
 
-m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                             % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(1,getinds('ch', 'dom')) = contmat(1,1);                             % no vuln Rows: 1.Dom DS 2.Migr DS 
 % m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  
 % m(1,getinds('ch', 'vuln','ds')) = contmat(1,3);
 % m(1,getinds('ad', 'vuln','ds')) = contmat(1,4);
 
-m(2,getinds('ch', 'dom', 'ds')) = contmat(2,1);
+m(2,getinds('ch', 'dom')) = contmat(2,1);
 % m(2,getinds('ad', 'dom','ds')) = contmat(2,2);
 % m(2,getinds('ch', 'vuln','ds')) = contmat(2,3);
 % m(2,getinds('ad', 'vuln','ds')) = contmat(2,4);

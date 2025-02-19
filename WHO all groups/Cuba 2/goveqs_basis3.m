@@ -11,7 +11,6 @@ den(den==0) = Inf;
 if t<1980                                                                  
     rHIV = 0;
 else
-    keyboard;
     rHIV = interp1(0:length(prm.rHIV)-1, prm.rHIV, (t-1980)); 
 end
 try

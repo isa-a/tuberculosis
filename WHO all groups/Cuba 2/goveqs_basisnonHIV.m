@@ -39,11 +39,11 @@ end
 
 % Auxiliaries
 out(i.aux.inc)        = agg.inc*(sel.inc.*allmat)*invec;
-tmp1                  = agg.incsources*((sel.L2I.*allmat)*invec);
-tmp2                  = agg.incsources*((sel.P2I.*allmat)*invec);
-tmp3                  = agg.incsources*((sel.R2I.*allmat)*invec);
-tmp4                  = agg.incsources*((sel.T2I.*allmat)*invec);
-%out(i.aux.incsources) = [tmp1; tmp2; tmp3; tmp4];
+% tmp1                  = agg.incsources*((sel.L2I.*allmat)*invec);
+% tmp2                  = agg.incsources*((sel.P2I.*allmat)*invec);
+% tmp3                  = agg.incsources*((sel.R2I.*allmat)*invec);
+% tmp4                  = agg.incsources*((sel.T2I.*allmat)*invec);
+% out(i.aux.incsources) = [tmp1; tmp2; tmp3; tmp4];
 out(i.aux.mort)       = sum(morts(:,2));
 out(i.aux.nTPT)       = sum((sel.nTPT.*allmat)*invec);
 out(i.aux.ch_notifs)  = sum((sel.ch_notifs.*allmat)*invec);

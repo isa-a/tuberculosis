@@ -4,11 +4,11 @@ states1     = {'U'};
 states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
 gps.born    = {'dom','vuln'};
-gps.strains = {'ds'};
+%gps.strains = {'ds'};
 gps.hiv     = {'neg','pos','art'};
 
 [i, s, d, lim] = get_addresses({states1, gps.age, gps.born, gps.hiv}, [], [], [], 0);
-[i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.strains, gps.hiv}, i, s, d, lim);
+[i, s, d, lim] = get_addresses({states2, gps.age, gps.born, gps.hiv}, i, s, d, lim);
 d = char(d);
 
 %s.migr       = [s.migr_rect, s.migr_long];
@@ -62,15 +62,13 @@ sel.inc = tmp - diag(diag(tmp));
 
 set1 = {s.dom, s.vuln};
 % set1 = {s.dom, s.migr};
-set2 = {s.ds};
+%set2 = {s.ds};
 
-tmp  = zeros(length(set1)*length(set2),i.nstates);
+tmp  = zeros(length(set1),i.nstates);
 row  = 1;
 for is1 = 1:length(set1)
-    for is2 = 1:length(set2)
-        tmp(row, intersect(s.allI, intersect(set1{is1}, set2{is2}))) = 1;
-        row = row+1;
-    end
+    tmp(row, intersect(s.allI, set1{is1})) = 1;
+    row = row+1;
 end
 agg.incsources = sparse(tmp);
 
