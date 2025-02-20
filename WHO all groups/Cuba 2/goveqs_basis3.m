@@ -31,9 +31,9 @@ dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
 out(i.U.ch.dom.neg) = out(i.U.ch.dom.neg) + dom_morts;
 
 
-if sum(invec)>5
-    keyboard;
-end
+% if sum(invec)>5
+%     keyboard;
+% end
 
 
 % Auxiliaries
