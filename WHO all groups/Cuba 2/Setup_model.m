@@ -3,7 +3,7 @@ clear all;
 states1     = {'U'};
 states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
-gps.born    = {'dom','vuln'};
+gps.born    = {'dom'};
 %gps.strains = {'ds'};
 gps.hiv     = {'neg','pos','art'};
 
@@ -20,7 +20,7 @@ s.prev       = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
 names = {'inc','incsources','mort','nTPT', 'ch_notifs'};
-lgths = [    6,          14,     1,     1,           1];
+lgths = [    5,          14,     1,     1,           1];
 for ii = 1:length(names)
     inds = lim + [1:lgths(ii)];
     i.aux.(names{ii}) = inds;
@@ -33,20 +33,20 @@ i.nx = lim;
 % --- Set up selectors and aggregators
 
 % --- Incidence
-tmp = zeros(6,i.nstates); 
+tmp = zeros(5,i.nstates); 
 tmp(1,s.allI) = 1;
-tmp(2,intersect(s.allI,s.vuln)) = 1;
-tmp(3,intersect(s.allI,s.ch))   = 1;
-tmp(4,intersect(s.allI,s.neg))   = 1;
-tmp(5,intersect(s.allI,s.pos))   = 1;
-tmp(6,intersect(s.allI,s.art))   = 1;
+%tmp(2,intersect(s.allI,s.vuln)) = 1;
+tmp(2,intersect(s.allI,s.ch))   = 1;
+tmp(3,intersect(s.allI,s.neg))   = 1;
+tmp(4,intersect(s.allI,s.pos))   = 1;
+tmp(5,intersect(s.allI,s.art))   = 1;
 agg.inc = sparse(tmp);
 
 tmp = zeros(i.nstates);
 tmp(s.allI,:) = 1;
 % Remove transitions due to change in vulnerability status
-tmp(s.dom, s.vuln) = 0;
-tmp(s.vuln, s.dom) = 0;
+% tmp(s.dom, s.vuln) = 0;
+% tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
@@ -60,7 +60,7 @@ sel.inc = tmp - diag(diag(tmp));
 
 % --- Sources of incidence 
 
-set1 = {s.dom, s.vuln};
+set1 = {s.dom};
 % set1 = {s.dom, s.migr};
 %set2 = {s.ds};
 
@@ -105,8 +105,8 @@ sel.nTPT = tmp - diag(diag(tmp));
 tmp = zeros(i.nstates);
 tmp(intersect([s.Tx, s.Tx2],s.ch),:) = 1;
 % Remove transitions due to change in vulnerability status
-tmp(s.dom, s.vuln) = 0;
-tmp(s.vuln, s.dom) = 0;
+% tmp(s.dom, s.vuln) = 0;
+% tmp(s.vuln, s.dom) = 0;
 % Remove transitions due to change in age status
 tmp(s.ch, s.ad) = 0;
 tmp(s.ad, s.ch) = 0;
@@ -158,8 +158,8 @@ r.ACF2         = [0 0 0 0];
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'r_ART_init','r_HIV_mort','p_HIV_relrate'};      
-lgths = [    1,        1,      2,                 1,        1,             1,           2,              1,                  1,                1,            1,              1,              1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad', 'p_relrate', 'r_ageing_sc','p_relrate_factor', 'contmat_factor', 'r_ART_init','r_HIV_mort','p_HIV_relrate'};      
+lgths = [    1,        1,      2,                 1,               2,              1,                  1,                1,            1,              1,              1];
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -175,8 +175,8 @@ bds(xi.betadec,:)                = [0 0.15];
 bds(xi.gamma,:)                  = repmat([1e-4 10],2,1);
 bds(xi.p_relrate_gamma_chvad,:)  = [0 1];
 bds(xi.p_relrate,:)              = repmat([1 20],2,1);
-bds(xi.r_vuln_sc,:)              = [0 1];
-bds(xi.relbeta_vuln,:)           = [0.1 20];
+% bds(xi.r_vuln_sc,:)              = [0 1];
+% bds(xi.relbeta_vuln,:)           = [0.1 20];
 bds(xi.r_ageing_sc,:)            = [0 1];
 bds(xi.p_relrate_factor,:) = [1, 10];
 bds(xi.contmat_factor,:)    = [0, 1];
@@ -217,8 +217,8 @@ load data_Thembisa_AFR.mat;
 data.incd2010       = [10 12 14];                                           % With broader uncertainty intervals
 data.incd2020       = [6.8  7.9  9.2];                                             
 data.mort           = [0.26 0.36 0.47];                                     % TB mortality, 2020
-data.p_vulnpopn     = [8 10 12]/100;                                        % Proportion of UK population being vulnerable
-data.p_vulnTB       = [5 7 9]/100;                                          % Proportion contribution to overall incidence
+% data.p_vulnpopn     = [8 10 12]/100;                                        % Proportion of UK population being vulnerable
+% data.p_vulnTB       = [5 7 9]/100;                                          % Proportion contribution to overall incidence
 data.nTPT2019       = 1.3*[0.9 1 1.1];                                      % Number of TPT initiations in 2019, per 10^5 population
 data.propincd_ch    = [0.006 0.014 0.025];
 data.p_chpopn       = [0.198 0.2471 0.3];                                    % proportion of country thats children
@@ -238,8 +238,8 @@ show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
 f1b = get_distribution_fns(data.incd2020,   'lognorm', show);
 f2  = get_distribution_fns(data.mort,       'lognorm', show);
-f3  = get_distribution_fns(data.p_vulnpopn, 'beta',    show);
-f4  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
+% f3  = get_distribution_fns(data.p_vulnpopn, 'beta',    show);
+% f4  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
 f5  = get_distribution_fns(data.propincd_ch,'beta', show);
 f6  = get_distribution_fns(data.p_chpopn,  'beta',    show);
 f7  = get_distribution_fns(data.p_adpopn,  'beta',    show);
@@ -250,9 +250,9 @@ f10 = get_distribution_fns(data.HIV_prev,    'lognorm', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
-lhd.fn = @(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, ART_covg, HIV_prev) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                    f2(mort) + f3(p_vulnpopn) + f4(p_vulnTB) ...
-                                                                                                    + f6(p_chpopn) + f8(ch_notifs) ...
+lhd.fn = @(incd2010, incd2020, mort, p_chpopn, ch_notifs, ART_covg, HIV_prev) f1a(incd2010) + f1b(incd2020) + ...
+                                                                                                    f2(mort) + ...
+                                                                                                    f6(p_chpopn) + f8(ch_notifs) ...
                                                                                                     + f9(ART_covg) + f10(HIV_prev);
 
 save Model_setup;

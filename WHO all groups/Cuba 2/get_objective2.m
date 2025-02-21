@@ -65,16 +65,16 @@ else
     mort       = dsol(end,i.aux.mort)*1e5;
 
     % Proportion of population being vulnerable
-    p_vulnpopn = sum(sfin(s.vuln))/sum(sfin(1:i.nstates));
+    %p_vulnpopn = sum(sfin(s.vuln))/sum(sfin(1:i.nstates));
 
     % Contribution of vulnerable people to overall incidence
-    p_vulnTB   = incd(2)/incd(1);
+    %p_vulnTB   = incd(2)/incd(1);
 
     % Number initiating TPT in 2019
     n_TPT2019  = dsol(end,i.aux.nTPT)*1e5;
 
     % Contribution of kids to overall incidence
-    propincd_ch =  incd(3)/incd(1);
+    propincd_ch =  incd(2)/incd(1);
 
     % Proportion of population thats kids
     p_chpopn = sum(sfin(s.ch))/sum(sfin(1:i.nstates));
@@ -92,15 +92,15 @@ else
     HIV_prev = sum(sfin([s.pos, s.art]))/sum(sfin(1:i.nstates));
 
     if incd > 0.1
-        out  = calfn.fn(incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, p_chpopn, ch_notifs, ART_covg, HIV_prev);
+        out  = calfn.fn(incd2010, incd2020, mort, p_chpopn, ch_notifs, ART_covg, HIV_prev);
         aux.soln       = soln1;
         msg            = 2;
         aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
         aux.incd2010   = incd2010;
         aux.incd2020   = incd2020;
         aux.mort       = mort;
-        aux.p_vulnpopn = p_vulnpopn;
-        aux.p_vulnTB   = p_vulnTB;
+%         aux.p_vulnpopn = p_vulnpopn;
+%         aux.p_vulnTB   = p_vulnTB;
         aux.nTPT       = n_TPT2019;
         aux.propincd_ch = propincd_ch;
         aux.chpopn     = p_chpopn;
@@ -108,9 +108,8 @@ else
         aux.ch_notifs  = ch_notifs;
         aux.ART_covg   = ART_covg;
         aux.HIV_prev   = HIV_prev;
-        aux.sim        = [incd2010, incd2020, mort, p_vulnpopn, p_vulnTB, propincd_ch, p_chpopn, p_adpopn, ch_notifs, ART_covg, HIV_prev];
+        aux.sim        = [incd2010, incd2020, mort, propincd_ch, p_chpopn, p_adpopn, ch_notifs, ART_covg, HIV_prev];
     else
-        keyboard;
         out = -Inf;
         aux = NaN;
         msg = 1;

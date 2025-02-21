@@ -141,10 +141,10 @@ end
 % m(inds) = m(inds) + 1/5;
 
 % Transition from dom to vulnerable population
-sources = s.dom;
-destins = s.vuln;
-inds = sub2ind([i.nstates, i.nstates], destins, sources);
-m(inds) = m(inds) + r.vuln;
+% sources = s.dom;
+% destins = s.vuln;
+% inds = sub2ind([i.nstates, i.nstates], destins, sources);
+% m(inds) = m(inds) + r.vuln;
 
 % --- Ageing process
 sources = s.ch;
@@ -198,15 +198,17 @@ end
 getinds = @(st1, st2) intersect(intersect(s.infectious, s.(st1)), s.(st2));
 contmat(end,end) = contmat(end,end);
 
-m = zeros(4,i.nstates);                                                     % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
+m = zeros(2,i.nstates);                                                     % Rows: 1.Dom DS 2.Dom RR 3.Migr DS 4.Migr RR 5.Vuln DS 6.Vuln RR
                                                                             % no RR Rows: 1.Dom DS 2.Migr DS 3.Vuln DS   
 
-m(1,getinds('ch', 'dom')) = contmat(1,1);                             % no vuln Rows: 1.Dom DS 2.Migr DS 
+m(1,getinds('ch', 'dom')) = contmat(1,1);
+m(1,getinds('ad', 'dom')) = contmat(1,2);
 % m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  
 % m(1,getinds('ch', 'vuln','ds')) = contmat(1,3);
 % m(1,getinds('ad', 'vuln','ds')) = contmat(1,4);
 
 m(2,getinds('ch', 'dom')) = contmat(2,1);
+m(2,getinds('ad', 'dom')) = contmat(2,2);
 % m(2,getinds('ad', 'dom','ds')) = contmat(2,2);
 % m(2,getinds('ch', 'vuln','ds')) = contmat(2,3);
 % m(2,getinds('ad', 'vuln','ds')) = contmat(2,4);
@@ -227,13 +229,13 @@ m = m*r.beta;
 M.lam = sparse(m);
 
 % Additional matrix to help keep track of numbers in each group 
-m = zeros(4,i.nstates);
+m = zeros(2,i.nstates);
 m(1, intersect(s.ch, s.dom))  = 1;  
 m(2, intersect(s.ad, s.dom))  = 1; 
 % m(3, intersect(s.ch, s.migr)) = 1; 
 % m(4, intersect(s.ad, s.migr)) = 1; 
-m(3, intersect(s.ch, s.vuln)) = 1; 
-m(4, intersect(s.ad, s.vuln)) = 1;  
+% m(3, intersect(s.ch, s.vuln)) = 1; 
+% m(4, intersect(s.ad, s.vuln)) = 1;  
 M.denvec = sparse(m);
 
 
@@ -243,7 +245,7 @@ m(s.ch,1)         = 0;
 m(s.ad,1)         = 1/72;
 m(s.pos,1)        = m(s.pos,1) + r.HIV_mort;
 %m(:,1)            = 1/83;
-m(s.vuln,1)       = 1/55;
+% m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
 
 M.mort            = sparse(m);

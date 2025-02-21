@@ -27,7 +27,7 @@ end
 morts = M.mort.*invec;
 out(1:i.nstates) = out(1:i.nstates) - sum(morts,2);
 
-dom_morts = sum(sum(morts([s.dom,s.vuln],:)));
+dom_morts = sum(sum(morts([s.dom],:)));
 out(i.U.ch.dom.neg) = out(i.U.ch.dom.neg) + dom_morts;
 
 

@@ -12,8 +12,8 @@ r.reactivation = r.reactivation0 * ones(2,2,3);
 r.reactivation(:,:,2:3) = r.reactivation0 * x(xi.p_HIV_relrate) .* repmat(reshape([1 0.4], 1, 1, []), 2, 2, 1);
 
 
-r.vuln           = x(xi.r_vuln_sc)/500;
-p.relbeta_vuln   = 1;
+% r.vuln           = x(xi.r_vuln_sc)/500;
+% p.relbeta_vuln   = 1;
 r.ageing         = x(xi.r_ageing_sc)/10;
 
 tmp_c = prm.contmat_age;
