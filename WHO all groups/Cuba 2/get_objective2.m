@@ -53,7 +53,7 @@ else
     % HIV decline/ART scaleup model
     init = soln0(end, :);
     geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, [2015 2020; 2010 2020], i, s, p2, r2, prm, sel, agg);
-    [t1, soln1] = ode15s(geq1, [2015:2020], init, options);
+    [t1, soln1] = ode15s(geq1, [2010:2020], init, options);
     
     dsol   = diff(soln1,[],1);
     sfin   = soln1(end,:);
@@ -91,7 +91,8 @@ else
     % HIV prevalence
     HIV_prev = sum(sfin([s.pos, s.art]))/sum(sfin(1:i.nstates));
 
-    if incd > 0.1
+    if incd(1) > 0.1
+        % keyboard;
         out  = calfn.fn(incd2010, incd2020, mort, p_chpopn, ch_notifs, ART_covg, HIV_prev);
         aux.soln       = soln1;
         msg            = 2;
@@ -110,6 +111,7 @@ else
         aux.HIV_prev   = HIV_prev;
         aux.sim        = [incd2010, incd2020, mort, propincd_ch, p_chpopn, p_adpopn, ch_notifs, ART_covg, HIV_prev];
     else
+        % keyboard;
         out = -Inf;
         aux = NaN;
         msg = 1;

@@ -3,7 +3,14 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 1000; 
+xv = [30, 0, 0.01, 0.01, 1, 1, 1, 1/15*10, 1, 1, 0.001, 0.01, 1];
+
+[out, aux, msg] = obj(xv)
+
+
+return;
+
+nsam = 100; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 % obj(xsam(1,:));
