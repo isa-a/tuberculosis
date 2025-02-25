@@ -35,9 +35,9 @@ cov0=[];
 nreps = 4;
 niter = [1, 1, 1, 5]*2e3;
 for ii = 1:nreps
-    [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, cov0, 1);
+    [xsto, outsto] = MCMC_adaptive2(obj, x1, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));
-    x3 = xsto(inds(1),:);
+    x1 = xsto(inds(1),:);
     cov0 = cov(xsto);
     fprintf('\n');
 end
