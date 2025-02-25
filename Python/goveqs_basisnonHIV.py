@@ -1,10 +1,11 @@
+
 from make_model import M
 import numpy as np
 from scipy.sparse import csr_matrix
 import pdb
 from setup_model import *
 
-def goveqs_basis2(t, in_vec, i, s, M, agg, sel, r, p, prm):
+def goveqs_basisnonHIV(t, in_vec, i, s, M, agg, sel, r, p, prm):
 
 
     out = np.zeros(len(in_vec))
@@ -15,15 +16,9 @@ def goveqs_basis2(t, in_vec, i, s, M, agg, sel, r, p, prm):
     den = np.sum(M['denvec'].toarray() * tmp[:, None], axis=0)
     den[den == 0] = np.inf
 
-    if t < 1980:
-        rHIV_val = 0
-    else:
-        rHIV_val = np.interp(t - 1980, np.arange(len(prm['rHIV'])), prm['rHIV'])
-
     try:
         lam_val = (M['lam'] @ (invec / den)) * ((1 - p['betadec']) ** max(t - 2010, 0))
         allmat = (M['lin'] +
-                  rHIV_val * M['linHIV'] +
                   lam_val[0] * M['nlin']['ch'] +
                   lam_val[1] * M['nlin']['ad'])
         out = allmat @ invec

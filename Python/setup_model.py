@@ -142,14 +142,12 @@ bds[np.array(xi['r_HIV_mort']) - 1, :] = [0, 10]
 bds[np.array(xi['p_HIV_relrate']) - 1, :] = [1, 100]
 prm = {}
 prm['bounds'] = bds.T
-ref = {'i': i, 's': s, 'xi': xi}
 prm['p'] = p
 prm['r'] = r
 prm['agg'] = agg
 prm['sel'] = sel
+ref = {'i': i, 's': s, 'xi': xi}
 
-
-prm = {}
 prm['contmat_born'] = np.array([[1, 0.5, 0.2],
                                 [0.5, 1, 0.2],
                                 [0.2, 0.2, 1]])

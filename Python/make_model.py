@@ -1,14 +1,13 @@
 import numpy as np
 from scipy.sparse import csr_matrix
-from setup_model import *
+from setup_model import p, r, i, s, gps, prm
 
 
+nstates = i['nstates']
+m = np.zeros((nstates, nstates))
+m2 = np.zeros((nstates, nstates))
 
 def make_model(p, r, i, s, gps, contmat):
-
-    nstates = i['nstates']
-    m = np.zeros((nstates, nstates))
-    m2 = np.zeros((nstates, nstates))
     
     for ia, age in enumerate(gps['age']):
         for ib, born in enumerate(gps['born']):
@@ -127,7 +126,6 @@ def make_model(p, r, i, s, gps, contmat):
                 
     return m
 
-
 # Ageing process
 sources = np.array(s['ch']) - 1
 destins = np.array(s['ad']) - 1
@@ -146,7 +144,6 @@ rates = r['ART_init']
 m[destins, sources] += rates
 
 # Combine
-from scipy.sparse import csr_matrix
 M = {}
 M['lin'] = csr_matrix(m - np.diag(np.sum(m, axis=0)))
 M['linHIV'] = csr_matrix(m2 - np.diag(np.sum(m2, axis=0)))
