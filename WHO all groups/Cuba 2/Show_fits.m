@@ -10,8 +10,8 @@ dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
 
-for ii = 1:size(x1,1)
-    [out, aux] = obj(x1);
+for ii = 1:size(x0,1)
+    [out, aux] = obj(x0);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     %pp(ii)     = aux.p_migrect;

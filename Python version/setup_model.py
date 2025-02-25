@@ -10,13 +10,20 @@ from scipy.sparse import csr_matrix
 from get_dist2 import get_dist2
 
 
-# combining states and born will be used as groups in get_addresses
-states = ['U', 'Lf', 'Ls', 'Pf', 'Ps', 'I', 'I2', 'Tx', 'Rlo', 'Rhi', 'R'] # states
-gps_born = ['dom', 'mig_recent', 'mig_long'] # where they are born
+
+states1 = ["U"]
+states2 = ["Lf", "Ls", "Pf", "Ps", "I", "I2", "Tx", "Tx2", "Rlo", "Rhi", "R"]
+
+gps_age  = ['ch','ad']
+gps_born = ['dom'] # where they are born
+gps_hiv  = ['neg','pos','art']
 
 
 
-i, s, d, lim = get_addresses([states, gps_born])
+# Call get_addresses function
+i, s, d, lim = get_addresses([states1, gps_age, gps_born, gps_hiv], None, None, None, 0)
+i, s, d, lim = get_addresses([states2, gps_age, gps_born, gps_hiv], i, s, d, lim)
+
 s['everyI'] = np.concatenate((s['I'], s['I2']))
 s['migr'] = np.concatenate((s['mig_recent'], s['mig_long']))
 s['migrstates'] = [i['U', 'mig_recent'], i['Lf','mig_recent'], i['Ls','mig_recent'], i['Pf','mig_recent'], i['Ps','mig_recent']]
