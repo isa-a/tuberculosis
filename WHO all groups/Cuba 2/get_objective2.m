@@ -100,8 +100,6 @@ else
         aux.incd2010   = incd2010;
         aux.incd2020   = incd2020;
         aux.mort       = mort;
-%         aux.p_vulnpopn = p_vulnpopn;
-%         aux.p_vulnTB   = p_vulnTB;
         aux.nTPT       = n_TPT2019;
         aux.propincd_ch = propincd_ch;
         aux.chpopn     = p_chpopn;

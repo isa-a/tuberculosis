@@ -178,11 +178,11 @@ bds(xi.p_relrate,:)              = repmat([1 20],2,1);
 % bds(xi.r_vuln_sc,:)              = [0 1];
 % bds(xi.relbeta_vuln,:)           = [0.1 20];
 bds(xi.r_ageing_sc,:)            = [0 1];
-bds(xi.p_relrate_factor,:) = [1, 10];
-bds(xi.contmat_factor,:)    = [0, 1];
-bds(xi.r_ART_init,:)    = [0 10];
-bds(xi.r_HIV_mort,:)    = [0 10];
-bds(xi.p_HIV_relrate,:) = [1 100];
+bds(xi.p_relrate_factor,:)       = [1, 10];
+bds(xi.contmat_factor,:)         = [0, 1];
+bds(xi.r_ART_init,:)            = [0 10];
+bds(xi.r_HIV_mort,:)            = [0 10];
+bds(xi.p_HIV_relrate,:)         = [1 100];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;

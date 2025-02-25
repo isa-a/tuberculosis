@@ -31,13 +31,13 @@ mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
 xord = xsam(ord,:);
 
-
+cov0=[];
 nreps = 4;
 niter = [1, 1, 1, 5]*2e3;
 for ii = 1:nreps
-    [xsto, outsto] = MCMC_adaptive2(obj, x_new, niter(ii), 1, cov0, 1);
+    [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));
-    x_new = xsto(inds(1),:);
+    x3 = xsto(inds(1),:);
     cov0 = cov(xsto);
     fprintf('\n');
 end
