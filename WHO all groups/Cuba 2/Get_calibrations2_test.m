@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-xv = [30, 0, 0.01, 0.01, 1, 1, 1, 1/15*10, 1, 1, 0.001, 0.01, 1];
+xv = [30, 0.1, 0.01, 0.01, 1, 1, 1, 1/15*10, 1, 1, 0.001, 0.01, 1];
 
 [out, aux, msg] = obj(xv)
 
@@ -71,7 +71,7 @@ end
 % return;
 
 options = optimset(PlotFcn=@optimplotfval);
-x0 = fminsearch(nobj,xord(1,:),options);
+x0 = fminsearch(nobj,xv,options);
 x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
 x3 = fminsearch(nobj,x2,options);
