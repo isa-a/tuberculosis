@@ -1,7 +1,7 @@
 import numpy as np
 import copy
 from scipy.integrate import solve_ivp
-from make_model import make_model
+from make_model2 import make_model2
 from goveqs_basisnonHIV import goveqs_basisnonHIV
 from goveqs_scaleup2D import goveqs_scaleup2D
 from allocate_parameters import allocate_parameters
@@ -42,7 +42,7 @@ def get_objective2(x, ref, prm, gps, contmat, calfn):
         p0['relbeta'] = 0
         r0['RR_acqu'] = 0
         r0['ART_init'] = 0
-        M0 = make_model(p0, r0, i, s, gps, prm['contmat'])
+        M0 = make_model2(p0, r0, i, s, gps, prm['contmat'])
 
         # HIV starts but no ART
         p1 = copy.deepcopy(p)
@@ -50,13 +50,13 @@ def get_objective2(x, ref, prm, gps, contmat, calfn):
         r1['TPT'] = [0, r['TPT2020rec'], 0, 0]
         r1['gamma'] = r['gamma_2015']
         r1['ART_init'] = 0
-        M1 = make_model(p1, r1, i, s, gps, prm['contmat'])
+        M1 = make_model2(p1, r1, i, s, gps, prm['contmat'])
 
         # >HIV, and ART scaleup
         p2 = copy.deepcopy(p)
         r2 = copy.deepcopy(r)
         r2['gamma'] = r['gamma_2020']
-        M2 = make_model(p2, r2, i, s, gps, prm['contmat'])
+        M2 = make_model2(p2, r2, i, s, gps, prm['contmat'])
 
         # --- Now simulate them all
 
@@ -68,7 +68,7 @@ def get_objective2(x, ref, prm, gps, contmat, calfn):
         init[i['I']['ad']['dom']['neg'] - 1] = seed
 
         ode_options = {'rtol': 1e-10, 'atol': 1e-10}
-        geq0 = lambda t, y: goveqs_basisnonHIV(t, y, i, s, M0, agg, sel, r0, p0)
+        geq0 = lambda t, y: goveqs_basisnonHIV(t, y, i, s, M0, agg, sel, r0, p0, prm)
         t_span0 = (0, 5000)
         t_eval0 = np.linspace(0, 5000, 5001)
         sol0 = solve_ivp(geq0, t_span0, init, t_eval=t_eval0, **ode_options)

@@ -55,6 +55,8 @@ tmp[np.ix_(np.array(s['art']) - 1, np.array(s['pos']) - 1)] = 0
 tmp[np.ix_(np.array(s['pos']) - 1, np.array(s['art']) - 1)] = 0
 sel = {}
 sel['inc'] = tmp - np.diag(np.diag(tmp))
+sel['inc'] = np.array(sel['inc'], dtype=float)
+
 
 
 # -----------Sources of incidence 
@@ -73,12 +75,17 @@ tmp = np.zeros((i['nstates'], i['nstates']))
 row_idx = np.concatenate((np.array(s['Pf']), np.array(s['Ps']))) - 1
 col_idx = np.concatenate((np.array(s['Lf']), np.array(s['Ls']))) - 1
 tmp[np.ix_(row_idx, col_idx)] = 1
-sel['nTPT'] = tmp - np.diag(np.diag(tmp))
+sel['nTPT'] = sparse.csr_matrix(tmp - np.diag(np.diag(tmp)))
+
+
 
 
 # -----Notifications
 tmp = np.zeros((i['nstates'], i['nstates']))
-sel_indices = np.intersect1d(np.concatenate((np.array(s['Tx']), np.array(s['Tx2']))), np.array(s['ch'])) - 1
+sel_indices = np.intersect1d(
+    np.concatenate((np.array(s['Tx']), np.array(s['Tx2']))),
+    np.array(s['ch'])
+) - 1
 tmp[sel_indices, :] = 1
 tmp[np.ix_(np.array(s['ch']) - 1, np.array(s['ad']) - 1)] = 0
 tmp[np.ix_(np.array(s['ad']) - 1, np.array(s['ch']) - 1)] = 0
@@ -86,7 +93,7 @@ tmp[np.ix_(np.array(s['pos']) - 1, np.array(s['neg']) - 1)] = 0
 tmp[np.ix_(np.array(s['neg']) - 1, np.array(s['pos']) - 1)] = 0
 tmp[np.ix_(np.array(s['art']) - 1, np.array(s['pos']) - 1)] = 0
 tmp[np.ix_(np.array(s['pos']) - 1, np.array(s['art']) - 1)] = 0
-sel['ch_notifs'] = tmp - np.diag(np.diag(tmp))
+sel['ch_notifs'] = sparse.csr_matrix(tmp - np.diag(np.diag(tmp)))
 
 
 # ------ Natural history parameters-------------------------------------------
@@ -202,6 +209,6 @@ def lhd_fn(incd2010, incd2020, mort, p_chpopn, ch_notifs, ART_covg, HIV_prev):
             f6(p_chpopn) + f8(ch_notifs) + f9(ART_covg) + f10(HIV_prev))
 
 
-Model_setup = {"lhd_fn": lhd_fn, "data": data, "prm": prm, "ref": ref}
-with open("Model_setup.pkl", "wb") as f:
-    pickle.dump(Model_setup, f)
+# Model_setup = {"lhd_fn": lhd_fn, "data": data, "prm": prm, "ref": ref}
+# with open("Model_setup.pkl", "wb") as f:
+#     pickle.dump(Model_setup, f)
