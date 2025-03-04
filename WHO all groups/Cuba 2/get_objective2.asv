@@ -38,7 +38,7 @@ else
     p2 = p; r2 = r; 
     r2.gamma = r.gamma_2020;
     M2 = make_model(p2, r2, i, s, gps, prm.contmat);
-    
+    keyboard;
     % --- Now simulate them all
 
     % Eq model

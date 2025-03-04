@@ -214,9 +214,9 @@ load data_Thembisa_AFR.mat;
 % -------------------------------------------------------------------------
 % --- Specify --------------------------------------------------------
 
-data.incd2010       = [10 12 14];                                           % With broader uncertainty intervals
-data.incd2020       = [6.8  7.9  9.2];                                             
-data.mort           = [0.26 0.36 0.47];                                     % TB mortality, 2020
+data.incd2010       = [5 10 15];                                           % With broader uncertainty intervals
+data.incd2020       = [4 7 10];                                             
+data.mort           = [0.43 0.49 0.54];                                     % TB mortality, 2020
 % data.p_vulnpopn     = [8 10 12]/100;                                        % Proportion of UK population being vulnerable
 % data.p_vulnTB       = [5 7 9]/100;                                          % Proportion contribution to overall incidence
 data.nTPT2019       = 1.3*[0.9 1 1.1];                                      % Number of TPT initiations in 2019, per 10^5 population
@@ -224,9 +224,10 @@ data.propincd_ch    = [0.006 0.014 0.025];
 data.p_chpopn       = [0.198 0.2471 0.3];                                    % proportion of country thats children
 data.p_adpopn       = [0.65 0.7529 0.85];                                  % proportion of country thats adults
 data.ch_notifs      = [3 3.69 4.2]/4.576e6*1e5;                             % notifications in the country  
-data.HIV_prev       = HIVprev_2019;
-data.ART_covg       = ARTcovg_2019;
-prm.ART_start       = ART_start;
+% data.HIV_prev       = [0.06 0.07 0.08];
+data.HIV_prev       = [0.0215 0.0247 0.0280];
+data.ART_covg       = [56 65 73]/100;
+prm.ART_start       = 2010;
 
 ys1 = HIV_incd(:,2);
 xs1 = 1:length(ys1);
