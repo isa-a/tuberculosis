@@ -224,8 +224,8 @@ data.propincd_ch    = [0.006 0.014 0.025];
 data.p_chpopn       = [0.198 0.2471 0.3];                                    % proportion of country thats children
 data.p_adpopn       = [0.65 0.7529 0.85];                                  % proportion of country thats adults
 data.ch_notifs      = [3 3.69 4.2]/4.576e6*1e5;                             % notifications in the country  
-% data.HIV_prev       = [0.06 0.07 0.08];
-data.HIV_prev       = [0.0215 0.0247 0.0280];
+data.HIV_prev       = [0.006 0.007 0.008];
+% data.HIV_prev       = [0.0215 0.0247 0.0280];
 data.ART_covg       = [56 65 73]/100;
 prm.ART_start       = 2010;
 
@@ -257,4 +257,3 @@ lhd.fn = @(incd2010, incd2020, mort, p_chpopn, ch_notifs, ART_covg, HIV_prev) f1
                                                                                                     + f9(ART_covg) + f10(HIV_prev);
 
 save Model_setup;
-

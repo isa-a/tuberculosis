@@ -38,7 +38,7 @@ xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs', 'ART', 'HIV'});
+set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs', 'ART coverage', 'HIV prevalence'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 return
