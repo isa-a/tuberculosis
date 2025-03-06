@@ -182,7 +182,8 @@ bds(xi.p_relrate_factor,:)       = [1, 10];
 bds(xi.contmat_factor,:)         = [0, 1];
 bds(xi.r_ART_init,:)            = [0 10];
 bds(xi.r_HIV_mort,:)            = [0 10];
-bds(xi.p_HIV_relrate,:)         = [1 100];
+% bds(xi.p_HIV_relrate,:)         = [1 100];
+bds(xi.p_HIV_relrate,:)         = [0 1];
 prm.bounds = bds';
 
 ref.i = i; ref.s = s; ref.xi = xi;
