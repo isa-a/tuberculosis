@@ -6,10 +6,10 @@ r.gamma_2015     = x(xi.gamma(1))*[x(xi.p_relrate_gamma_chvad), 1];
 r.gamma_2020     = x(xi.gamma(2))*[x(xi.p_relrate_gamma_chvad), 1];
 
 r.progression = r.progression0 * ones(2,2,3); 
-r.progression(:,:,2:3) = r.progression0 * x(xi.p_HIV_relrate)/10 .* repmat(reshape([1 0.4], 1, 1, []), 2, 2, 1);
+r.progression(:,:,2:3) = r.progression0 * x(xi.p_HIV_relrate)/100 .* repmat(reshape([1 0.4], 1, 1, []), 2, 2, 1);
 
 r.reactivation = r.reactivation0 * ones(2,2,3); 
-r.reactivation(:,:,2:3) = r.reactivation0 * x(xi.p_HIV_relrate)/10 .* repmat(reshape([1 0.4], 1, 1, []), 2, 2, 1);
+r.reactivation(:,:,2:3) = r.reactivation0 * x(xi.p_HIV_relrate)/100 .* repmat(reshape([1 0.4], 1, 1, []), 2, 2, 1);
 
 
 % r.vuln           = x(xi.r_vuln_sc)/500;
