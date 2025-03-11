@@ -4,7 +4,7 @@
 clear all;
 
 states1     = {'U'};
-states2     = {'Lf','Ls','Pf','Ps','I','I2','Tx','Tx2','Rlo','Rhi','R'};
+states2     = {'Lf_imp','Lf_uki','Ls','Pf','Ps','I_nUK','I_UK','I2','Tx','Tx2','Rlo','Rhi','R'};
 gps.age     = {'ch','ad'};                                                  % added age here before other groups
 gps.born    = {'dom','migr_rect','migr_long','vuln'};
 gps.strains = {'ds'};
@@ -16,7 +16,7 @@ d = char(d);
 s.migr       = [s.migr_rect, s.migr_long];
 s.allI       = [s.I, s.I2];
 % s.migrstates = [i.U.migr_rect, i.Lf.migr_rect, i.Ls.migr_rect, i.Pf.migr_rect, i.Ps.migr_rect];
-s.migrstates = intersect([s.U, s.Lf, s.Ls, s.Pf, s.Ps],s.migr_rect);
+s.migrstates = intersect([s.U, s.Lf_imp, s.Ls, s.Pf, s.Ps],s.migr_rect);
 s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
