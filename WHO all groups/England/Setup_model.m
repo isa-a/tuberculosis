@@ -14,9 +14,9 @@ gps.strains = {'ds'};
 d = char(d);
 
 s.migr       = [s.migr_rect, s.migr_long];
-s.allI       = [s.I, s.I2];
+s.allI       = [s.I_nUK, s.I_UK, s.I2];
 % s.migrstates = [i.U.migr_rect, i.Lf.migr_rect, i.Ls.migr_rect, i.Pf.migr_rect, i.Ps.migr_rect];
-s.migrstates = intersect([s.U, s.Lf_imp, s.Ls, s.Pf, s.Ps],s.migr_rect);
+s.migrstates = intersect([s.U, s.Lf_imp, s.Lf_uki, s.Ls, s.Pf, s.Ps],s.migr_rect);
 s.infectious = [s.allI, (s.Tx)];
 
 % Include the auxiliaries
@@ -85,7 +85,7 @@ agg.incsources = sparse(tmp);
 
 % Untreated TB infection
 tmp = zeros(i.nstates);
-tmp(s.allI, [s.Lf, s.Ls]) = 1;
+tmp(s.allI, [s.Lf_imp, s.Lf_uki, s.Ls]) = 1;
 sel.L2I = sparse(tmp - diag(diag(tmp)));
 
 % Treated TB infecction
@@ -107,7 +107,7 @@ sel.T2I = sparse(tmp - diag(diag(tmp)));
 
 % --- People starting TPT
 tmp = zeros(i.nstates);
-tmp([s.Pf, s.Ps],[s.Lf, s.Ls]) = 1;
+tmp([s.Pf, s.Ps],[s.Lf_imp, s.Lf_uki, s.Ls]) = 1;
 sel.nTPT = tmp - diag(diag(tmp));
 
 % --- Notifications

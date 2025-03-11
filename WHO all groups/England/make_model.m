@@ -14,17 +14,19 @@ for ia = 1:length(gps.age)
             born = gps.born{ib};
             geti = @(st) i.(st).(age).(born).(strain);
             
-            Lf  = geti('Lf');
-            Ls  = geti('Ls');
-            Pf  = geti('Pf');
-            Ps  = geti('Ps');
-            I   = geti('I');
-            I2  = geti('I2');
-            Tx  = geti('Tx');
-            Tx2 = geti('Tx2');
-            Rlo = geti('Rlo');
-            Rhi = geti('Rhi');
-            R   = geti('R');
+            Lf_imp  = geti('Lf_imp');
+            Lf_uki  = geti('Lf_uki');
+            Ls      = geti('Ls');
+            Pf      = geti('Pf');
+            Ps      = geti('Ps');
+            I_nUK   = geti('I_nUK');
+            I_UK    = geti('I_UK');
+            I2      = geti('I2');
+            Tx      = geti('Tx');
+            Tx2     = geti('Tx2');
+            Rlo     = geti('Rlo');
+            Rhi     = geti('Rhi');
+            R       = geti('R');
     
             % Progression from 'fast' latent
             source  = Lf;
