@@ -176,10 +176,10 @@ for ia = 1:length(gps.age)
             born = gps.born{ib};
     
             m = zeros(i.nstates);
-            susinds = intersect(intersect([s.U, s.Lf, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born));
+            susinds = intersect(intersect([s.U, s.Lf_imp, s.Lf_uki, s.Ls, s.Rlo, s.Rhi, s.R],s.(age)),s.(born));
             m(i.Lf.(age).(born).(strain), susinds) = 1;
             
-            imminds = [s.Lf, s.Ls, s.Rlo, s.Rhi, s.R];
+            imminds = [s.Lf_imp, s.Lf_uki, s.Ls, s.Rlo, s.Rhi, s.R];
             m(:,imminds) = m(:,imminds)*(1-p.imm);
             
             M.nlin.(age).(born).(strain) = sparse(m - diag(sum(m,1)));     % <--- Make sure all of these are used in goveqs_basis, multiplied by relevant elements of lambda
