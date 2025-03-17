@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 1000; 
+nsam = 100; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 % obj(xsam(1,:));
@@ -79,13 +79,25 @@ x_new = xsto(inds(1),:);
 cov0 = cov(xsto);
 [xsto, outsto] = MCMC_adaptive33(obj, x_new, 1e4, 1, [], [], cov0, 1);
 
-
+cov0=[]
 nreps = 4;
 niter = [1, 1, 1, 5]*2e3;
 for ii = 1:nreps
-    [xsto, outsto] = MCMC_adaptive2(obj, x_new, niter(ii), 1, cov0, 1);
+    [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));
-    x_new = xsto(inds(1),:);
+    x3 = xsto(inds(1),:);
+    cov0 = cov(xsto);
+    fprintf('\n');
+end
+
+
+xnew=x3;
+nreps = 1;
+niter = [5]*2e3;
+for ii = 1:nreps
+    [xsto, outsto] = MCMC_adaptive2(obj, xnew, niter(ii), 1, cov0, 1);
+    inds = find(outsto==max(outsto));
+    xnew = xsto(inds(1),:);
     cov0 = cov(xsto);
     fprintf('\n');
 end
@@ -128,7 +140,15 @@ for ii = 1:nreps
     cov0 = cov(xsto);
 end
 
-
+x_new=x3;
+nreps = 1;
+niter = [5]*2e4;
+for ii = 1:nreps
+    [xsto, outsto] = MCMC_adaptive2(obj, x0, niter(ii), 1, cov0, 1);
+    inds = find(outsto==max(outsto));
+    x0 = xsto(inds(1),:);
+    cov0 = cov(xsto);
+end
 
 
 [xsto, outsto] = MCMC_adaptive(obj, x0, niter(ii), 1, [], [], cov0, 1);

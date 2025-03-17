@@ -292,7 +292,7 @@ f8  = get_distribution_fns(data.incd_ch2020,'lognorm', show);
 f10  = get_distribution_fns(data.p_chpopn,  'beta',    show);
 f11  = get_distribution_fns(data.p_adpopn,  'beta',    show);
 f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
-f13  = get_distribution_fns(data.p_incd_recentinf, 'lognorm', show);
+f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
