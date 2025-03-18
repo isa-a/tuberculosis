@@ -1,9 +1,73 @@
 clear all; load Model_setup; % load calibration_res_prev cov0;
 
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
+
+testvec = mean(prm.bounds,1);
+
+[out, aux, msg] = obj(testvec)
+
+
+
+[p,r] = allocate_parameters(testvec, p, r, xi);
+r.gamma = r.gamma_2015;
+M = make_model_test(p, r, i, s, gps, prm.contmat);
+
+delinds = [s.Lf_imp, s.Pf_imp, s.Irec, s.I2rec];
+
+matnew = M.lam;
+matnew(:,delinds) = [];
+
+load('../England/testprms');
+matold = Mold.lam;
+
+[rows, cols] = find(matold ~= matnew);
+[dold(cols,:), dold(rows,:)]
+
+return;
+
+
+
+Mlin = M.lin;
+Mlin(:,[]) = [];
+Mlin([s.Lf_imp, s.Pf_imp, s.Irec, s.I2rec],:) = [];
+
+
+age  = 'ch';
+born = 'dom';
+born = 'dom';
+
+Mnlin = M.nlin.(age).(born).ds;
+Mnlin(:,[s.Lf_imp, s.Pf_imp, s.Irec, s.I2rec]) = [];
+Mnlin([s.Lf_imp, s.Pf_imp, s.Irec, s.I2rec],:) = [];
+
+
+
+
+
+figure;
+
+subplot(1,2,1);
+spy(Mold.lin);
+
+subplot(1,2,2);
+spy(M.lin);
+
+[rows, cols] = find(Mold.lin ~= Mlin);
+[dold(cols,:), dold(rows,:)];
+
+[rowsn, colsn] = find(Mold.nlin.(age).(born).ds ~= Mnlin);
+[dold(colsn,:), dold(rowsn,:)]
+
+
+
+
+
+
+return;
+
 nobj = @(x) -obj(x);
 
-nsam = 100; 
+nsam = 2000; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 % obj(xsam(1,:));
@@ -41,7 +105,7 @@ end
 % x2 = fminsearch(nobj,x1,options);
 % save optim_res_noVULN5_v2;
 
-save optim_res
+save optim_res_MAIN
 % [xsto, outsto] = MCMC_adaptive2(obj, x0sto(2,:), 1000, 1, [], true);
 
 
@@ -79,25 +143,13 @@ x_new = xsto(inds(1),:);
 cov0 = cov(xsto);
 [xsto, outsto] = MCMC_adaptive33(obj, x_new, 1e4, 1, [], [], cov0, 1);
 
-cov0=[]
+
 nreps = 4;
 niter = [1, 1, 1, 5]*2e3;
 for ii = 1:nreps
-    [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, cov0, 1);
+    [xsto, outsto] = MCMC_adaptive2(obj, x_new, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));
-    x3 = xsto(inds(1),:);
-    cov0 = cov(xsto);
-    fprintf('\n');
-end
-
-
-xnew=xsto(inds(1),:);
-nreps = 1;
-niter = [5]*2e3;
-for ii = 1:nreps
-    [xsto, outsto] = MCMC_adaptive2(obj, xnew, niter(ii), 1, cov0, 1);
-    inds = find(outsto==max(outsto));
-    xnew = xsto(inds(1),:);
+    x_new = xsto(inds(1),:);
     cov0 = cov(xsto);
     fprintf('\n');
 end
@@ -140,15 +192,7 @@ for ii = 1:nreps
     cov0 = cov(xsto);
 end
 
-x_new=x3;
-nreps = 1;
-niter = [5]*2e4;
-for ii = 1:nreps
-    [xsto, outsto] = MCMC_adaptive2(obj, x0, niter(ii), 1, cov0, 1);
-    inds = find(outsto==max(outsto));
-    x0 = xsto(inds(1),:);
-    cov0 = cov(xsto);
-end
+
 
 
 [xsto, outsto] = MCMC_adaptive(obj, x0, niter(ii), 1, [], [], cov0, 1);

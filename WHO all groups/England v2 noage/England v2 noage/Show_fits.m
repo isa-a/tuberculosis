@@ -2,14 +2,14 @@ clear all; %load optim_resUK3.mat;
 % load optim_res_noVULN5_v2.mat;
 load optim_res_MAIN;
 
-x3=[0.4915,    0.1419 ,   0.2860,    4.3056,    0.9999 ,   0.1770,    6.4304 ,   0.3189  ,  1.0569 ,   1.8553 ,  12.4415 ,   0.9102,    5.5168];
+x0 = x0sto(5,:);
 
 ix0 = size(xsto,1)/2;
-nx  = 200;
+nx  = 20;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
-%xs(ii,:)
+
 for ii = 1:size(xs,1)
     [out, aux] = obj(xs(ii,:));
     sims(ii,:) = aux.sim;
@@ -19,7 +19,7 @@ end
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_vulnpopn; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs; data.p_incd_recentinf];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_vulnpopn; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -37,7 +37,7 @@ xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs', 'proportion recent'});
+set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 return
@@ -66,7 +66,7 @@ for ii = 1:length(fnames)
 end
 for ii = 1:16
    subplot(4,4,ii); 
-   histogram(xs(:,ii));
+   histogram(x0(:,ii));
    title(names{ii});
 end
 
