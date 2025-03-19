@@ -2,16 +2,18 @@ clear all; %load optim_resUK3.mat;
 % load optim_res_noVULN5_v2.mat;
 load optim_res_MAIN;
 
-x3=[0.4915,    0.1419 ,   0.2860,    4.3056,    0.9999 ,   0.1770,    6.4304 ,   0.3189  ,  1.0569 ,   1.8553 ,  12.4415 ,   0.9102,    5.5168];
+% x3=[0.4915,    0.1419 ,   0.2860,    4.3056,    0.9999 ,   0.1770,    6.4304 ,   0.3189  ,  1.0569 ,   1.8553 ,  12.4415 ,   0.9102,    5.5168];
+
 
 ix0 = size(xsto,1)/2;
 nx  = 200;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
+x3=[0.3778,    0.1261  ,  0.0672 ,   4.7561,    1.6836 ,   0.2195,    5.7229 ,   0.3210  ,  1.9110  ,  1.6026 ,  12.8686  ,  0.4666 ,   1.9086];
 %xs(ii,:)
-for ii = 1:size(xs,1)
-    [out, aux] = obj(xs(ii,:));
+for ii = 1:size(x3,1)
+    [out, aux] = obj(x3);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
