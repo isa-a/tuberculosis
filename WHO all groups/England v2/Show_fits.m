@@ -10,7 +10,8 @@ nx  = 200;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
-x3=[0.3778,    0.1261  ,  0.0672 ,   4.7561,    1.6836 ,   0.2195,    5.7229 ,   0.3210  ,  1.9110  ,  1.6026 ,  12.8686  ,  0.4666 ,   1.9086];
+% x3=[0.3778,    0.1261  ,  0.0672 ,   4.7561,    1.6836 ,   0.2195,    5.7229 ,   0.3210  ,  1.9110  ,  1.6026 ,  12.8686  ,  0.4666 ,   1.9086];
+x3=[0.3778,    0.1261  ,  0.001 ,   1e-4,    1.6836 ,   0.2195,    5.7229 ,   0.3210  ,  1.9110  ,  20 ,  20  ,  0.4666 ,   1.9086];
 %xs(ii,:)
 for ii = 1:size(x3,1)
     [out, aux] = obj(x3);
@@ -71,53 +72,3 @@ for ii = 1:16
    histogram(xs(:,ii));
    title(names{ii});
 end
-
-
-for ii = 1:size(x0sto,1)
-    [out, aux] = obj(x0sto(ii,:));
-    sims(ii,:) = aux.sim;
-    inc(:,ii)  = aux.incd;
-    pp(ii)     = aux.p_migrect;
-end
-
-% Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_vulnpopn; data.p_vulnTB; data.incd_ch2020; data.p_chpopn; data.p_adpopn; data.ch_notifs];
-den = alldat(:,2)';
-
-% Compute the simulation results for plotting
-sim_plt = sims ./ den;
-dat_plt = alldat' ./ den;
-
-% Plotting
-figure; ms = 24; hold on;
-
-% Plot the real data with red error bars
-md = dat_plt(2,:);
-hilo = diff(dat_plt, [], 1);
-xx = (1:length(md)) - 0.1;
-plot(xx, md, 'r.', 'markersize', ms);
-errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'r', 'linestyle', 'None');
-
-% Define colors for each parameter set
-colors = {'b', 'k', 'g', 'y', 'm'}; % Blue, black, green
-
-% Plot simulation results for each parameter set
-for ii = 1:size(sim_plt, 1)
-    md = sim_plt(ii, :);
-    xx = (1:length(md)) + 0.1 + 0.1 * (ii - 1); % Adjust x positions slightly to avoid overlap
-    plot(xx, md, '.', 'Color', colors{ii}, 'markersize', ms);
-end
-
-% Set X-axis labels
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'p_vulnpopn', 'p_vulnTB', 'incd_ch2020', 'p_chpopn', 'p_adpopn', 'ch_notifs'});
-yl = ylim; yl(1) = 0; ylim(yl);
-
-% Create legend
-h1 = plot(nan, nan, 'r.', 'markersize', ms);  % Placeholder for real data
-h2 = plot(nan, nan, 'b.', 'markersize', ms);  % Placeholder for Set 1
-h3 = plot(nan, nan, 'k.', 'markersize', ms);  % Placeholder for Set 2
-h4 = plot(nan, nan, 'g.', 'markersize', ms);  % Placeholder for Set 3
-h5 = plot(nan, nan, 'y.', 'markersize', ms);  % Placeholder for Set 2
-h6 = plot(nan, nan, 'm.', 'markersize', ms);  % Placeholder for Set 3
-legend([h1, h2, h3, h4, h5, h6], {'Real Data', 'Set 1', 'Set 2', 'Set 3', 'Set 4', 'Set 5'}, 'Location', 'Best');
-
