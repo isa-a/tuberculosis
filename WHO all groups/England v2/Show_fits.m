@@ -1,6 +1,4 @@
-clear all; %load optim_resUK3.mat;
-% load optim_res_noVULN5_v2.mat;
-load optim_res_MAIN;
+clear all;
 
 % x3=[0.4915,    0.1419 ,   0.2860,    4.3056,    0.9999 ,   0.1770,    6.4304 ,   0.3189  ,  1.0569 ,   1.8553 ,  12.4415 ,   0.9102,    5.5168];
 
