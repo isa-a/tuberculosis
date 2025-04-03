@@ -4,13 +4,14 @@ function [p,r] = allocate_parameters(x,p,r,xi,scaling)
 
 r.beta           = x(xi.beta);
 %p.betadec        = x(xi.betadec);
+p.reldec        = x(xi.reldec);
 r.gamma_2015     = x(xi.gamma(1))*[x(xi.p_relrate_gamma_chvad), 1];
 r.gamma_2020     = x(xi.gamma(2))*[x(xi.p_relrate_gamma_chvad), 1];
 
-tmp              = r.progression0*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
+tmp              = (p.reldec*r.progression0)*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
 r.progression    = [tmp*x(xi.p_relrate_factor); tmp];
 
-tmp              = r.reactivation0*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
+tmp              = (p.reldec*r.reactivation0)*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
 r.reactivation   = [tmp*x(xi.p_relrate_factor); tmp];
 
 p.LTBI_in_migrad = x(xi.p_LTBI_in_migrad);

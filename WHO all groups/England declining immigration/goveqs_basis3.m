@@ -81,18 +81,36 @@ out(i.U.ch.dom) = out(i.U.ch.dom) + dom_morts;
 
 years = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023];
 vals = [797, 772, 752, 825, 886, 682, 773, 1294, 1316];
-mgrtn_ft = interp1(years, vals ./ vals(years==2015), t, 'linear', 'extrap');
+%mgrtn_ft = interp1(years, vals ./ vals(years==2015), t, 'linear', 'extrap');
 
-% Migration out of UK
-outmigr = r.migr*invec(s.migr)/sum(invec(s.migr));
-out(s.migr) = out(s.migr) - outmigr;
-%disp('out');
-%disp(sum(out));
+if t < 2015
+    mgrtn_ft = 1;
+    % Migration out of UK
+    outmigr = r.migr * invec(s.migr) / sum(invec(s.migr));
+    out(s.migr) = out(s.migr) - outmigr;
+    
+    % Migration into UK 
+    migrmorts = sum(sum(morts(s.migr,:)));
+    totalout = sum(outmigr) + migrmorts;
+    out(1:i.nstates) = out(1:i.nstates) + mgrtn_ft * totalout .* M.migrentries;
+else
+    mgrtn_ft = interp1(years, vals ./ vals(years==2015), t, 'linear', 'extrap');
+    % Migration out of UK
+    outmigr = 1 / r.migr;
+    out(s.migr) = out(s.migr) - outmigr;
+    
+    % Migration into UK
+    out(1:i.nstates) = out(1:i.nstates) + mgrtn_ft * sum(outmigr) .* M.migrentries;
+end
 
-% Migration into UK (balance the migration out and migrant mortality)
-migrmorts = sum(sum(morts(s.migr,:)));
-totalout = sum(outmigr) + migrmorts;
-out(1:i.nstates) = out(1:i.nstates) + mgrtn_ft*totalout.*M.migrentries;
+% % Migration out of UK
+% outmigr = r.migr * invec(s.migr) / sum(invec(s.migr));
+% out(s.migr) = out(s.migr) - outmigr;
+% 
+% % Migration into UK 
+% migrmorts = sum(sum(morts(s.migr,:)));
+% totalout = sum(outmigr) + migrmorts;
+% out(1:i.nstates) = out(1:i.nstates) + mgrtn_ft * totalout .* M.migrentries;
 
 % keyboard;
 

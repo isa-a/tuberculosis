@@ -6,21 +6,6 @@ nobj = @(x) -obj(x);
 nsam = 100; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
-% obj(xsam(1,:));
-
-% xx = xsam(1,:);
-% [p,r] = allocate_parameters(xx, p, r, xi);
-% init = zeros(1,i.nx);
-% seed = 1e-5;
-% init(i.U.dom)       = 1 - 0.168 - seed;
-% init(i.U.migr_rect) = 0.168;
-% init(i.I.dom)       = Setupseed;
-% 
-% p0 = p; r0 = r; p0.betadec = 0;
-% M0 = make_model(p0, r0, i, s, gps);
-% geq0 = @(t,in) goveqs_basis3(t, in, i, s, M0, agg, sel, r0, p0);
-% [t0, soln0] = ode15s(geq0, [0:1e4], init, odeset('NonNegative',1:5));
-
 mk = round(nsam/25);
 for ii = 1:nsam
     if mod(ii,mk)==0; fprintf('%0.5g ', ii/mk); end
@@ -31,12 +16,7 @@ mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
 xord = xsam(ord,:);
 
-options = optimset(PlotFcn=@optimplotfval);
-for ii = 1:10
-    tmp = fminsearch(nobj,xord(ii,:),options);
-    x0sto(ii,:) = fminsearch(nobj,tmp,options);
-end
-
+return;
 % x1 = fminsearch(nobj,x0,options);
 % x2 = fminsearch(nobj,x1,options);
 % save optim_res_noVULN5_v2;

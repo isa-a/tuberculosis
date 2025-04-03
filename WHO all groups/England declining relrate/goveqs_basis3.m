@@ -9,7 +9,8 @@ den = sum(tmp.*M.denvec,1)';
 den(den==0) = Inf;
 
 % New infections
-lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
+% lam = M.lam*(invec./den)*(1-p.betadec)^(max((t-2010),0));
+lam = M.lam*(invec./den)*(1-p.reldec)^(max((t-2010),0));
 % lam = M.lam*(invec./sum(invec))*(1-p.betadec)^(max((t-2010),0));
 
 % Indices for lambda entries

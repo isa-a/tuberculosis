@@ -24,7 +24,8 @@ else
     
     % Equlibrium model, without RR-TB
     p0 = p; r0 = r; 
-    p0.betadec = 0;
+%     p0.betadec = 0;
+    p0.reldec = 0;
     r0.gamma   = r.gamma_2015;
     p0.relbeta = 0; r0.RR_acqu = 0;
     M0 = make_model(p0, r0, i, s, gps, contmat);
