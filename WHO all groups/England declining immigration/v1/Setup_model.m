@@ -176,14 +176,14 @@ r.migr         = 1/10;                                                     % Ave
 % pop = 68.35e6;
 % prop = vals / pop;
 
-years = [2019, 2020, 2021, 2022, 2023];
-vals = [806,    682, 773, 1294, 1316];
-vals = vals * 1e5;
-pop = [66.6e6, 66.7e6, 67e6, 67.6e6, 68.2e6];
-prop = vals ./ pop;
+years    = [2019, 2020, 2021, 2022, 2023];
+vals     = [806,    682, 773, 1294, 1316]*1e3;
+pop      = [66.6e6, 66.7e6, 67e6, 67.6e6, 68.2e6];
+rin_vec  = vals./pop;
+% migrvec  = rin_vals/rin_vals(1);
 
-migrvec = [1.1792, 0.9978, 1.1309, 1.8932, 1.9254];
-migrvec2 = [1.2102  ,  1.0225 ,   1.1537, 1.9142, 1.9296];
+% migrvec = [1.1792, 0.9978, 1.1309, 1.8932, 1.9254];
+% migrvec2 = [1.2102, 1.0225, 1.1537, 1.9142, 1.9296];
 
 % -------------------------------------------------------------------------
 % --- Name free parameters ------------------------------------------------
@@ -202,8 +202,8 @@ migrvec2 = [1.2102  ,  1.0225 ,   1.1537, 1.9142, 1.9296];
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc', 'p_relrate_factor'};      
 % lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,                  1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor'};      
-lgths =      [1,        1,      2,                      1,                 1,                       1,          1,             1,                  1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_migrout','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor'};      
+lgths =      [1,        1,      2,                      1,          1,                 1,                       1,          1,             1,                  1];
 
 
 lim = 0; xi = [];
@@ -220,6 +220,7 @@ bds(xi.beta,:)                   = [0 40];
 bds(xi.betadec,:)                = [0 0.15];
 bds(xi.gamma,:)                  = [0, 1; 1e-4, 10];                       % Rate of treatment uptake, in 2015 and 2020
 bds(xi.p_relrate_gamma_chvad,:)  = [0 2];                                  % Relative rate of treatment uptake, children vs adults
+bds(xi.r_migrout,:)              = [0 1];
 bds(xi.p_LTBI_in_migrad,:)       = [0.1 0.6];                              % Prevalence of LTBI in adult migrants, used to construct migrant 'birth' terms
 bds(xi.p_relLTBI_inmigr_advch,:) = [3 7];                                  % Relative prev of LTBI in migrants, ad vs ch: estimated using simple ARTI calculation
 % bds(xi.r_vuln_sc,:)              = [0 1];                                  % Rate of acquisition of vulnerability
@@ -244,7 +245,7 @@ ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 % prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
-prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
+prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2, 0.2, 1];
 prm.contmat_born(end,:) = [];
 prm.contmat_born(:,end) = [];
 
@@ -330,10 +331,10 @@ f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
 %                                                                                                      f8(incd_ch2020) + ...
 %                                                                                                      f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
 
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, incd_ch2020, p_chpopn, p_adpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                     f2(mort) + f3(p_migrTB) + f5(p_LTBI_inmigr) + ...                                                                                                    
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
+                                                                                                     f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + ...                                                                                                    
                                                                                                      f8(incd_ch2020) + ...
-                                                                                                     f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
+                                                                                                     f10(p_chpopn) + f12(ch_notifs);
 
 
 
