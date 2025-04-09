@@ -217,23 +217,22 @@ getindsch = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(
 getindsad = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(st2)),s.ad);
 m = zeros(i.nstates,1);
 
-m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch)*p.ch_in_migr;
-m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad)*(1-p.ch_in_migr);
+m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch-0.003)*p.ch_in_migr;
+m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad-0.003)*(1-p.ch_in_migr);
 
 m(getindsch('Lf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.02;
 m(getindsch('Ls','ds'))     = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.98;
 m(getindsch('Pf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.02;
 m(getindsch('Ps','ds'))     = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.98;
 
-m(getindsch('Irem','ds'))   = p.ch_in_migr*0.003;
+m(getindsch('Irem','ds')) = p.ch_in_migr*0.003;
 
 m(getindsad('Lf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.02;
 m(getindsad('Ls','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.98;
 m(getindsad('Pf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.02;
 m(getindsad('Ps','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.98;
 
-m(getindsad('Irem','ds'))   = (1-p.ch_in_migr)*(1-0.003);                   % 0.9970
-
+m(getindsad('Irem','ds')) = (1-p.ch_in_migr)*0.003;
 
 % m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;
 % m(getindsch('Lf','rr')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*p.RR_in_migr*0.02;

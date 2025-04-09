@@ -42,13 +42,13 @@ else
     p1 = p; r1 = r; 
     r1.TPT = [0 r.TPT2020rec 0];
     r1.gamma = r.gamma_2015;
-    M1 = make_model(p1, r1, i, s, gps, contmat);
+    M1 = make_modelnonEQ(p1, r1, i, s, gps, contmat);
     
     % >2010: increase in case-finding
     p2 = p; r2 = r; 
     % r2.gamma = r.gamma_2020;
     r2.gamma = r.gamma_2015;
-    M2 = make_model(p2, r2, i, s, gps, contmat);
+    M2 = make_modelnonEQ(p2, r2, i, s, gps, contmat);
 
     % --- Now simulate them all
 
@@ -106,7 +106,7 @@ else
     
     if incd(1) > 0.1
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs);
+        out  = calfn.fn(incd2010, incd2020, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf);
         aux.soln0      = soln0;
         aux.soln       = soln1;
         msg            = 2;

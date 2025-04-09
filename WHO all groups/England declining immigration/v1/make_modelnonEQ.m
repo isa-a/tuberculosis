@@ -1,4 +1,4 @@
-function M = make_model(p,r,i,s,gps,contmat)
+function M = make_modelnonEQ(p,r,i,s,gps,contmat)
 
 m = zeros(i.nstates);
 
@@ -225,12 +225,12 @@ m(getindsch('Ls','ds'))     = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.98;
 m(getindsch('Pf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.02;
 m(getindsch('Ps','ds'))     = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.98;
 
-m(getindsch('Irem','ds'))   = p.ch_in_migr*0.003;
 
 m(getindsad('Lf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.02;
 m(getindsad('Ls','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.98;
 m(getindsad('Pf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.02;
 m(getindsad('Ps','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.98;
+
 
 
 % m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;

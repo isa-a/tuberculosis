@@ -232,7 +232,8 @@ bds(xi.p_relrate_factor,:)       = [1, 10];                                % Rel
 
 scaling = ones(1,xi.nx);
 % scaling(xi.r_vuln_sc)   = 500;
-scaling(xi.r_ageing_sc) = 10;
+%scaling(xi.r_ageing_sc) = 10;
+scaling(xi.r_migrout) = 10;
 prm.scaling             = scaling;
 
 %bds(xi.r_migr,:)           = [0 1];
@@ -245,7 +246,7 @@ ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 % prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
-prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2, 0.2, 1];
+prm.contmat_born = [1, 0.5, 0.2; 0.5, 5, 0.2; 0.2, 0.2, 1];
 prm.contmat_born(end,:) = [];
 prm.contmat_born(:,end) = [];
 
@@ -331,10 +332,10 @@ f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
 %                                                                                                      f8(incd_ch2020) + ...
 %                                                                                                      f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
 
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                     f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + ...                                                                                                    
+lhd.fn = @(incd2010, incd2020, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
+                                                                                                     f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + ...                                                                                                    
                                                                                                      f8(incd_ch2020) + ...
-                                                                                                     f10(p_chpopn) + f12(ch_notifs);
+                                                                                                     f10(p_chpopn) + f12(ch_notifs) + f13(p_incd_recentinf);
 
 
 
