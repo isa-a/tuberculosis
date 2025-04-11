@@ -27,6 +27,8 @@ p.LTBI_in_migrch = x(xi.p_LTBI_in_migrad)/x(xi.p_relLTBI_inmigr_advch);
 % p.relbeta_vuln   = 1;                        % NB: not currently used in make_model
 
 r.ageing         = x(xi.r_ageing_sc)/10;
+
+r.muTB           = r.muTB*x(xi.mort_factor);
 %r.ch_mort        = x(xi.ch_mort);
 
 % r.progression = [

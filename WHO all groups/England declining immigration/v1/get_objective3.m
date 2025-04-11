@@ -61,7 +61,7 @@ else
 
     % Increased TPT and case-finding
     geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, rin_vec, [2015 2020; 2010 2020], i, s, p2, r2, prm, sel, agg, false);
-    [t1, soln1] = ode15s(geq1, [2010:2020], soln0(end,:), odeset('NonNegative', 1:i.nstates));
+    [t1, soln1] = ode15s(geq1, [2010:2030], soln0(end,:), odeset('NonNegative', 1:i.nstates));
     
 %     allsol = [soln0; soln1(2:end,:)];
 %     allt   = [t0; t1(2:end)];
@@ -106,7 +106,7 @@ else
     
     if incd(1) > 0.1
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
-        out  = calfn.fn(incd2010, incd2020, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf);
         aux.soln0      = soln0;
         aux.soln       = soln1;
         msg            = 2;

@@ -202,8 +202,8 @@ rin_vec  = vals./pop;
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc', 'p_relrate_factor'};      
 % lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,                  1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_migrout','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor'};      
-lgths =      [1,        1,      2,                      1,          1,                 1,                       1,          1,             1,                  1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_migrout','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor', 'mort_factor'};      
+lgths =      [1,        1,      2,                      1,          1,                 1,                       1,          1,             1,                  1,             1];
 
 
 lim = 0; xi = [];
@@ -229,11 +229,12 @@ bds(xi.p_relLTBI_inmigr_advch,:) = [3 7];                                  % Rel
 bds(xi.p_relrate,:)              = [1 20];                                 % Relative rate of progression vs domestic, migr_recent and vulnerable 
 bds(xi.r_ageing_sc,:)            = [0 1];                                  % Rate of ageing
 bds(xi.p_relrate_factor,:)       = [1, 10];                                % Rel.rate of progression for children vs adults
+bds(xi.mort_factor,:)       = [0, 1];                               
 
 scaling = ones(1,xi.nx);
 % scaling(xi.r_vuln_sc)   = 500;
 %scaling(xi.r_ageing_sc) = 10;
-scaling(xi.r_migrout) = 10;
+%scaling(xi.r_migrout) = 10;
 prm.scaling             = scaling;
 
 %bds(xi.r_migr,:)           = [0 1];
@@ -332,8 +333,8 @@ f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
 %                                                                                                      f8(incd_ch2020) + ...
 %                                                                                                      f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
 
-lhd.fn = @(incd2010, incd2020, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                     f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + ...                                                                                                    
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
+                                                                                                     f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + ...                                                                                                    
                                                                                                      f8(incd_ch2020) + ...
                                                                                                      f10(p_chpopn) + f12(ch_notifs) + f13(p_incd_recentinf);
 
