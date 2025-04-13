@@ -203,8 +203,8 @@ rin_vec  = vals./pop;
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc', 'p_relrate_factor'};      
 % lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,                  1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_migrout','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor', 'muTB'};      
-lgths =      [1,        1,      2,                      1,          1,                 1,                       1,          1,             1,                  1,    1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_migrout','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor', 'muTB', 'migrant_mix'};      
+lgths =      [1,        1,      2,                      1,          1,                 1,                       1,          1,             1,                  1,     1,             1];
 
 
 lim = 0; xi = [];
@@ -231,7 +231,8 @@ bds(xi.p_relrate,:)              = [1 20];                                 % Rel
 bds(xi.r_ageing_sc,:)            = [0 1];                                  % Rate of ageing
 bds(xi.p_relrate_factor,:)       = [1, 10];                                % Rel.rate of progression for children vs adults
 %bds(xi.mort_factor,:)       = [0, 1];                               
-bds(xi.muTB,:)       = [0, 1];
+bds(xi.muTB,:)                  = [0, 1];
+bds(xi.migrant_mix,:)       = [1, 10];
 
 scaling = ones(1,xi.nx);
 % scaling(xi.r_vuln_sc)   = 500;
@@ -249,7 +250,7 @@ ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 % prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
-prm.contmat_born = [1, 0.5, 0.2; 0.5, 2, 0.2; 0.2, 0.2, 1];
+prm.contmat_born = [1, 0.5, 0.2; 0.5, 5, 0.2; 0.2, 0.2, 1];
 prm.contmat_born(end,:) = [];
 prm.contmat_born(:,end) = [];
 
@@ -272,6 +273,11 @@ for age_row = 1:2                                                           % ro
     end
 end
 
+prm.contmat = [ ...
+    1.0000, 0.3000, 0.5000, 0.1500; ...
+    0.3000, 1.0000, 0.1500, 0.5000; ...
+    0.5000, 0.1500, 5.0000, 1.5000; ...
+    0.1500, 0.5000, 1.5000, 5.0000];
 
 
 
@@ -335,8 +341,9 @@ f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
 %                                                                                                      f8(incd_ch2020) + ...
 %                                                                                                      f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
 
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_chpopn, ch_notifs, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + ...                                                                                                    
+                                                                                                     f8(incd_ch2020) + ...
                                                                                                      f10(p_chpopn) + f12(ch_notifs) + f13(p_incd_recentinf);
 
 

@@ -106,7 +106,7 @@ else
     
     if incd(1) > 0.1
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_chpopn, ch_notifs, p_incd_recentinf);
         aux.soln0      = soln0;
         aux.soln       = soln1;
         msg            = 2;
