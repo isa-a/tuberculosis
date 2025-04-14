@@ -249,7 +249,7 @@ ref.i = i; ref.s = s; ref.xi = xi;
 prm.p = p; prm.r = r; prm.agg = agg; prm.sel = sel;
 
 % prm.contmat_born = [1, 0.5, 0.2; 0.5, 1, 0.2; 0.2 0.2 1];
-prm.contmat_born = [1, 0.5, 0.2; 0.5, 2, 0.2; 0.2, 0.2, 1];
+prm.contmat_born = [1, 0.5, 0.2; 0.5, 0.5, 0.2; 0.2, 0.2, 1];
 prm.contmat_born(end,:) = [];
 prm.contmat_born(:,end) = [];
 
