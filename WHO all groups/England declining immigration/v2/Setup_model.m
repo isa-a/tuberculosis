@@ -203,8 +203,8 @@ rin_vec  = vals./pop;
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','r_vuln_sc','relbeta_vuln', 'p_relrate', 'r_ageing_sc', 'p_relrate_factor'};      
 % lgths =      [1,        1,      2,                      1,                 1,                       1,       1,             1,           2,        1,                  1];
 
-names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_migrout','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor', 'muTB', 'migrmix'};      
-lgths =      [1,        1,      2,                      1,          1,                 1,                       1,          1,             1,                  1,    1,           1];
+names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_migrout','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor', 'muTB'};      
+lgths =      [1,        1,      2,                      1,          1,                 1,                       1,          1,             1,                  1,    1];
 
 
 lim = 0; xi = [];
@@ -232,8 +232,6 @@ bds(xi.r_ageing_sc,:)            = [0 1];                                  % Rat
 bds(xi.p_relrate_factor,:)       = [1, 10];                                % Rel.rate of progression for children vs adults
 %bds(xi.mort_factor,:)       = [0, 1];                               
 bds(xi.muTB,:)       = [0, 1];
-bds(xi.migrmix,:)       = [1 10];
-
 
 scaling = ones(1,xi.nx);
 % scaling(xi.r_vuln_sc)   = 500;

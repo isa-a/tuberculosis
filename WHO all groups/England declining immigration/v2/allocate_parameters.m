@@ -1,4 +1,4 @@
-function [p, r, prm] = allocate_parameters(x,p,r,xi,scaling, prm)
+function [p,r] = allocate_parameters(x,p,r,xi,scaling)
 
 % x = x./scaling;
 
@@ -30,12 +30,3 @@ r.ageing         = x(xi.r_ageing_sc);
 
 % r.muTB           = r.muTB*x(xi.mort_factor);
 r.muTB           = x(xi.muTB);
-
-p.migrmix = x(xi.migrmix);
-
-prm.contmat = [ ...
-    1.0000, 0.3000, 0.5000, 0.1500; ...
-    0.3000, 1.0000, 0.1500, 0.5000; ...
-    0.5000, 0.1500, p.migrmix, 1.5000; ...
-    0.1500, 0.5000, 1.5000, p.migrmix];
-

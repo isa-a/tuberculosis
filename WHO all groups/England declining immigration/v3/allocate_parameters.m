@@ -4,7 +4,7 @@ function [p, r, prm] = allocate_parameters(x,p,r,xi,scaling, prm)
 
 r.beta           = x(xi.beta);
 
-r.migrout        = x(xi.r_migrout);
+r.migrout        = x(xi.r_migrout)/10;
 
 p.betadec        = x(xi.betadec);
 % p.betadec        = 0;
@@ -26,7 +26,7 @@ p.LTBI_in_migrch = x(xi.p_LTBI_in_migrad)/x(xi.p_relLTBI_inmigr_advch);
 % r.vuln           = x(xi.r_vuln_sc)/500;
 % p.relbeta_vuln   = 1;                        % NB: not currently used in make_model
 
-r.ageing         = x(xi.r_ageing_sc);
+r.ageing         = x(xi.r_ageing_sc)/10;
 
 % r.muTB           = r.muTB*x(xi.mort_factor);
 r.muTB           = x(xi.muTB);

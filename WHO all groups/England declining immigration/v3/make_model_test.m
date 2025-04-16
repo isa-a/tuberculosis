@@ -1,6 +1,7 @@
-function M = make_modelnonEQ(p,r,i,s,gps,contmat)
+function M = make_model(p,r,i,s,gps,contmat)
 
-m     = zeros(i.nstates);
+m = zeros(i.nstates);
+
 
 for ia = 1:length(gps.age)
     age = gps.age{ia};
@@ -30,31 +31,31 @@ for ia = 1:length(gps.age)
             R      = geti('R');
     
             % Outcomes of 'fast' latent
-            sources = [Lf, Lf_imp];
-            destin  = Ls;
-            rates   = r.LTBI_stabil;
-            m(destin, sources) = m(destin, sources) + rates;
-
             source   = Lf;
-            destins  =                  [Irec];
-            rates    = [r.progression(ia, ib)];
+            
+            % REVERT
+            %destins  =                  [Irec,            Ls];
+            destins  =                  [Irem,            Ls];
+            rates    = [r.progression(ia, ib), r.LTBI_stabil];
             m(destins, source) = m(destins, source) + rates';
-
+    
             source   = Lf_imp;
-            destins  =                  [Irem];
-            rates    = [r.progression(ia, ib)];
+            destins  =                  [Irem,            Ls];
+            rates    = [r.progression(ia, ib), r.LTBI_stabil];
             m(destins, source) = m(destins, source) + rates';
             
             % REVERT
             source  = Pf;
-            destins =                                  [I2rec,            Ps];
-            rates   = [r.progression(ia, ib)*(1-p.TPTeff(is)), r.LTBI_stabil];
-            m(destins, source) = m(destins, source) + rates';
-
-            source  = Pf_imp;
+            %destins =                                  [I2rec,            Ps];
             destins =                                  [I2rem,            Ps];
             rates   = [r.progression(ia, ib)*(1-p.TPTeff(is)), r.LTBI_stabil];
             m(destins, source) = m(destins, source) + rates';
+
+            % % REVERT
+            % source  = Pf_imp;
+            % destins =                                  [I2rem,            Ps];
+            % rates   = [r.progression(ia, ib)*(1-p.TPTeff(is)), r.LTBI_stabil];
+            % m(destins, source) = m(destins, source) + rates';
 
             % Outcomes of 'slow' latent
             source  = Ls;
@@ -135,10 +136,10 @@ for ia = 1:length(gps.age)
             rate   = r.TPT(ib);
             m(destin, source) = m(destin, source) + rate;
 
-            source = Lf_imp;
-            destin = Pf_imp;
-            rate   = r.TPT(ib);
-            m(destin, source) = m(destin, source) + rate;
+            % source = Lf_imp;
+            % destin = Pf_imp;
+            % rate   = r.TPT(ib);
+            % m(destin, source) = m(destin, source) + rate;
 
             source = Ls;
             destin = Ps;
@@ -176,11 +177,11 @@ destins = s.migr_long;
 inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + 1/5;
 
-% % Transition from dom to vulnerable population
-% sources = s.dom;
-% destins = s.vuln;
-% inds = sub2ind([i.nstates, i.nstates], destins, sources);
-% m(inds) = m(inds) + r.vuln;
+% Transition from dom to vulnerable population
+sources = s.dom;
+destins = s.vuln;
+inds = sub2ind([i.nstates, i.nstates], destins, sources);
+m(inds) = m(inds) + r.vuln;
 
 % --- Ageing process
 sources = s.ch;
@@ -189,7 +190,6 @@ inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + r.ageing;
 
 M.lin = sparse(m - diag(sum(m,1)));
-
 
 
 % --- Nonlinear component -------------------------------------------------
@@ -226,17 +226,20 @@ m = zeros(i.nstates,1);
 m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch)*p.ch_in_migr;
 m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad)*(1-p.ch_in_migr);
 
-m(getindsch('Lf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.02;
+% REVERT
+% m(getindsch('Lf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.02;
+m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.02;
 m(getindsch('Ls','ds'))     = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.98;
-m(getindsch('Pf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.02;
+% m(getindsch('Pf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.02;
+m(getindsch('Pf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.02;
 m(getindsch('Ps','ds'))     = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.98;
 
-
-m(getindsad('Lf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.02;
+% m(getindsad('Lf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.02;
+m(getindsad('Lf','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.02;
 m(getindsad('Ls','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.98;
-m(getindsad('Pf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.02;
+% m(getindsad('Pf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.02;
+m(getindsad('Pf','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.02;
 m(getindsad('Ps','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.98;
-
 
 
 % m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;
@@ -280,8 +283,8 @@ m(1,getinds('ch', 'dom', 'ds')) = contmat(1,1);                              % n
 m(1,getinds('ad', 'dom', 'ds')) = contmat(1,2);                                  
 m(1,getinds('ch', 'migr','ds')) = contmat(1,3);
 m(1,getinds('ad', 'migr','ds')) = contmat(1,4);
-% m(1,getinds('ch', 'vuln','ds')) = contmat(1,5);
-% m(1,getinds('ad', 'vuln','ds')) = contmat(1,6);
+m(1,getinds('ch', 'vuln','ds')) = contmat(1,5);
+m(1,getinds('ad', 'vuln','ds')) = contmat(1,6);
 
 % m(2,getinds('ch', 'dom', 'rr')) = contmat(1,1);
 % m(2,getinds('ad', 'dom','rr')) = contmat(1,2);
@@ -294,8 +297,8 @@ m(2,getinds('ch', 'dom', 'ds')) = contmat(2,1);
 m(2,getinds('ad', 'dom','ds')) = contmat(2,2);
 m(2,getinds('ch', 'migr','ds')) = contmat(2,3);
 m(2,getinds('ad', 'migr','ds')) = contmat(2,4);
-% m(2,getinds('ch', 'vuln','ds')) = contmat(2,5);
-% m(2,getinds('ad', 'vuln','ds')) = contmat(2,6);
+m(2,getinds('ch', 'vuln','ds')) = contmat(2,5);
+m(2,getinds('ad', 'vuln','ds')) = contmat(2,6);
 
 % m(4,getinds('ch', 'dom', 'rr')) = contmat(2,1);
 % m(4,getinds('ad', 'dom','rr')) = contmat(2,2);
@@ -308,8 +311,8 @@ m(3,getinds('ch', 'dom', 'ds')) = contmat(3,1);
 m(3,getinds('ad', 'dom','ds')) = contmat(3,2);
 m(3,getinds('ch', 'migr','ds')) = contmat(3,3);
 m(3,getinds('ad', 'migr','ds')) = contmat(3,4);
-% m(3,getinds('ch', 'vuln','ds')) = contmat(3,5);
-% m(3,getinds('ad', 'vuln','ds')) = contmat(3,6);
+m(3,getinds('ch', 'vuln','ds')) = contmat(3,5);
+m(3,getinds('ad', 'vuln','ds')) = contmat(3,6);
 
 % m(6,getinds('ch', 'dom', 'rr')) = contmat(3,1);
 % m(6,getinds('ad', 'dom','rr')) = contmat(3,2);
@@ -322,43 +325,43 @@ m(4,getinds('ch', 'dom', 'ds')) = contmat(4,1);
 m(4,getinds('ad', 'dom','ds')) = contmat(4,2);
 m(4,getinds('ch', 'migr','ds')) = contmat(4,3);
 m(4,getinds('ad', 'migr','ds')) = contmat(4,4);
-% m(4,getinds('ch', 'vuln','ds')) = contmat(4,5);
-% m(4,getinds('ad', 'vuln','ds')) = contmat(4,6);
+m(4,getinds('ch', 'vuln','ds')) = contmat(4,5);
+m(4,getinds('ad', 'vuln','ds')) = contmat(4,6);
 
-% % m(8,getinds('ch', 'dom', 'rr')) = contmat(4,1);
-% % m(8,getinds('ad', 'dom','rr')) = contmat(4,2);
-% % m(8,getinds('ch', 'migr','rr')) = contmat(4,3);
-% % m(8,getinds('ad', 'migr','rr')) = contmat(4,4);
-% % m(8,getinds('ch', 'vuln','rr')) = contmat(4,5);
-% % m(8,getinds('ad', 'vuln','rr')) = contmat(4,6);
-% 
-% m(5,getinds('ch', 'dom', 'ds')) = contmat(5,1);
-% m(5,getinds('ad', 'dom','ds')) = contmat(5,2);
-% m(5,getinds('ch', 'migr','ds')) = contmat(5,3);
-% m(5,getinds('ad', 'migr','ds')) = contmat(5,4);
-% % m(5,getinds('ch', 'vuln','ds')) = contmat(5,5);
-% % m(5,getinds('ad', 'vuln','ds')) = contmat(5,6);
-% 
-% % m(10,getinds('ch', 'dom', 'rr')) = contmat(5,1);
-% % m(10,getinds('ad', 'dom','rr')) = contmat(5,2);
-% % m(10,getinds('ch', 'migr','rr')) = contmat(5,3);
-% % m(10,getinds('ad', 'migr','rr')) = contmat(5,4);
-% % m(10,getinds('ch', 'vuln','rr')) = contmat(5,5);
-% % m(10,getinds('ad', 'vuln','rr')) = contmat(5,6);
-% 
-% m(6,getinds('ch', 'dom', 'ds')) = contmat(6,1);
-% m(6,getinds('ad', 'dom','ds')) = contmat(6,2);
-% m(6,getinds('ch', 'migr','ds')) = contmat(6,3);
-% m(6,getinds('ad', 'migr','ds')) = contmat(6,4);
-% m(6,getinds('ch', 'vuln','ds')) = contmat(6,5);
-% m(6,getinds('ad', 'vuln','ds')) = contmat(6,6);
-% 
-% % m(12,getinds('ch', 'dom', 'rr')) = contmat(6,1);
-% % m(12,getinds('ad', 'dom','rr')) = contmat(6,2);
-% % m(12,getinds('ch', 'migr','rr')) = contmat(6,3);
-% % m(12,getinds('ad', 'migr','rr')) = contmat(6,4);
-% % m(12,getinds('ch', 'vuln','rr')) = contmat(6,5);
-% % m(12,getinds('ad', 'vuln','rr')) = contmat(6,6);
+% m(8,getinds('ch', 'dom', 'rr')) = contmat(4,1);
+% m(8,getinds('ad', 'dom','rr')) = contmat(4,2);
+% m(8,getinds('ch', 'migr','rr')) = contmat(4,3);
+% m(8,getinds('ad', 'migr','rr')) = contmat(4,4);
+% m(8,getinds('ch', 'vuln','rr')) = contmat(4,5);
+% m(8,getinds('ad', 'vuln','rr')) = contmat(4,6);
+
+m(5,getinds('ch', 'dom', 'ds')) = contmat(5,1);
+m(5,getinds('ad', 'dom','ds')) = contmat(5,2);
+m(5,getinds('ch', 'migr','ds')) = contmat(5,3);
+m(5,getinds('ad', 'migr','ds')) = contmat(5,4);
+m(5,getinds('ch', 'vuln','ds')) = contmat(5,5);
+m(5,getinds('ad', 'vuln','ds')) = contmat(5,6);
+
+% m(10,getinds('ch', 'dom', 'rr')) = contmat(5,1);
+% m(10,getinds('ad', 'dom','rr')) = contmat(5,2);
+% m(10,getinds('ch', 'migr','rr')) = contmat(5,3);
+% m(10,getinds('ad', 'migr','rr')) = contmat(5,4);
+% m(10,getinds('ch', 'vuln','rr')) = contmat(5,5);
+% m(10,getinds('ad', 'vuln','rr')) = contmat(5,6);
+
+m(6,getinds('ch', 'dom', 'ds')) = contmat(6,1);
+m(6,getinds('ad', 'dom','ds')) = contmat(6,2);
+m(6,getinds('ch', 'migr','ds')) = contmat(6,3);
+m(6,getinds('ad', 'migr','ds')) = contmat(6,4);
+m(6,getinds('ch', 'vuln','ds')) = contmat(6,5);
+m(6,getinds('ad', 'vuln','ds')) = contmat(6,6);
+
+% m(12,getinds('ch', 'dom', 'rr')) = contmat(6,1);
+% m(12,getinds('ad', 'dom','rr')) = contmat(6,2);
+% m(12,getinds('ch', 'migr','rr')) = contmat(6,3);
+% m(12,getinds('ad', 'migr','rr')) = contmat(6,4);
+% m(12,getinds('ch', 'vuln','rr')) = contmat(6,5);
+% m(12,getinds('ad', 'vuln','rr')) = contmat(6,6);
 
 % Include infectiousness
 m = m*r.beta;
@@ -373,8 +376,8 @@ m(1, intersect(s.ch, s.dom))  = 1;
 m(2, intersect(s.ad, s.dom))  = 1; 
 m(3, intersect(s.ch, s.migr)) = 1; 
 m(4, intersect(s.ad, s.migr)) = 1; 
-% m(5, intersect(s.ch, s.vuln)) = 1; 
-% m(6, intersect(s.ad, s.vuln)) = 1;  
+m(5, intersect(s.ch, s.vuln)) = 1; 
+m(6, intersect(s.ad, s.vuln)) = 1;  
 M.denvec = sparse(m);
 
 
@@ -382,11 +385,9 @@ M.denvec = sparse(m);
 m = zeros(i.nstates,2);
 m(s.ch,1)         = 0;
 m(s.ad,1)         = 1/83;
-m(s.migr,1)       = m(s.migr,1) + r.migrout;
 %m(:,1)            = 1/83;
-% m(s.vuln,1)       = 1/55;
+m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
-% m(s.Tx,2)         = r.muTx;
 M.mort            = sparse(m);
 
 % --- Mortality -----------------------------------------------------------

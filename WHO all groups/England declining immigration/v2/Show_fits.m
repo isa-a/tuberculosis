@@ -4,6 +4,7 @@ clear all;
 load optim_res3;
 
 x3(xi.betadec)  = 0;
+xn=[0.2226 ,   0.0014  ,  0.2835  ,  7.4443  ,  0.8252  ,  0.5823   , 0.1672   , 6.7586  , 12.8811 ,   0.8039 ,   4.6272,    0.1127];
 % x3(xi.gamma(2)) = 2;
 
 % ix0 = size(xsto,1)/2;
@@ -12,15 +13,15 @@ x3(xi.betadec)  = 0;
 % xs  = xsto(ix0:dx:end,:);
 
 %xs(ii,:)
-for ii = 1:size(x3,1)
-    [out, aux, msg] = obj(x3);
+for ii = 1:size(xn,1)
+    [out, aux] = obj(xn);
     sims(ii,:) = aux.sim;
     inc(:,ii)  = aux.incd;
     pp(ii)     = aux.p_migrect;
 end
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
-% aux.p_incd_recentinf
+aux.p_incd_recentinf
 
 % Collate data
 alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.incd_ch2020; data.p_chpopn; data.ch_notifs; data.p_incd_recentinf];

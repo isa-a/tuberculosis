@@ -6,7 +6,7 @@ function [out, aux, msg] = get_objective2(x, ref, prm, gps, contmat, rin_vec, ca
 i = ref.i; s = ref.s; xi = ref.xi;
 p = prm.p; r = prm.r; sel = prm.sel; agg = prm.agg;
 
-[p, r, prm] = allocate_parameters(x, p, r, xi, prm.scaling,prm);
+[p,r] = allocate_parameters(x, p, r, xi, prm.scaling);
 
 % keyboard;
 
@@ -26,7 +26,8 @@ else
     init(i.Irec.ad.dom.ds) = seed;
     
     % Equlibrium model, without RR-TB
-    p0 = p; r0 = r; 
+    p0 = p; r0 = r;
+    p0.prev_in_migr = 0.003;
     p0.betadec = 0;
     r0.gamma   = r.gamma_2015;
     p0.relbeta = 0; r0.RR_acqu = 0;
@@ -40,12 +41,14 @@ else
     
     % >2015: scaleup of TPT 
     p1 = p; r1 = r; 
+    % p1.prev_in_migr = 0;
     r1.TPT = [0 r.TPT2020rec 0];
     r1.gamma = r.gamma_2015;
     M1 = make_modelnonEQ(p1, r1, i, s, gps, contmat);
     
     % >2010: increase in case-finding
     p2 = p; r2 = r; 
+    % p2.prev_in_migr = 0;
     % r2.gamma = r.gamma_2020;
     r2.gamma = r.gamma_2015;
     M2 = make_modelnonEQ(p2, r2, i, s, gps, contmat);

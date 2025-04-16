@@ -1,6 +1,6 @@
 function M = make_modelnonEQ(p,r,i,s,gps,contmat)
 
-m     = zeros(i.nstates);
+m = zeros(i.nstates);
 
 for ia = 1:length(gps.age)
     age = gps.age{ia};
@@ -30,19 +30,14 @@ for ia = 1:length(gps.age)
             R      = geti('R');
     
             % Outcomes of 'fast' latent
-            sources = [Lf, Lf_imp];
-            destin  = Ls;
-            rates   = r.LTBI_stabil;
-            m(destin, sources) = m(destin, sources) + rates;
-
             source   = Lf;
-            destins  =                  [Irec];
-            rates    = [r.progression(ia, ib)];
+            destins  =                  [Irec,            Ls];
+            rates    = [r.progression(ia, ib), r.LTBI_stabil];
             m(destins, source) = m(destins, source) + rates';
-
+    
             source   = Lf_imp;
-            destins  =                  [Irem];
-            rates    = [r.progression(ia, ib)];
+            destins  =                  [Irem,            Ls];
+            rates    = [r.progression(ia, ib), r.LTBI_stabil];
             m(destins, source) = m(destins, source) + rates';
             
             % REVERT
@@ -189,7 +184,6 @@ inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + r.ageing;
 
 M.lin = sparse(m - diag(sum(m,1)));
-
 
 
 % --- Nonlinear component -------------------------------------------------

@@ -1,6 +1,7 @@
-function M = make_modelnonEQ(p,r,i,s,gps,contmat)
+function M = make_model(p,r,i,s,gps,contmat)
 
 m     = zeros(i.nstates);
+mLTBI = zeros(i.nstates);
 
 for ia = 1:length(gps.age)
     age = gps.age{ia};
@@ -38,34 +39,34 @@ for ia = 1:length(gps.age)
             source   = Lf;
             destins  =                  [Irec];
             rates    = [r.progression(ia, ib)];
-            m(destins, source) = m(destins, source) + rates';
+            mLTBI(destins, source) = m(destins, source) + rates';
 
             source   = Lf_imp;
             destins  =                  [Irem];
             rates    = [r.progression(ia, ib)];
-            m(destins, source) = m(destins, source) + rates';
+            mLTBI(destins, source) = m(destins, source) + rates';
             
             % REVERT
             source  = Pf;
             destins =                                  [I2rec,            Ps];
             rates   = [r.progression(ia, ib)*(1-p.TPTeff(is)), r.LTBI_stabil];
-            m(destins, source) = m(destins, source) + rates';
+            mLTBI(destins, source) = m(destins, source) + rates';
 
             source  = Pf_imp;
             destins =                                  [I2rem,            Ps];
             rates   = [r.progression(ia, ib)*(1-p.TPTeff(is)), r.LTBI_stabil];
-            m(destins, source) = m(destins, source) + rates';
+            mLTBI(destins, source) = m(destins, source) + rates';
 
             % Outcomes of 'slow' latent
             source  = Ls;
             destin  = Irem;
             rate    = r.reactivation(ia, ib);
-            m(destin, source) = m(destin, source) + rate;
+            mLTBI(destin, source) = m(destin, source) + rate;
 
             source  = Ps;
             destin  = Irem;
             rate    = r.reactivation(ia, ib)*(1-p.TPTeff(is));
-            m(destin, source) = m(destin, source) + rate;
+            mLTBI(destin, source) = m(destin, source) + rate;
     
             % Initiation of treatment
             %pSLinit = ismdr*p.RRrec;
@@ -189,8 +190,7 @@ inds = sub2ind([i.nstates, i.nstates], destins, sources);
 m(inds) = m(inds) + r.ageing;
 
 M.lin = sparse(m - diag(sum(m,1)));
-
-
+M.LTBIlin = sparse(mLTBI - diag(sum(mLTBI,1)));
 
 % --- Nonlinear component -------------------------------------------------
 
@@ -223,21 +223,25 @@ getindsch = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(
 getindsad = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(st2)),s.ad);
 m = zeros(i.nstates,1);
 
-m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch)*p.ch_in_migr;
-m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad)*(1-p.ch_in_migr);
+prev_in_migr = 0.003;
+% prev_in_migr = 0;
+
+m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch-prev_in_migr)*p.ch_in_migr;
+m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad-prev_in_migr)*(1-p.ch_in_migr);
 
 m(getindsch('Lf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.02;
 m(getindsch('Ls','ds'))     = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*0.98;
 m(getindsch('Pf_imp','ds')) = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.02;
 m(getindsch('Ps','ds'))     = p.LTBI_in_migrch*p.ch_in_migr*p.migrTPT*0.98;
 
+m(getindsch('Irem','ds')) = p.ch_in_migr*prev_in_migr;
 
 m(getindsad('Lf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.02;
 m(getindsad('Ls','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*(1-p.migrTPT)*0.98;
 m(getindsad('Pf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.02;
 m(getindsad('Ps','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.98;
 
-
+m(getindsad('Irem','ds')) = (1-p.ch_in_migr)*prev_in_migr;
 
 % m(getindsch('Lf','ds')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*(1-p.RR_in_migr)*0.02;
 % m(getindsch('Lf','rr')) = p.LTBI_in_migrch*p.ch_in_migr*(1-p.migrTPT)*p.RR_in_migr*0.02;

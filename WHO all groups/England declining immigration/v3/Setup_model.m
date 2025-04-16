@@ -237,7 +237,7 @@ bds(xi.migrmix,:)       = [1 10];
 
 scaling = ones(1,xi.nx);
 % scaling(xi.r_vuln_sc)   = 500;
-%scaling(xi.r_ageing_sc) = 10;
+scaling(xi.r_ageing_sc) = 10;
 %scaling(xi.r_migrout) = 10;
 prm.scaling             = scaling;
 
@@ -337,9 +337,9 @@ f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
 %                                                                                                      f8(incd_ch2020) + ...
 %                                                                                                      f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
 
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_chpopn, ch_notifs, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, incd_ch2020, p_chpopn, ch_notifs, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + ...                                                                                                    
-                                                                                                     f10(p_chpopn) + f12(ch_notifs) + f13(p_incd_recentinf);
+                                                                                                     f8(incd_ch2020) + f10(p_chpopn) + f12(ch_notifs) + f13(p_incd_recentinf);
 
 
 
