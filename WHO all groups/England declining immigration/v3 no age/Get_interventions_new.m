@@ -1,29 +1,23 @@
-clear all;
-
-% x3=[0.4915,    0.1419 ,   0.2860,    4.3056,    0.9999 ,   0.1770,    6.4304 ,   0.3189  ,  1.0569 ,   1.8553 ,  12.4415 ,   0.9102,    5.5168];
-load optim_res3;
-
-x3(xi.betadec)  = 0;
-% x3(xi.gamma(2)) = 2;
+clear all; load calibration_res.mat;
 
 ix0 = size(xsto,1)/2;
 nx  = 200;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
-%xs(ii,:)
-for ii = 1:size(x3,1)
-    [out, aux, msg] = obj(x3);
-    sims(ii,:) = aux.sim;
-    inc(:,ii)  = aux.incd;
-    pp(ii)     = aux.p_migrect;
+for ii = 1:size(xs,1)
+    [out, aux] = obj(xs(ii,:));
+    incd(:,:,ii) = diff(aux.soln(:,i.aux.inc),[],1)*1e5;
 end
+incd_pct = prctile(incd,[2.5,50,97.5],3);
+
+
+return;
+
 sim_pct = prctile(sims,[2.5,50,97.5],1);
 
-% aux.p_incd_recentinf
-
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.incd_ch2020; data.p_chpopn; data.ch_notifs; data.p_incd_recentinf];
+alldat = [data.incd2010; data.incd2020; data.incdRR2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI; data.p_vulnpopn; data.p_vulnTB];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -40,18 +34,13 @@ md = sim_plt(2,:); hilo = diff(sim_plt,[],1);
 xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
-%set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'incd_ch2020', 'p_chpopn', 'ch_notifs', 'proportion recent'});
-yl = ylim; yl(1) = 0; ylim(yl);
+set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
 
+yl = ylim; yl(1) = 0; ylim(yl);
 
 % Plot incidence timeseries
 figure; hold on;
-plot(2010:2029, inc,'Color',0.5*[1 1 1]);
-yl = ylim; yl(1) = 0; ylim(yl);
-xlim([2010, 2024])
-
-return;
+plot(inc,'Color',0.5*[1 1 1]);
 
 % Plot data for comparison
 vecs = [data.incd2010; data.incd2020]';
@@ -69,8 +58,8 @@ for ii = 1:length(fnames)
     fname = fnames{ii};
     names = [names, repmat({fname},1,length(xi.(fname)))];
 end
-for ii = 1:16
-   subplot(4,4,ii); 
-   histogram(xs(:,ii));
+for ii = 1:12
+   subplot(4,3,ii); 
+   histogram(xsto(:,ii));
    title(names{ii});
 end

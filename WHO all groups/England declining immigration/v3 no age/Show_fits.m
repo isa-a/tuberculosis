@@ -23,7 +23,7 @@ sim_pct = prctile(sims,[2.5,50,97.5],1);
 % aux.p_incd_recentinf
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.incd_ch2020; data.p_chpopn; data.ch_notifs; data.p_incd_recentinf];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_incd_recentinf];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
@@ -41,7 +41,7 @@ xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'incd_ch2020', 'p_chpopn', 'ch_notifs', 'proportion recent'});
+set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'proportion recent'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 
