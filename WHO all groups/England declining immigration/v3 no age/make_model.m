@@ -39,23 +39,23 @@ for ia = 1:length(gps.age)
             source   = Lf;
             destins  =                  [Irec];
             rates    = [r.progression(ia, ib)];
-            mLTBI(destins, source) = m(destins, source) + rates';
+            m(destins, source) = m(destins, source) + rates';
 
             source   = Lf_imp;
             destins  =                  [Irem];
             rates    = [r.progression(ia, ib)];
-            mLTBI(destins, source) = m(destins, source) + rates';
+            m(destins, source) = m(destins, source) + rates';
             
             % REVERT
             source  = Pf;
             destins =                                  [I2rec,            Ps];
             rates   = [r.progression(ia, ib)*(1-p.TPTeff(is)), r.LTBI_stabil];
-            mLTBI(destins, source) = m(destins, source) + rates';
+            m(destins, source) = m(destins, source) + rates';
 
             source  = Pf_imp;
             destins =                                  [I2rem,            Ps];
             rates   = [r.progression(ia, ib)*(1-p.TPTeff(is)), r.LTBI_stabil];
-            mLTBI(destins, source) = m(destins, source) + rates';
+            m(destins, source) = m(destins, source) + rates';
 
             % Outcomes of 'slow' latent
             source  = Ls;
@@ -223,7 +223,7 @@ end
 getindsad = @(st1, st2) intersect(intersect(intersect(s.migr_rect, s.(st1)), s.(st2)),s.ad);
 m = zeros(i.nstates,1);
 
-prev_in_migr = 0.006;
+prev_in_migr = 0.003;
 % prev_in_migr = 0;
 
 % m(i.U.ch.migr_rect) = (1-p.LTBI_in_migrch-prev_in_migr)*p.ch_in_migr;

@@ -28,7 +28,7 @@ else
     % Equlibrium model, without RR-TB
     p0 = p; r0 = r; 
     p0.betadec = 0;
-    p0.prev_in_migr = 0.006;
+    p0.prev_in_migr = 0.003;
     r0.gamma   = r.gamma_2015;
     p0.relbeta = 0; r0.RR_acqu = 0;
     M0 = make_model(p0, r0, i, s, gps, contmat);
@@ -102,14 +102,14 @@ else
     % p_adpopn = sum(sfin(s.ad))/sum(sfin(1:i.nstates));
 
     % Notifications
-%     ch_notifs = dsol(end,i.aux.ch_notifs)/popfin*1e5;
+    ch_notifs = dsol(end,i.aux.ch_notifs)/popfin*1e5;
 
     % Proportion of incidence coming from recent infection
     p_incd_recentinf = incd(3)/incd(1);
     
     if incd(1) > 0.1
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, ch_notifs, p_incd_recentinf);
         aux.soln0      = soln0;
         aux.soln       = soln1;
         msg            = 2;
@@ -127,9 +127,9 @@ else
 %         aux.incd_ch    = incd_ch2020;
 %         aux.chpopn     = p_chpopn;
         % aux.adpopn     = p_adpopn;
-%         aux.ch_notifs  = ch_notifs;
+        aux.ch_notifs  = ch_notifs;
         aux.p_incd_recentinf = p_incd_recentinf;
-        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf];
+        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, ch_notifs, p_incd_recentinf];
     else
         out = -Inf;
         aux = NaN;
