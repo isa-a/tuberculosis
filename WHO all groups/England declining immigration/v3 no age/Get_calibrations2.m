@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 100; 
+nsam = 1000; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 mk = round(nsam/25);
@@ -21,7 +21,7 @@ return;
 % x2 = fminsearch(nobj,x1,options);
 % save optim_res_noVULN5_v2;
 
-save optim_res10000;
+save optim_res1000;
 % [xsto, outsto] = MCMC_adaptive2(obj, x0sto(2,:), 1000, 1, [], true);
 
 
@@ -76,13 +76,13 @@ end
 save calibrations_mort_mcmc;
 
 
-xnew=xsto(inds(1),:);
+%xnew=xsto(inds(1),:);
 nreps = 1;
 niter = [5]*2e3;
 for ii = 1:nreps
-    [xsto, outsto] = MCMC_adaptive2(obj, xnew, niter(ii), 1, cov0, 1);
+    [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));
-    xnew = xsto(inds(1),:);
+    x3 = xsto(inds(1),:);
     cov0 = cov(xsto);
     fprintf('\n');
 end

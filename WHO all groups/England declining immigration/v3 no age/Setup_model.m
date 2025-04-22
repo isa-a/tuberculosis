@@ -207,7 +207,7 @@ rin_vec  = vals./pop;
 % names = {'beta','betadec','gamma','p_relrate_gamma_chvad','r_migrout','p_LTBI_in_migrad','p_relLTBI_inmigr_advch','p_relrate', 'r_ageing_sc', 'p_relrate_factor', 'muTB', 'migrmix'};      
 % lgths =      [1,        1,      2,                      1,          1,                 1,                       1,          1,             1,                  1,    1,           1];
 
-names = {'beta','betadec','gamma','r_migrout','p_LTBI_in_migrad','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
+names = {'beta','LTBIdec','gamma','r_migrout','p_LTBI_in_migrad','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
 lgths =      [1,        1,      2,            1,                 1,          1,                   1,    1,           1];
 
 
@@ -222,7 +222,7 @@ xi.nx = lim;
 % Set their boundaries
 bds = [];
 bds(xi.beta,:)                   = [0 40];
-bds(xi.betadec,:)                = [0 0.15];
+bds(xi.LTBIdec,:)                = [0 0.15];
 bds(xi.gamma,:)                  = [0, 1; 1e-4, 10];                       % Rate of treatment uptake, in 2015 and 2020
 % bds(xi.p_relrate_gamma_chvad,:)  = [0 2];                                  % Relative rate of treatment uptake, children vs adults
 bds(xi.r_migrout,:)              = [0 1];
@@ -243,7 +243,7 @@ scaling = ones(1,xi.nx);
 % scaling(xi.r_vuln_sc)   = 500;
 % scaling(xi.r_ageing_sc) = 10;
 scaling(xi.r_migrout) = 10;
-scaling(xi.betadec) = 10;
+scaling(xi.LTBIdec) = 10;
 scaling(xi.muTB) = 10;
 prm.scaling             = scaling;
 
