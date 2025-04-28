@@ -23,28 +23,15 @@ for ii = 1:size(xs,1)
     xx = xs(ii,:);
     [out,aux] = obj(xx);
       
-    init    = aux.soln(2022 - 2010 + 1, :);
+    init    = aux.soln(end, :);
 
     [p0,r0,prm0] = allocate_parameters(xx,p,r,xi,prm.scaling,prm);
     r0.gamma = r0.gamma_2020;
-    p0.LTBIdec = 0;
-    p0.prev_in_migr = 0.003;
     M0 = make_model(p0,r0,i,s,gps,prm0.contmat);
-
-    p1 = p0;  r1 = r0;
-    r1.TPT         = [0 r.TPT2020rec 0];
-    p1.prev_in_migr = 0;
-    r1.gamma = r1.gamma_2020;
-    M1 = make_model(p1, r1, i, s, gps, prm0.contmat);
-
-    p2 = p0;  r2 = r0;
-    r2.gamma        = r2.gamma_2020;
-    p2.prev_in_migr = 0;
-    M2 = make_model(p2, r2, i, s, gps, prm0.contmat);
 
     TPTcov = -log(1-0.25);
     ACFcov = -log(1-0.50); 
-    
+
     % UKHSA action plan (from now)
     % 25% annually of recent migrants (arrived within the last 5 years)
     % Reduce the average delay to diagnosis from 75 days to 56 days
@@ -52,7 +39,7 @@ for ii = 1:size(xs,1)
     ra.TPT = TPTcov * [0 1 0 0];
     ra.ACF = ACFcov * [1 0 0 0];
     Ma = make_model(pa, ra, i, s, gps, prma.contmat);
-    
+
     %Expanded deployment of current tools (2027 – 2030)
     %Scale up diagnosis efforts to detect 100% of cases in all population groups
     %50% annually in all TB infected: UK born, Non-UK born
@@ -63,43 +50,34 @@ for ii = 1:size(xs,1)
     pb.migrTPT = 0.8;
     Mb = make_model(pb, rb, i, s, gps, prmb.contmat);
 
-    models = {M0, M1, M2};
+    models = {M0, Ma, Mb};
 
     for mi = 1:length(models)
         if mi < 3
 
-            geq0 = @(t,in) goveqs_basis3(t, in, i, s, M0, rin_vec, agg, sel, r0, p0, true);
-            [t0, soln0] = ode15s(geq0, [0:5e3], init, odeset('NonNegative', 1:i.nstates));
-
-            geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, rin_vec, [2015 2020; 2010 2020], i, s, p2, r2, prm, sel, agg, false);
-            [t1, soln1] = ode15s(geq1, [2022:2041], soln0(end,:), odeset('NonNegative', 1:i.nstates));
-%             geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pa, [2024 2027], agg, prm0, sel, r0, false);
-%             [t, soln] = ode15s(geq, 2022:2041, init, opts);
-            sdiff = diff(soln1, [], 1);
-            incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5;
+            geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pa, [2024 2027], agg, prm0, sel, r0, false);
+            [t, soln] = ode15s(geq, 2022:2041, init, opts);
+            sdiff = diff(soln, [], 1);
+            sfin   = soln(end,:);
+            popfin = sum(sfin(1:i.nstates));
+            incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5/popfin;
         else
             % --- expanded deployment (mi=3): run Ma to 2027 then Mb to 2041
             geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{2}, rin_vec, p0, pa, [2024 2027], agg, prma, sel, ra, false);
-            [~, soln] = ode15s(geq, 2022:2027, init, opts);
-            sdiff_ma = diff(soln, [], 1);
+            [~, soln1] = ode15s(geq, 2022:2027, init, opts);
+            sdiff_ma = diff(soln1, [], 1);
             
-            geq = @(t,in) goveqs_scaleup(t,in,i,s,M0,models{3},rin_vec,p0,pb,[2027 2030],agg,prmb,sel,rb,true);
-            [~, soln2] = ode15s(geq, 2027:2041, soln(end,:), opts);
+            geq = @(t,in) goveqs_scaleup(t,in,i,s,Ma,models{3},rin_vec,pa,pb,[2027 2030],agg,prmb,sel,rb,true);
+            [~, soln2] = ode15s(geq, 2027:2041, soln1(end,:), opts);
             sdiff_mb = diff(soln2(:, i.aux.inc(1)));
+            sfin   = soln(end,:);
+            popfin = sum(sfin(1:i.nstates));
 
-            incsto(:, ii, 3) = [sdiff_ma(:, i.aux.inc(1)); sdiff_mb] * 1e5;
+            incsto(:, ii, 3) = [sdiff_ma(:, i.aux.inc(1)); sdiff_mb] * 1e5/popfin;
         end
     end
 end
 fprintf('\n');
-
-
-mat  = prctile(incsto,[2.5,50,97.5],2);
-mat2 = squeeze(mat(1,2,1))
-
-
-return;
-
 
 %  years vector based on incsto 
 years = 2022:(2022 + size(incsto, 1) - 1);

@@ -27,30 +27,30 @@ for ii = 1:size(xs,1)
 
     [p0,r0,prm0] = allocate_parameters(xx,p,r,xi,prm.scaling,prm);
     r0.gamma = r0.gamma_2015;
-%     p0.LTBIdec = 0;
-%     p0.prev_in_migr = 0.003;
+    p0.LTBIdec = 0;
+    p0.prev_in_migr = 0.003;
     M0 = make_model(p0,r0,i,s,gps,prm0.contmat);
 
-    TPTcov = -log(1-0.25);
-    ACFcov = -log(1-0.50); 
-    
-    % UKHSA action plan (from now)
-    % 25% annually of recent migrants (arrived within the last 5 years)
-    % Reduce the average delay to diagnosis from 75 days to 56 days
-    ra = r0; pa = p0; prma = prm0;
-    ra.TPT = TPTcov * [0 1 0 0];
-    ra.ACF = ACFcov * [1 0 0 0];
-    Ma = make_model(pa, ra, i, s, gps, prma.contmat);
-    
-    %Expanded deployment of current tools (2027 – 2030)
-    %Scale up diagnosis efforts to detect 100% of cases in all population groups
-    %50% annually in all TB infected: UK born, Non-UK born
-    %Pre-entry screening to cover 80% of new migrants (80% with LTBI completing treatment)
-    rb = ra; pb = pa; prmb = prma;
-    rb.ACF = -log(1-0.99) * [1 1 1 1];
-    rb.TPT = -log(1-0.5) * [1 1 1 1];
-    pb.migrTPT = 0.8;
-    Mb = make_model(pb, rb, i, s, gps, prmb.contmat);
+    % TPTcov = -log(1-0.25);
+    % ACFcov = -log(1-0.50); 
+    % 
+    % % UKHSA action plan (from now)
+    % % 25% annually of recent migrants (arrived within the last 5 years)
+    % % Reduce the average delay to diagnosis from 75 days to 56 days
+    % ra = r0; pa = p0; prma = prm0;
+    % ra.TPT = TPTcov * [0 1 0 0];
+    % ra.ACF = ACFcov * [1 0 0 0];
+    % Ma = make_model(pa, ra, i, s, gps, prma.contmat);
+    % 
+    % %Expanded deployment of current tools (2027 – 2030)
+    % %Scale up diagnosis efforts to detect 100% of cases in all population groups
+    % %50% annually in all TB infected: UK born, Non-UK born
+    % %Pre-entry screening to cover 80% of new migrants (80% with LTBI completing treatment)
+    % rb = ra; pb = pa; prmb = prma;
+    % rb.ACF = -log(1-0.99) * [1 1 1 1];
+    % rb.TPT = -log(1-0.5) * [1 1 1 1];
+    % pb.migrTPT = 0.8;
+    % Mb = make_model(pb, rb, i, s, gps, prmb.contmat);
 
     models = {M0};
 
