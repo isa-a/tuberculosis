@@ -1,9 +1,9 @@
 %clear all; load optim_res_MAIN.mat; load Model_setup;
 
-obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
+obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 set1 = {'ds'};
-set2 = {'dom','migr','vuln'};
+set2 = {'dom','migr'};
 set3 = {'L','P','R','T'};
 [inci, incs, incd, lim] = get_addresses({set3, set2, set1}, [], [], [], 0);
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
@@ -13,7 +13,7 @@ if midpt
     xs = x0sto(2,:);
 else
     ix0 = size(xsto,1)/2;
-    nx  = 200;
+    nx  = 20;
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
@@ -84,14 +84,14 @@ for ii = 1:size(xs,1)
     for mi = 1:length(models)
         if mi == length(models)
             % Run Mf to 2030, then Mg
-            geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi-1}, p0, pf, [2024 2030], agg, sel, r0);
+            geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi-1}, rin_vec, p0, pf, [2024 2030], agg, sel, r0, false);
             [t1, soln1] = ode15s(geq_mf, 2022:2030, init, opts);
 
             % Final solution for Mf
             init_final = soln1(end,:);
 
             % Mg from 2030 
-            geq_mg = @(t,in) goveqs_scaleup(t, in, i, s, models{mi-1}, models{mi}, p0, pg, [2030 2033], agg, sel, r0);
+            geq_mg = @(t,in) goveqs_scaleup(t, in, i, s, models{mi-1}, models{mi}, rin_vec, p0, pg, [2030 2033], agg, sel, r0, false);
             [t2, soln2] = ode15s(geq_mg, 2030:2041, init_final, opts);
 
             % Combine
@@ -99,14 +99,14 @@ for ii = 1:size(xs,1)
             soln = [soln1; soln2(2:end,:)];
         elseif mi == length(models)-1
             % For Mf, run Me up to 2027, then Mf 
-            geq_me = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi-1}, p0, pe, [2024 2027], agg, sel, r0);
+            geq_me = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi-1}, rin_vec, p0, pe, [2024 2027], agg, sel, r0, false);
             [t1, soln1] = ode15s(geq_me, 2022:2027, init, opts);
 
             % Final solution for Me
             init_final = soln1(end,:);
 
             % Mf from 2027
-            geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, models{mi-1}, models{mi}, p0, pf, [2027 2030], agg, sel, r0);
+            geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, models{mi-1}, models{mi}, rin_vec, p0, pf, [2027 2030], agg, sel, r0, false);
             [t2, soln2] = ode15s(geq_mf, 2027:2041, init_final, opts);
 
             % Combine
@@ -114,7 +114,7 @@ for ii = 1:size(xs,1)
             soln = [soln1; soln2(2:end,:)];
         else
             % All others
-            geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pa, [2024 2029], agg, sel, r0);
+            geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pa, [2024 2029], agg, sel, r0, false);
             [t, soln] = ode15s(geq, 2022:2041, init, opts);
         end
 

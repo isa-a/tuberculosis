@@ -1,9 +1,9 @@
 clear all; load optim_res_MAIN.mat; load Model_setup;
 
-obj = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
+obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 set1 = {'ds'};
-set2 = {'dom','migr','vuln'};
+set2 = {'dom','migr'};
 set3 = {'L','P','R','T'};
 [inci, incs, incd, lim] = get_addresses({set3, set2, set1}, [], [], [], 0);
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
@@ -29,7 +29,7 @@ for ii = 1:size(xs,1)
     init = aux.soln(end,:);
 
     [p0,r0] = allocate_parameters(xx,p,r,xi);
-    r0.gamma = r0.gamma_2020;
+    r0.gamma = r0.gamma_2015;
     M0 = make_model(p0,r0,i,s,gps,prm.contmat);
 
     TPTcov = -log(1-0.25);
@@ -63,10 +63,10 @@ for ii = 1:size(xs,1)
     % rb2.reactivation = rb2.reactivation * 0.9;
     % Mb2 = make_model(pb2, rb2, i, s, gps, prm.contmat);
 
-    % TPT in vulnerables
-    rc = rb; pc = pb;
-    rc.TPT = TPTcov * [0 1 0 1];
-    Mc = make_model(pc, rc, i, s, gps, prm.contmat);
+%     % TPT in vulnerables
+%     rc = rb; pc = pb;
+%     rc.TPT = TPTcov * [0 1 0 1];
+%     Mc = make_model(pc, rc, i, s, gps, prm.contmat);
 
     % ACF in migrants and vulnerables
     % rd = rc; pd = pc;
@@ -75,7 +75,7 @@ for ii = 1:size(xs,1)
     % Md = make_model(pd, rd, i, s, gps, prm.contmat);
 
     % Reducing diagnostic delay
-    re = rc; pe = pc;
+    re = rb; pe = pb;
     re.ACF = ACFcov * [1 0 0 0];
     re.TPT = TPTcov * [0 1 0 1];
     Me = make_model(pe, re, i, s, gps, prm.contmat);
@@ -92,7 +92,7 @@ for ii = 1:size(xs,1)
     
     for mi = 1:length(models)
         % Define the ODE system for M0 and Me
-        geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, p0, pe, [2024 2027], agg, sel, r0);
+        geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pe, [2024 2027], agg, sel, r0, false);
         [t, soln] = ode15s(geq, [2022:2041], init, opts);
         
         % Store incidence rates
@@ -105,7 +105,7 @@ for ii = 1:size(xs,1)
     init_mf = soln(idx_2027, :);  % Final state at 2027 for Mf
 
     % Run Mf from 2027 to 2041 with scale-up period [2027 2030]
-    geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, M0, Mf, p0, pe, [2027 2030], agg, sel, r0);
+    geq_mf = @(t,in) goveqs_scaleup(t, in, i, s, M0, Mf, rin_vec, p0, pe, [2027 2030], agg, sel, r0, false);
     [t_mf, soln_mf] = ode15s(geq_mf, [2027:2041], init_mf, opts);
 
     % Concatenate Me (up to 2026) with Mf (2027 onward) for final incsto
@@ -150,7 +150,7 @@ end
 xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
 ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
 xlim([years(1) years(end)]);
-ylim([0, 8]);
+ylim([0, 12]);
 legend(legendEntries, 'FontWeight', 'bold', 'FontSize', 12);
 
 hold off;
