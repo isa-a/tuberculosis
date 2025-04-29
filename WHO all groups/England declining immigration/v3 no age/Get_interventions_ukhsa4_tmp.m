@@ -1,5 +1,6 @@
-clear all; load optim_res1000_2.mat;
+clear all; load optim_res1000.mat;
 
+% rin_vec(end-2:end) = rin_vec(end-3);
 obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 
@@ -23,18 +24,15 @@ for ii = 1:size(xs,1)
     xx = xs(ii,:);
     [out,aux] = obj(xx);
       
-%     init    = aux.soln(end, :);
-%     incd(ii) = aux.incd(end);
-
-    init  = aux.init;
-    incd  = aux.incd;
-    incdt = aux.incdt;
+    init    = aux.soln(end, :);
+    incd(ii) = aux.incd(end);
 
     [p0,r0,prm0] = allocate_parameters(xx,p,r,xi,prm.scaling,prm);
+    % r0.gamma = r0.gamma_2020;
     p0.prev_in_migr = 0;
     r0.gamma        = r0.gamma_2015;
-    r0.TPT          = [0 r0.TPT2020rec 0];
-    M0              = make_model(p0, r0, i, s, gps, prm0.contmat);
+    % r0.TPT          = [0 r0.TPT2020rec 0];
+    M0              = make_model(p0,r0,i,s,gps,prm0.contmat);
 
     TPTcov = -log(1-0.25);
     ACFcov = -log(1-0.50); 
@@ -58,44 +56,50 @@ for ii = 1:size(xs,1)
     Mb = make_model(pb, rb, i, s, gps, prmb.contmat);
 
     % models = {M0, Ma, Mb};
-    models = {M0,Ma,Mb};
+    models = {M0};
+    
+    geq = @(t,in) goveqs_basis3(t, in, i, s, M0, rin_vec, agg, sel, r0, p0, false);
 
-    for mi = 1:length(models)
-        if mi < 3
-            geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pa, [2024 2027], agg, prm0, sel, r0, false);
-            [t, soln] = ode15s(geq, 2021:2041, init, opts);
-            sdiff = diff(soln, [], 1);
-            sfin  = soln(end,:);
-            pops  = sum(soln(:,1:i.nstates),2);
-            incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5./pops(1:end-1);
-        else
-            % --- expanded deployment (mi=3): run Ma to 2027 then Mb to 2041
-            geq1 = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{2}, rin_vec, p0, pa, [2024 2027], agg, prma, sel, ra, false);
-            [~, soln1] = ode15s(geq1, 2021:2027, init, opts);
-            sdiff_ma = diff(soln1, [], 1);
-            pops1 = sum(soln1(:, 1:i.nstates), 2);
-            inc1 = sdiff_ma(:, i.aux.inc(1)) * 1e5 ./ pops1(1:end-1);
-        
-            % expanded deployment (mi==3): phase 2 (2027–2041)
-            geq2 = @(t,in) goveqs_scaleup(t, in, i, s, Ma, models{3}, rin_vec, pa, pb, [2027 2030], agg, prmb, sel, rb, true);
-            [~, soln2] = ode15s(geq2, 2027:2041, soln1(end, :), opts);
-            sdiff_mb = diff(soln2(:, i.aux.inc(1)), [], 1);
-            pops2 = sum(soln2(:, 1:i.nstates), 2);
-            inc2 = sdiff_mb * 1e5 ./ pops2(1:end-1);
-        
-            incsto(:, ii, 3) = [inc1; inc2];
-        end
-    end
+    [t, soln] = ode15s(geq, 2022:2041, init, opts);
+    sdiff = diff(soln, [], 1);
+    sfin  = soln(end,:);
+    pops  = sum(soln(:,1:i.nstates),2);
+    incsto(:, ii) = sdiff(:, i.aux.inc(1)) * 1e5./pops(1:end-1);
+    
+    % 
+    % 
+    % for mi = 1:length(models)
+    %     if mi < 3
+    %         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pa, [2024 2027], agg, prm0, sel, r0, false);
+    %         [t, soln] = ode15s(geq, 2022:2041, init, opts);
+    %         sdiff = diff(soln, [], 1);
+    %         sfin  = soln(end,:);
+    %         pops  = sum(soln(:,1:i.nstates),2);
+    %         incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5./pops(1:end-1);
+    %     else
+    %         % --- expanded deployment (mi=3): run Ma to 2027 then Mb to 2041
+    %         geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{2}, rin_vec, p0, pa, [2024 2027], agg, prma, sel, ra, false);
+    %         [~, soln1] = ode15s(geq, 2022:2027, init, opts);
+    %         sdiff_ma = diff(soln1, [], 1);
+    % 
+    %         geq = @(t,in) goveqs_scaleup(t,in,i,s,Ma,models{3},rin_vec,pa,pb,[2027 2030],agg,prmb,sel,rb,true);
+    %         [~, soln2] = ode15s(geq, 2027:2041, soln1(end,:), opts);
+    %         sdiff_mb = diff(soln2(:, i.aux.inc(1)));
+    %         sfin   = soln(end,:);
+    %         pops  = sum(soln2(:,1:i.nstates),2);
+    %         incsto(:, ii, 3) = [sdiff_ma(:, i.aux.inc(1)); sdiff_mb] * 1e5./pops(1:end-1);
+    %     end
+    % end
 end
 fprintf('\n');
 
-% mat = prctile(incsto,[2.5,50,97.5],2)
-% 
-% prctile(incd,[2.5,50,97.5])
-% 
-% figure; plot(mat)
-% 
-% return;
+mat = prctile(incsto,[2.5,50,97.5],2)
+
+prctile(incd,[2.5,50,97.5])
+
+figure; plot(mat)
+
+return;
 
 
 %  years vector based on incsto 

@@ -31,7 +31,7 @@ else
     p0.prev_in_migr = 0.003;
     r0.gamma   = r.gamma_2015;
     %p0.relbeta = 0; r0.RR_acqu = 0;
-    M0 = make_model(p0, r0, i, s, gps, contmat);
+    M0 = make_model(p0, r0, i, s, gps, prm.contmat);
 
     % Introduction of RR-TB from 1970
 %     p0b = p; r0b = r; 
@@ -42,16 +42,16 @@ else
     % >2015: scaleup of TPT 
     p1 = p; r1 = r; 
     r1.TPT = [0 r.TPT2020rec 0];
-    p1.prev_in_migr = 0;
+%     p1.prev_in_migr = 0;
     r1.gamma = r.gamma_2015;
-    M1 = make_model(p1, r1, i, s, gps, contmat);
+    M1 = make_model(p1, r1, i, s, gps, prm.contmat);
     
     % >2010: increase in case-finding
     p2 = p; r2 = r; 
     % r2.gamma = r.gamma_2020;
     p2.prev_in_migr = 0;
     r2.gamma = r.gamma_2015;
-    M2 = make_model(p2, r2, i, s, gps, contmat);
+    M2 = make_model(p2, r2, i, s, gps, prm.contmat);
 
     % --- Now simulate them all
 
@@ -63,25 +63,31 @@ else
     %[t0b, soln0b] = ode15s(geq0b, [1970:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
 
     % Increased TPT and case-finding
-    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, rin_vec, [2015 2020; 2010 2020], i, s, p2, r2, prm, sel, agg, false);
+    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, rin_vec, [2015 2020; 2010 2011], i, s, p2, r2, prm, sel, agg, false);
     [t1, soln1] = ode15s(geq1, [2010:2022], soln0(end,:), odeset('NonNegative', 1:i.nstates));
     
 %     allsol = [soln0; soln1(2:end,:)];
 %     allt   = [t0; t1(2:end)];
-    dsol   = diff(soln1,[],1);
-    sfin   = soln1(end,:);
-    popfin = sum(sfin(1:i.nstates));
+    dsol = diff(soln1,[],1);
+    sfin = soln1(end,:);
+    pops = sum(soln1(:,1:i.nstates),2);
 
-    incd2010   = dsol(t1==2010,i.aux.inc(1))*1e5/popfin;
-    incd2020   = dsol(t1==2020,i.aux.inc(1))*1e5/popfin;
+    incds = dsol(:,i.aux.inc(1))./pops(1:end-1)*1e5;
+    incd2010 = incds(t1==2010);
+    incd2020 = incds(t1==2020);
+    incd     = dsol(:,i.aux.inc)./pops(1:end-1)*1e5;
+
+    % incd2010   = dsol(t1==2010,i.aux.inc(1))*1e5/popfin;
+    % incd2020   = dsol(t1==2020,i.aux.inc(1))*1e5/popfin;
     %incdRR2020 = dsol(end,i.aux.inc(3))*1e5;
-    incd       = dsol(end,i.aux.inc)*1e5/popfin;
-    mort       = dsol(end,i.aux.mort)*1e5/popfin;
-    p_migrTB   = incd(2)/incd(1);
+    % incd       = dsol(end,i.aux.inc)*1e5/popfin;
+    morts      = dsol(:,i.aux.mort)./pops(1:end-1)*1e5;
+    mort       = morts(end);
+    p_migrTB   = incd(end,2)/incd(end,1);
     
     %p_LTBI     = sum(sfin(intersect(s.migr_rect,[s.Lf, s.Ls])))/sum(sfin(s.migr_rect));
     p_LTBI_inmigr = sum(sfin(intersect(s.migr_rect,[s.Lf, s.Ls])))/sum(sfin(s.migr_rect));
-    p_migrpopn    = sum(sfin(s.migr))/popfin;
+    p_migrpopn    = sum(sfin(s.migr))/pops(end);
 
     % % Proportion of population being vulnerable
     % p_vulnpopn = sum(sfin(s.vuln))/sum(sfin(1:i.nstates));
@@ -90,10 +96,10 @@ else
     % p_vulnTB   = incd(3)/incd(1);
 
     % Number initiating TPT in 2019
-    n_TPT2019  = dsol(end,i.aux.nTPT)*1e5/popfin;
+    n_TPT2019  = dsol(end,i.aux.nTPT)*1e5/pops(end);
 
     % Proportion of population thats kids
-%     p_chpopn = sum(sfin(s.ch))/popfin;
+%     p_chpopn = sum(sfin(s.ch))/pops(end);
 
     % Incidence in children; 2020
 %     incd_ch2020 = dsol(end,i.aux.inc(3))/sum(sfin(s.ch))*1e5;
@@ -102,18 +108,21 @@ else
     % p_adpopn = sum(sfin(s.ad))/sum(sfin(1:i.nstates));
 
     % Notifications
-%     ch_notifs = dsol(end,i.aux.ch_notifs)/popfin*1e5;
+%     ch_notifs = dsol(end,i.aux.ch_notifs)/pops(end)*1e5;
 
     % Proportion of incidence coming from recent infection
-    p_incd_recentinf = incd(3)/incd(1);
+    p_incd_recentinf = incd(end,3)/incd(end,1);
     
-    if incd(1) > 0.1
+    if incd(end,1) > 0.1
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
+        % keyboard;
         out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf);
+        aux.init       = soln1(end-1,:);
         aux.soln0      = soln0;
         aux.soln       = soln1;
         msg            = 2;
-        aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))/popfin*1e5;
+        aux.incd       = incd(end,1);
+        aux.incdt      = incds;
         aux.incd2010   = incd2010;
         aux.incd2020   = incd2020;
         aux.mort       = mort;
