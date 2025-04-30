@@ -21,7 +21,7 @@ return;
 % x2 = fminsearch(nobj,x1,options);
 % save optim_res_noVULN5_v2;
 
-save optim_res1000_2;
+save optim_res1000_3;
 % [xsto, outsto] = MCMC_adaptive2(obj, x0sto(2,:), 1000, 1, [], true);
 
 
@@ -78,7 +78,7 @@ save calibrations_mort_mcmc;
 
 %xnew=xsto(inds(1),:);
 nreps = 1;
-niter = [5]*2e3;
+niter = [10]*2e3;
 for ii = 1:nreps
     [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));

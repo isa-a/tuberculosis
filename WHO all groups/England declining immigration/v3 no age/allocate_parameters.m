@@ -13,7 +13,7 @@ p.LTBIdec        = x(xi.LTBIdec);
 % r.gamma_2020     = x(xi.gamma(2))*[x(xi.p_relrate_gamma_chvad), 1];        % NB: not currently used
 
 r.gamma_2015     = x(xi.gamma(1));
-r.gamma_2020     = x(xi.gamma(2))/1000;        % NB: not currently used
+r.gamma_2020     = x(xi.gamma(2));        % NB: not currently used
 
 % tmp              = r.progression0*[1, x(xi.p_relrate(1)), 1, x(xi.p_relrate(2))];
 tmp              = r.progression0*[1, x(xi.p_relrate(1)), 1];

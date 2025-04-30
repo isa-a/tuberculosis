@@ -395,7 +395,7 @@ m(s.migr,1)       = m(s.migr,1) + r.migrout;
 %m(:,1)            = 1/83;
 % m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;
-% m(s.Tx,2)         = r.muTx;
+m(s.Tx,2)         = r.muTx;
 M.mort            = sparse(m);
 
 % --- Mortality -----------------------------------------------------------

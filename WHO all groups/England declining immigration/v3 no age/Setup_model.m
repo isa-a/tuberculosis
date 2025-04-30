@@ -139,8 +139,22 @@ r.progression0  = 0.0826;
 r.LTBI_stabil   = 0.872;
 r.reactivation0 = 0.0006;
 
+% [3873	103	240	149]
+% success, failure, mortality, LTFU
+
+% mutx= (proportion died/proportion completed) * rTx
+%       ( 240/4365) / ( 3873/4365) * r.Tx
+
+
+% ltfu = (proportion ltfu / proportion completed) * Tx
+%       ( 149/4365) / ( 3873/4365) * r.Tx
+ 
+
 r.Tx            = 2;
-r.ltfu          = 0.01;                                                     % loss to followup
+r.ltfu          = ( 149/4365) / ( 3873/4365) * r.Tx;   
+
+% r.Tx            = 2;
+% r.ltfu          = 0.01;                                                     % loss to followup
 
 % Second-line outcomes
 % p.RRrec         = 1;
@@ -152,7 +166,7 @@ r.ltfu          = 0.01;                                                     % lo
 r.self_cure    = 1/6;
 r.relapse      = [0.032 0.14 0.0015];
 %r.muTB         = 1/6;                                                      % TB related mortality
-r.muTx         = -log(1 - 0.06)/0.5;                                           % mortality on tb treatment
+r.muTx         = ( 240/4365) / ( 3873/4365) * r.Tx;                                           % mortality on tb treatment
 p.imm          = 0.8;                                                      % Reduced susceptibility conferred by previous infection
 
 p.ch_in_migr   = 0.07;                                                      % GUESS: check with countries
@@ -302,8 +316,10 @@ prm.contmat      = prm.contmat_born;
 % data.p_adpopn       = [0.688 0.708 0.728];                                 % proportion of country thats adults
 % data.ch_notifs      = [310 360 420]/4.5e6*1e5;                             % notifications in the country   
 
-data.incd2010       = [13.6 14.6 15.6];                                    % With broader uncertainty intervals
-data.incd2020       = [6 7 8];                                             
+% data.incd2010       = [13.6 14.6 15.6];                                    % With broader uncertainty intervals
+data.incd2010       = [10.8 11.8 12.8];                                    % With broader uncertainty intervals
+% data.incd2020       = [6 7 8];  
+data.incd2020       = [5.3 6.3 7.3];  
 %data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
 data.mort           = [0.28 0.3 0.32];                                     % TB mortality, 2020
 data.p_migrTB       = [0.708 0.728 0.748];                                 % Proportion contribution of migrants to overall incidence
