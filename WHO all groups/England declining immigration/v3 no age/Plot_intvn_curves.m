@@ -12,7 +12,7 @@ ff = figure; hold on;
 lw = 1.5; tp = 0.1; fs = 14;
 
 cols = linspecer(size(incsto,3));
-
+cols(1, :) = [0, 0, 0.5];
 for mi = 1:6
     md   = inc_pct(2,:,mi);
     hilo = inc_pct([1,3],:,mi);
@@ -27,15 +27,15 @@ ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
 % ylim([0, 11]);
 set(gca, 'fontsize', fs);
 xlim([years(1) years(end)]);
-
-yl = ylim; yl(1) = 0; ylim(yl);
+ylim([0 9]);
+%yl = ylim; yl(1) = 0; ylim(yl);
 
 
 legend(lg,'Baseline','Enhanced TPT, recent migrants','+ Improved Tx outcomes','+ Accelerated case-finding (foreign-born)','+ Accelerated case-finding (UK-born)','+ Pre-entry migrant screening, TBI');
 
 set(ff,'Position',[577, 190, 1029, 732]);
 
-
+return;
 %
 
 gg = figure; hold off;
