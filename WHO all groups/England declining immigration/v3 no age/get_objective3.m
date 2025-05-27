@@ -114,9 +114,14 @@ else
     p_incd_recentinf = incd(end,3)/incd(end,1);
     
     if incd(end,1) > 0.1
-        % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
-        % keyboard;
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr);
+        if t1(end) > 2020
+            calfn.data.p_LTBI_inmigr = [0.35 0.4 0.45];
+        else
+            calfn.data.p_LTBI_inmigr = [0.15 0.2 0.25];
+        end
+
+        out = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr);
+
         aux.init       = soln1(end-1,:);
         aux.soln0      = soln0;
         aux.soln       = soln1;
@@ -129,37 +134,14 @@ else
         aux.p_migrTB   = p_migrTB;
         aux.p_migrpopn = p_migrpopn;
         aux.p_LTBI_inmigr = p_LTBI_inmigr;
-        % aux.p_vulnpopn = p_vulnpopn;
-        % aux.p_vulnTB   = p_vulnTB;
         aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
         aux.nTPT       = n_TPT2019;
-%         aux.incd_ch    = incd_ch2020;
-%         aux.chpopn     = p_chpopn;
-        % aux.adpopn     = p_adpopn;
-%         aux.ch_notifs  = ch_notifs;
         aux.p_incd_recentinf = p_incd_recentinf;
-        aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf];
+        aux.sim = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf];
     else
         out = -Inf;
         aux = NaN;
         msg = 1;
-        % disp('incd <= 0.1');
-        % disp(incd);
-        % aux.soln0      = soln0;
-        % aux.soln0b     = soln0b;
-        % aux.soln       = soln1;
-        % aux.incd       = dsol(find(t1==2010):end,i.aux.inc(1))*1e5;
-        % aux.incd2010   = incd2010;
-        % aux.incd2020   = incd2020;
-        % aux.incdRR2020 = incdRR2020;
-        % aux.mort       = mort;
-        % aux.p_migrTB   = p_migrTB;
-        % aux.p_migrpopn = p_migrpopn;
-        % aux.p_LTBI     = p_LTBI;
-        % aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
-        % aux.nTPT       = n_TPT2019;
-        % aux.M0         = M0;
     end
-    
-   %keyboard;
+end
 end

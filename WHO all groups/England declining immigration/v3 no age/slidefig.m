@@ -4,9 +4,9 @@ obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
-midpt = false; 
+midpt = true; 
 if midpt
-    xs = x0sto(2,:);
+    xs = x3;
 else
     ix0 = size(xsto,1)/2;
     nx  = 20;

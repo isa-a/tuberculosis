@@ -42,9 +42,9 @@ yl = ylim; yl(1) = 0; ylim(yl);
 
 % Plot incidence timeseries
 figure; hold on;
-plot(2010:2029, inc,'Color',0.5*[1 1 1]);
+plot(2010:2021, aux.incdt,'Color',0.5*[1 1 1]);
 yl = ylim; yl(1) = 0; ylim(yl);
-xlim([2010, 2024])
+xlim([2010, 2021])
 
 return;
 
