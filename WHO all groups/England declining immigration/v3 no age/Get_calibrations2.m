@@ -3,7 +3,7 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 nobj = @(x) -obj(x);
 
-nsam = 1000; 
+nsam = 500; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 mk = round(nsam/25);
@@ -47,7 +47,7 @@ x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
 x3 = fminsearch(nobj,x2,options);
 
-
+save res_40prct
 
 x3 =[0.5887,    0.0003 ,   1.0000 ,   0.7602 ,   1.3823 ,   0.0488 ,   0.1000 ,   7.0000,    3.0711 ,   0.9829 ,   2.9096];
 
