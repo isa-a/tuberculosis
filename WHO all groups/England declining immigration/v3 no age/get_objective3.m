@@ -114,9 +114,20 @@ else
     p_incd_recentinf = incd(end,3)/incd(end,1);
     
     if incd(end,1) > 0.1
+<<<<<<< HEAD
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         % keyboard;
         out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf);
+=======
+        if t1(end) > 2020
+            calfn.data.p_LTBI_inmigr = [0.35 0.4 0.45];
+        else
+            calfn.data.p_LTBI_inmigr = [0.15 0.2 0.25];
+        end
+
+        out = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr);
+
+>>>>>>> 8dbc6be35cab08ae8917ea5182337bdebab93cec
         aux.init       = soln1(end-1,:);
         aux.soln0      = soln0;
         aux.soln       = soln1;
@@ -129,6 +140,7 @@ else
         aux.p_migrTB   = p_migrTB;
         aux.p_migrpopn = p_migrpopn;
         aux.p_LTBI_inmigr = p_LTBI_inmigr;
+<<<<<<< HEAD
         % aux.p_vulnpopn = p_vulnpopn;
         % aux.p_vulnTB   = p_vulnTB;
         aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
@@ -139,10 +151,17 @@ else
 %         aux.ch_notifs  = ch_notifs;
         aux.p_incd_recentinf = p_incd_recentinf;
         aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf];
+=======
+        aux.p_migrect  = sum(sfin(s.migr_rect))/sum(sfin(1:i.nstates));
+        aux.nTPT       = n_TPT2019;
+        aux.p_incd_recentinf = p_incd_recentinf;
+        aux.sim = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf];
+>>>>>>> 8dbc6be35cab08ae8917ea5182337bdebab93cec
     else
         out = -Inf;
         aux = NaN;
         msg = 1;
+<<<<<<< HEAD
         % disp('incd <= 0.1');
         % disp(incd);
         % aux.soln0      = soln0;
@@ -162,4 +181,8 @@ else
     end
     
    %keyboard;
+=======
+    end
+end
+>>>>>>> 8dbc6be35cab08ae8917ea5182337bdebab93cec
 end
