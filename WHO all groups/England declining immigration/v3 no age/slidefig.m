@@ -4,7 +4,7 @@ obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
-midpt = true; 
+midpt = false; 
 if midpt
     xs = x3;
 else
