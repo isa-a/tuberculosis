@@ -1,4 +1,4 @@
-clear all; load mcmc_res.mat;
+clear all; load temp4.mat;
 
 obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
@@ -28,7 +28,7 @@ for ii = 1:size(xs,1)
     p0.prev_in_migr = 0;
     r0.gamma = r0.gamma_2015;
     r0.TPT = [0 r0.TPT2020rec 0];
-    M0 = make_model(p0, r0, i, s, gps, prm0.contmat);
+    M0 = make_model2(p0, r0, i, s, gps, prm0.contmat);
 
     rb = r0; pb = p0; prmb = prm0;
     rb.ACF = -log(1-0.99) * [1 1 1 1];

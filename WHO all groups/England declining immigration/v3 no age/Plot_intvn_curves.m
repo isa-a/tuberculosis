@@ -27,7 +27,7 @@ ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
 % ylim([0, 11]);
 set(gca, 'fontsize', fs);
 xlim([years(1) years(end)]);
-ylim([0 9]);
+%ylim([0 9]);
 %yl = ylim; yl(1) = 0; ylim(yl);
 
 
