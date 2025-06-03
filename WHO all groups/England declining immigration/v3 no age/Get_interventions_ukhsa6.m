@@ -36,19 +36,19 @@ for ii = 1:size(xs,1)
     pb.migrTPT = 0.8;
     rb.muTx    = ( 109/4365) / ( 4044+103/4365) * rb.Tx;
     rb.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb.Tx;   
-    Mb = make_model(pb, rb, i, s, gps, prmb.contmat);
+    Mb = make_model2(pb, rb, i, s, gps, prmb.contmat);
 
         % Mb: and TPT migrant 
     rb_TPT = r0; pb_TPT = p0; prmb_TPT = prm0;
     rb_TPT.TPT = -log(1-0.5) * [0 1 0 0];
-    Mb_TPT = make_model(pb_TPT, rb_TPT, i, s, gps, prmb_TPT.contmat);
+    Mb_TPT = make_model2(pb_TPT, rb_TPT, i, s, gps, prmb_TPT.contmat);
 
         % Mb: treatment outcomes 
     rb_tx = r0; pb_tx = p0; prmb_tx = prm0;
     rb_tx.TPT = -log(1-0.5) * [0 1 0 0]; 
     rb_tx.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_tx.Tx;
     rb_tx.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_tx.Tx;   
-    Mb_tx = make_model(pb_tx, rb_tx, i, s, gps, prmb_tx.contmat);
+    Mb_tx = make_model2(pb_tx, rb_tx, i, s, gps, prmb_tx.contmat);
 
         % Mb: ACF migrant only
     rb_ACFmig = r0; pb_ACFmig = p0; prmb_ACFmig = prm0;
@@ -56,7 +56,7 @@ for ii = 1:size(xs,1)
     rb_ACFmig.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_ACFmig.Tx;
     rb_ACFmig.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_ACFmig.Tx;   
     rb_ACFmig.ACF = -log(1-0.99) * [0 1 1 1];
-    Mb_ACFmig = make_model(pb_ACFmig, rb_ACFmig, i, s, gps, prmb_ACFmig.contmat);
+    Mb_ACFmig = make_model2(pb_ACFmig, rb_ACFmig, i, s, gps, prmb_ACFmig.contmat);
 
     % Mb: ACF domestic and migrant
     rb_ACFdom = r0; pb_ACFdom = p0; prmb_ACFdom = prm0;
@@ -64,7 +64,7 @@ for ii = 1:size(xs,1)
     rb_ACFdom.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_ACFdom.Tx;
     rb_ACFdom.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_ACFdom.Tx;   
     rb_ACFdom.ACF = -log(1-0.99) * [1 1 1 1];
-    Mb_ACFdom = make_model(pb_ACFdom, rb_ACFdom, i, s, gps, prmb_ACFdom.contmat);
+    Mb_ACFdom = make_model2(pb_ACFdom, rb_ACFdom, i, s, gps, prmb_ACFdom.contmat);
 
     % Mb: and migrant entry TPT 
     rb_migTPT = r0; pb_migTPT = p0; prmb_migTPT = prm0;
@@ -73,10 +73,10 @@ for ii = 1:size(xs,1)
     rb_migTPT.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_migTPT.Tx;   
     rb_migTPT.ACF = -log(1-0.99) * [1 1 1 1];
     pb_migTPT.migrTPT = 0.8;
-    Mb_migTPT = make_model(pb_migTPT, rb_migTPT, i, s, gps, prmb_migTPT.contmat);
+    Mb_migTPT = make_model2(pb_migTPT, rb_migTPT, i, s, gps, prmb_migTPT.contmat);
 
 
-    models = {M0, Mb, Mb_TPT, Mb_tx, Mb_ACFmig, Mb_ACFdom};
+    models = {M0, Mb, Mb_tx, Mb_TPT, Mb_ACFmig, Mb_ACFdom};
     prev_soln = init;
 
     M0_end_soln = [];
@@ -98,9 +98,9 @@ for ii = 1:size(xs,1)
             if mi == 2
                 geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pb, [2026 2030], agg, prmb, sel, rb, false);
             elseif mi == 3
-                geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pb_TPT, [2026 2030], agg, prmb_TPT, sel, rb_TPT, false);
+                geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pb_tx, [2026 2030], agg, prmb_tx , sel,rb_tx , false);
             elseif mi == 4
-                geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pb_tx, [2026 2030], agg, prmb_tx, sel, rb_tx, false);
+                geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pb_TPT, [2026 2030], agg, prmb_TPT, sel, rb_TPT, false);
             elseif mi == 5
                 geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, pb_ACFmig, [2026 2030], agg, prmb_ACFmig, sel, rb_ACFmig, false);
             elseif mi == 6
