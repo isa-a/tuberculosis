@@ -1,4 +1,3 @@
-clear all; load mcmc_res.mat;
 
 obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
@@ -35,14 +34,20 @@ for ii = 1:size(xs,1)
     models = {M0};
 
     for mi = 1:length(models)
-        if mi ==1 % 
-                geq = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, p0, [2024 2027], agg, prm0, sel, r0, false);
-                [t, soln] = ode15s(geq, 2014:2024, init, opts);
-                sdiff = diff(soln, [], 1);
-                pops = sum(soln(:,1:i.nstates),2);
-                incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5./pops(1:end-1);
+        if mi ==1 
+            geq1 = @(t,in) goveqs_scaleup(t, in, i, s, M0, models{mi}, rin_vec, p0, p0, [2024 2027], agg, prm0, sel, r0, false);
+            [t1, soln1] = ode15s(geq1, 2014:2020, init, opts);
+            M1 = make_model2(p0, r0, i, s, gps, prm0.contmat);
+            geq2 = @(t,in) goveqs_scaleup(t, in, i, s, M1, M1, rin_vec, p0, p0, [2024 2027], agg, prm0, sel, r0, false);
+            [t2, soln2] = ode15s(geq2, 2020:2024, soln1(end,:)', opts);
+    
+            soln = [soln1; soln2(2:end,:)];
+            sdiff = diff(soln, [], 1);
+            pops = sum(soln(:,1:i.nstates),2);
+            incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5 ./ pops(1:end-1);
         end
     end
+
 end
 fprintf('\n');
 
