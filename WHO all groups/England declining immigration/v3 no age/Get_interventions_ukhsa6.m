@@ -48,6 +48,8 @@ for ii = 1:size(xs,1)
 
         % Mb: and TPT migrant 
     rb_TPT = r0; pb_TPT = p0; prmb_TPT = prm0;
+    rb_TPT.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_TPT.Tx;
+    rb_TPT.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_TPT.Tx;  
     rb_TPT.TPT = -log(1-0.5) * [0 1 0 0];
     Mb_TPT = make_model2(pb_TPT, rb_TPT, i, s, gps, prmb_TPT.contmat);
 
