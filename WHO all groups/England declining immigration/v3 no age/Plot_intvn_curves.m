@@ -31,7 +31,7 @@ ylim([0 12]);
 %yl = ylim; yl(1) = 0; ylim(yl);
 
 
-legend(lg,'Baseline','+ Improved Tx outcomes', 'Enhanced TPT, recent migrants','+ Accelerated case-finding (foreign-born)','+ Accelerated case-finding (UK-born)','+ Pre-entry migrant screening, TBI');
+legend(lg,'Baseline','Improved Tx outcomes', ' + Enhanced TPT, recent migrants','+ Accelerated case-finding (foreign-born)','+ Accelerated case-finding (UK-born)','+ Pre-entry migrant screening, TBI');
 
 set(ff,'Position',[577, 190, 1029, 732]);
 
