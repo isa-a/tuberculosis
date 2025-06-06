@@ -1,4 +1,4 @@
-clear all; load temp4.mat;
+clear all; load temp6.mat;
 
 obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
@@ -13,7 +13,8 @@ else
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
-
+incsto = nan(20, size(xs,1), length(models));
+mrtsto = nan(20, size(xs,1), length(models));
 mk = round(size(xs,1)/25);
 for ii = 1:size(xs,1)
     
@@ -71,13 +72,13 @@ for ii = 1:size(xs,1)
     Mb_ACFdom = make_model2(pb_ACFdom, rb_ACFdom, i, s, gps, prmb_ACFdom.contmat);
 
     % Mb: and migrant entry TPT 
-    rb_migTPT = r0; pb_migTPT = p0; prmb_migTPT = prm0;
-    rb_migTPT.TPT = -log(1-0.5) * [0 1 0 0]; 
-    rb_migTPT.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_migTPT.Tx;
-    rb_migTPT.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_migTPT.Tx;   
-    rb_migTPT.ACF = -log(1-0.99) * [1 1 1 1];
-    pb_migTPT.migrTPT = 0.8;
-    Mb_migTPT = make_model2(pb_migTPT, rb_migTPT, i, s, gps, prmb_migTPT.contmat);
+%     rb_migTPT = r0; pb_migTPT = p0; prmb_migTPT = prm0;
+%     rb_migTPT.TPT = -log(1-0.5) * [0 1 0 0]; 
+%     rb_migTPT.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_migTPT.Tx;
+%     rb_migTPT.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_migTPT.Tx;   
+%     rb_migTPT.ACF = -log(1-0.99) * [1 1 1 1];
+%     pb_migTPT.migrTPT = 0.8;
+%     Mb_migTPT = make_model2(pb_migTPT, rb_migTPT, i, s, gps, prmb_migTPT.contmat);
 
 
     models = {M0, Mb, Mb_tx, Mb_TPT, Mb_ACFmig, Mb_ACFdom};

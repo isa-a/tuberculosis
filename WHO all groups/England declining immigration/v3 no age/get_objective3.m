@@ -116,7 +116,7 @@ else
     if incd(end,1) > 0.1
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         % keyboard;
-        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf);
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr);
         aux.init       = soln1(end-1,:);
         aux.soln0      = soln0;
         aux.soln       = soln1;
