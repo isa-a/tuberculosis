@@ -3,7 +3,9 @@ clear all; load Model_setup; % load calibration_res_prev cov0;
 obj  = @(x) get_objective2(x, ref, prm, gps, prm.contmat, lhd);
 nobj = @(x) -obj(x);
 
-xv = [30, 0.1, 0.01, 0.01, 1, 1, 1, 1/15*10, 1, 1, 0.001, 0.01, 1];
+%xv = [30, 0.1, 0.01, 0.01, 1, 1, 1, 1/15*10, 1, 1, 0.001, 0.01, 1];
+
+xv =[12.4566  ,  0.0939  ,  1.2456 ,   1.6166  ,  1.7092 ,  19.9533,    1.0648 ,   0.9443 ,   0.1492  ,  0.1758  ,  0.9837];
 
 [out, aux, msg] = obj(xv)
 

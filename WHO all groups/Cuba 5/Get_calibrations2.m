@@ -80,7 +80,7 @@ x2 = fminsearch(nobj,x1,options);
 x3 = fminsearch(nobj,x2,options);
 
 
-save temp;
+save temp2;
 % Perform MCMC
 [xsto, outsto] = MCMC_adaptive(obj, x3, 1e4, 1, [], [], [], 1);
 
