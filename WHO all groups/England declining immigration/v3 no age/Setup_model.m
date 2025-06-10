@@ -324,7 +324,7 @@ data.incd2020       = [5.3 6.3 7.3];
 data.mort           = [0.28 0.3 0.32];                                     % TB mortality, 2020
 data.p_migrTB       = [0.708 0.728 0.748];                                 % Proportion contribution of migrants to overall incidence
 data.p_migrpopn     = [0.138 0.168 0.198];                                 % Proportion of population that is migrants
-data.p_LTBI_inmigr  = [0.15 0.2 0.25];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
+data.p_LTBI_inmigr  = [0.05 0.1 0.15];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
 data.p_vulnpopn     = [2 3.48 5.5]/100;                                         % Proportion of UK population being vulnerable
 data.p_vulnTB       = [6 9.05 12]/100;                                        % Proportion contribution to overall incidence
 data.nTPT2019       = 1.3*[0.9 1 1.1];                                     % Number of TPT initiations in 2019, per 10^5 population
@@ -359,8 +359,8 @@ f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
 %                                                                                                      f8(incd_ch2020) + ...
 %                                                                                                      f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
 
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                     f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr);
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
+                                                                                                     f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + f13(p_incd_recentinf);
 
 
 
