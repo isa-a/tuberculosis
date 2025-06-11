@@ -56,12 +56,12 @@ for ia = 1:length(gps.age)
             % REVERT
             source  = Pf;
             destins =                                  [I2rec,            Ps];
-            rates   = [r.progression(ia, ib, ih)*(1-p.TPTeff(ib)), r.LTBI_stabil];
+            rates   = [r.progression(ia, ib, ih)*(1-p.TPTeff(ih)), r.LTBI_stabil];
             m(destins, source) = m(destins, source) + rates';
 
             source  = Pf_imp;
             destins =                                  [I2rem,            Ps];
-            rates   = [r.progression(ia, ib, ih)*(1-p.TPTeff(ib)), r.LTBI_stabil];
+            rates   = [r.progression(ia, ib, ih)*(1-p.TPTeff(ih)), r.LTBI_stabil];
             m(destins, source) = m(destins, source) + rates';
     
 %             source  = Pf;
@@ -84,7 +84,7 @@ for ia = 1:length(gps.age)
 
             source  = Ps;
             destin  = Irem;
-            rate    = r.reactivation(ia, ib, ih)*(1-p.TPTeff(ib));
+            rate    = r.reactivation(ia, ib, ih)*(1-p.TPTeff(ih));
             m(destin, source) = m(destin, source) + rate;
     
     
