@@ -48,6 +48,7 @@ x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
 x3 = fminsearch(nobj,x2,options);
 
+x3 = fminsearch(nobj,x3,options);
 save res_40prct
 
 x3 =[0.5887,    0.0003 ,   1.0000 ,   0.7602 ,   1.3823 ,   0.0488 ,   0.1000 ,   7.0000,    3.0711 ,   0.9829 ,   2.9096];
@@ -77,7 +78,7 @@ end
 save calibrations_mort_mcmc;
 
 
-%xnew=xsto(inds(1),:);
+cov0=[];
 nreps = 1;
 niter = [10]*2e3;
 for ii = 1:nreps

@@ -241,10 +241,10 @@ m(i.U.ad.migr_rect) = (1-p.LTBI_in_migrad-prev_in_migr);
 % m(getindsad('Pf_imp','ds')) = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.02;
 % m(getindsad('Ps','ds'))     = p.LTBI_in_migrad*(1-p.ch_in_migr)*p.migrTPT*0.98;
 
-m(getindsad('Lf_imp','ds')) = 0.14*(1-p.migrTPT)*0.02;
-m(getindsad('Ls','ds'))     = 0.14*(1-p.migrTPT)*0.98;
-m(getindsad('Pf_imp','ds')) = 0.14*p.migrTPT*0.02;
-m(getindsad('Ps','ds'))     = 0.14*p.migrTPT*0.98;
+m(getindsad('Lf_imp','ds')) = 0.2*(1-p.migrTPT)*0.02;
+m(getindsad('Ls','ds'))     = 0.2*(1-p.migrTPT)*0.98;
+m(getindsad('Pf_imp','ds')) = 0.2*p.migrTPT*0.02;
+m(getindsad('Ps','ds'))     = 0.2*p.migrTPT*0.98;
 
 m(getindsad('Irem','ds')) = prev_in_migr;
 
