@@ -92,6 +92,20 @@ set(gca, 'FontSize', 12);  % Applies to x and y tick labels
 hold off;
 
 return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
