@@ -4,7 +4,7 @@ obj  = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 nobj = @(x) -obj(x);
 
 
-nsam = 10000; 
+nsam = 100; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 mk = round(nsam/25);
