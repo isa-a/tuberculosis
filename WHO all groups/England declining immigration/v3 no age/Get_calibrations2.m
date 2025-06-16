@@ -1,10 +1,10 @@
-clear all; load Model_setup; % load calibration_res_prev cov0;
+% clear all; load Model_setup; % load calibration_res_prev cov0;
 
 obj  = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 nobj = @(x) -obj(x);
 
 
-nsam = 100; 
+nsam = 10000; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 mk = round(nsam/25);
@@ -16,6 +16,12 @@ end
 mat  = sortrows([outs; 1:nsam]',-1);
 ord  = mat(:,2);
 xord = xsam(ord,:);
+
+options = optimset(PlotFcn=@optimplotfval);
+x0 = fminsearch(nobj,xord(1,:),options);
+x1 = fminsearch(nobj,x0,options);
+x2 = fminsearch(nobj,x1,options);
+x3 = fminsearch(nobj,x2,options);
 
 return;
 % x1 = fminsearch(nobj,x0,options);

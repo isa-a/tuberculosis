@@ -81,13 +81,22 @@ out(i.U.ad.dom) = out(i.U.ad.dom) + dom_morts;
 % vals = [797, 772, 752, 825, 886, 682, 773, 1294, 1316];
 %mgrtn_ft = interp1(years, vals ./ vals(years==2015), t, 'linear', 'extrap');
 
+% if equil
+%     r_in = rin_vec(1);
+% else
+%     r_in = rin_vec(min(max(ceil(t-2019),1),length(rin_vec)));
+% end
+% 
+% out(1:i.nstates) = out(1:i.nstates) + r_in*M.migrentries; 
+
 if equil
     r_in = rin_vec(1);
 else
-    r_in = rin_vec(min(max(ceil(t-2019),1),length(rin_vec)));
+    r_in = rin_vec(min(max(round(t) - 2019 + 1,1),length(rin_vec)));
 end
 
-out(1:i.nstates) = out(1:i.nstates) + r_in*M.migrentries; 
+out(1:i.nstates) = out(1:i.nstates) + r_in*M.migrentries;
+
 
 
 % if t < 2015
