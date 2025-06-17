@@ -4,12 +4,12 @@ obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
-midpt = false; 
+midpt = true; 
 if midpt
-    xs = x0sto(2,:);
+    xs = x3;
 else
     ix0 = size(xsto,1)/2;
-    nx  = 200;
+    nx  = 20;
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
@@ -168,7 +168,7 @@ end
 xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
 ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
 xlim([years(1) years(end)]);
-ylim([0, 11]);
+% ylim([0, 11]);
 
 hold off;
 

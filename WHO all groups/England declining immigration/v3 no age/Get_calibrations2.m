@@ -4,7 +4,7 @@ obj  = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 nobj = @(x) -obj(x);
 
 
-nsam = 10000; 
+nsam = 100; 
 xsam = repmat(prm.bounds(1,:),nsam,1) + diff(prm.bounds).*lhsdesign(nsam,size(prm.bounds,2));
 
 mk = round(nsam/25);
@@ -86,7 +86,7 @@ save calibrations_mort_mcmc;
 
 cov0=[];
 nreps = 1;
-niter = [10]*2e3;
+niter = [1]*2e3;
 for ii = 1:nreps
     [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));
