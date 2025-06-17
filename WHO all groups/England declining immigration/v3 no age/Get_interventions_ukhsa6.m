@@ -1,4 +1,4 @@
-clear all; load temp6.mat;
+% clear all; load temp6.mat;
 
 obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
@@ -9,7 +9,7 @@ if midpt
     xs = x0sto(2,:);
 else
     ix0 = size(xsto,1)/2;
-    nx  = 20;
+    nx  = 200;
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
@@ -34,7 +34,7 @@ for ii = 1:size(xs,1)
     rb = r0; pb = p0; prmb = prm0;
     rb.ACF = -log(1-0.99) * [1 1 1 1];
     rb.TPT = -log(1-0.5) * [0 1 0 0];
-    pb.migrTPT = 0.8;
+    pb.migrTPT = 0.6;
     rb.muTx    = ( 109/4365) / ( 4044+103/4365) * rb.Tx;
     rb.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb.Tx;   
     Mb = make_model2(pb, rb, i, s, gps, prmb.contmat);

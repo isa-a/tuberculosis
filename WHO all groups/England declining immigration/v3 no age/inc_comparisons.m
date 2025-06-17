@@ -2,7 +2,7 @@ obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
-midpt = true; 
+midpt = false; 
 if midpt
     xs = x3;
 else
@@ -53,10 +53,11 @@ lowerbound = prctile(incsto, 2.5, 2);
 upperbound = prctile(incsto, 97.5, 2);          
 
 
-full_incs1 = [5734,5621,5066,4610,4704,4124,4407,4375,4855,5494] * 0.001538;
+full_incs1 = [5734,5621,5066,4610,4704,4124,4407,4375,4855,0] * 0.001538;
+full_incs1(end)   = 9.5; 
 
 
-start_year = 2017;
+start_year = 2015;
 idx = find(all_years >= start_year);
 years = all_years(idx);
 
@@ -105,7 +106,7 @@ ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 18);
 xlim([years(1) years(end)]);
 ylim([0, 10]);
 
-legend({'Sharon"s data LTBI calculation, visa data', 'Notification-based incidence', '20% LTBI, HOC data'}, ...
+legend({'Incidence modelled using immigration based on visas issued', 'Notification-based incidence', 'Incidence modelled using House of Commons migration data'}, ...
        'Location', 'NorthEast', 'FontSize', 18);
 set(gca, 'FontSize', 12);  
 hold off;

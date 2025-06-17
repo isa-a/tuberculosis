@@ -2,7 +2,7 @@ obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
 opts = odeset('RelTol', 1e-9, 'AbsTol', 1e-9);
 
-midpt = false; 
+midpt = true; 
 if midpt
     xs = x3;
 else
@@ -53,7 +53,8 @@ lowerbound = prctile(incsto, 2.5, 2);
 upperbound = prctile(incsto, 97.5, 2);        
 
 years = [2015, 2016,2017, 2018,2019, 2020, 2021, 2022, 2023, 2024];
-incs1 = [5734,5621,5066,4610,4704,4124,4407,4375,4855,5494] * 0.001538;
+incs1 = [5734,5621,5066,4610,4704,4124,4407,4375,4855,0] * 0.001538;
+incs1(end)   = 9.5; 
 % rate  = [10.46,10.17,9.11,8.24,8.37,7.32,7.79,7.66,8.5];
 
 % Plotting
