@@ -17,6 +17,20 @@ ord  = mat(:,2);
 xord = xsam(ord,:);
 
 return;
+
+cov0=[];
+nreps = 1;
+niter = [10]*2e3;
+for ii = 1:nreps
+    [xsto, outsto] = MCMC_adaptive2(obj, x3, niter(ii), 1, cov0, 1);
+    inds = find(outsto==max(outsto));
+    x3 = xsto(inds(1),:);
+    cov0 = cov(xsto);
+    fprintf('\n');
+end
+
+
+
 % x1 = fminsearch(nobj,x0,options);
 % x2 = fminsearch(nobj,x1,options);
 % save optim_res_noVULN5_v2;
@@ -127,7 +141,7 @@ end
 
 x_new=x3;
 nreps = 1;
-niter = [5]*2e4;
+niter = [10]*2e3;
 for ii = 1:nreps
     [xsto, outsto] = MCMC_adaptive2(obj, x0, niter(ii), 1, cov0, 1);
     inds = find(outsto==max(outsto));

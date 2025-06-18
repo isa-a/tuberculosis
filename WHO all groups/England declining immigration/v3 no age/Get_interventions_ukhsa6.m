@@ -1,4 +1,4 @@
-% clear all; load temp6.mat;
+clear all; load tmp6.mat;
 
 obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
@@ -13,8 +13,8 @@ else
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
-incsto = nan(20, size(xs,1), length(models));
-mrtsto = nan(20, size(xs,1), length(models));
+
+
 mk = round(size(xs,1)/25);
 for ii = 1:size(xs,1)
     
@@ -29,7 +29,7 @@ for ii = 1:size(xs,1)
     p0.prev_in_migr = 0;
     r0.gamma = r0.gamma_2015;
     r0.TPT = [0 r0.TPT2020rec 0];
-    M0 = make_model2(p0, r0, i, s, gps, prm0.contmat);
+    M0 = make_model(p0, r0, i, s, gps, prm0.contmat);
 
     rb = r0; pb = p0; prmb = prm0;
     rb.ACF = -log(1-0.99) * [1 1 1 1];
@@ -37,7 +37,7 @@ for ii = 1:size(xs,1)
     pb.migrTPT = 0.6;
     rb.muTx    = ( 109/4365) / ( 4044+103/4365) * rb.Tx;
     rb.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb.Tx;   
-    Mb = make_model2(pb, rb, i, s, gps, prmb.contmat);
+    Mb = make_model(pb, rb, i, s, gps, prmb.contmat);
 
 
             % Mb: treatment outcomes 
@@ -45,14 +45,14 @@ for ii = 1:size(xs,1)
     %rb_tx.TPT = -log(1-0.5) * [0 1 0 0]; 
     rb_tx.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_tx.Tx;
     rb_tx.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_tx.Tx;   
-    Mb_tx = make_model2(pb_tx, rb_tx, i, s, gps, prmb_tx.contmat);
+    Mb_tx = make_model(pb_tx, rb_tx, i, s, gps, prmb_tx.contmat);
 
         % Mb: and TPT migrant 
     rb_TPT = r0; pb_TPT = p0; prmb_TPT = prm0;
     rb_TPT.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_TPT.Tx;
     rb_TPT.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_TPT.Tx;  
     rb_TPT.TPT = -log(1-0.5) * [0 1 0 0];
-    Mb_TPT = make_model2(pb_TPT, rb_TPT, i, s, gps, prmb_TPT.contmat);
+    Mb_TPT = make_model(pb_TPT, rb_TPT, i, s, gps, prmb_TPT.contmat);
 
 
         % Mb: ACF migrant only
@@ -61,7 +61,7 @@ for ii = 1:size(xs,1)
     rb_ACFmig.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_ACFmig.Tx;
     rb_ACFmig.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_ACFmig.Tx;   
     rb_ACFmig.ACF = -log(1-0.99) * [0 1 1 1];
-    Mb_ACFmig = make_model2(pb_ACFmig, rb_ACFmig, i, s, gps, prmb_ACFmig.contmat);
+    Mb_ACFmig = make_model(pb_ACFmig, rb_ACFmig, i, s, gps, prmb_ACFmig.contmat);
 
     % Mb: ACF domestic and migrant
     rb_ACFdom = r0; pb_ACFdom = p0; prmb_ACFdom = prm0;
@@ -69,7 +69,7 @@ for ii = 1:size(xs,1)
     rb_ACFdom.muTx    = ( 109/4365) / ( 4044+103/4365) * rb_ACFdom.Tx;
     rb_ACFdom.ltfu    = ( 109/4365) / ( 4044+103/4365) * rb_ACFdom.Tx;   
     rb_ACFdom.ACF = -log(1-0.99) * [1 1 1 1];
-    Mb_ACFdom = make_model2(pb_ACFdom, rb_ACFdom, i, s, gps, prmb_ACFdom.contmat);
+    Mb_ACFdom = make_model(pb_ACFdom, rb_ACFdom, i, s, gps, prmb_ACFdom.contmat);
 
     % Mb: and migrant entry TPT 
 %     rb_migTPT = r0; pb_migTPT = p0; prmb_migTPT = prm0;
@@ -83,6 +83,9 @@ for ii = 1:size(xs,1)
 
     models = {M0, Mb, Mb_tx, Mb_TPT, Mb_ACFmig, Mb_ACFdom};
     prev_soln = init;
+    
+    incsto = nan(20, size(xs,1), length(models));
+    mrtsto = nan(20, size(xs,1), length(models));
 
     M0_end_soln = [];
 
@@ -127,7 +130,7 @@ for ii = 1:size(xs,1)
     end
 end
 fprintf('\n');
-
+% save intvn_res;
 
 years = 2022:2041;
 central_estimate = mean(incsto, 2);             
@@ -172,4 +175,4 @@ xlim([years(1) years(end)]);
 
 hold off;
 
-save intvn_res;
+

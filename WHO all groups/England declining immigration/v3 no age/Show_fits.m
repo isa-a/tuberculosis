@@ -1,5 +1,3 @@
-clear all;
-
 
 ix0 = size(xsto,1)/2;
 nx  = 20;
