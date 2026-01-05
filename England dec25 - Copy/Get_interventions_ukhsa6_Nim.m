@@ -1,10 +1,4 @@
-% v2: Simulating using initial conditions starting from 2014, to ensure
-% doing same simulations as in slidefig
-
-clear all; load tmp0.mat; load Model_setup.mat;
-
-% rin_vec  = [rin_vec, rin_vec(end)*5/9];
-saving = 1;
+clear all; load tmp0.mat;
 
 obj = @(x) get_objective3(x, ref, prm, gps, prm.contmat, rin_vec, lhd);
 
@@ -19,8 +13,8 @@ else
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
-
-
+incsto = nan(20, size(xs,1), 6);
+mrtsto = nan(20, size(xs,1), 6);
 mk = round(size(xs,1)/25);
 for ii = 1:size(xs,1)
     
@@ -30,7 +24,6 @@ for ii = 1:size(xs,1)
     [out,aux] = obj(xx);
       
     init = aux.init;
-    init = aux.soln(2010:2022==2014,:);
 
     [p0,r0,prm0] = allocate_parameters(xx,p,r,xi,prm.scaling,prm);
     p0.prev_in_migr = 0;
@@ -40,7 +33,7 @@ for ii = 1:size(xs,1)
 
     % Enhanced TPT, recent migrants
     r1 = r0; p1 = p0;
-    r1.TPT = -log(1-0.25) * [0 1 0 0];
+    r1.TPT = -log(1-0.5) * [0 1 0 0];
     M1 = make_model(p1, r1, i, s, gps, prm0.contmat);
 
     % Improved Tx outcomes
@@ -57,12 +50,12 @@ for ii = 1:size(xs,1)
 
     % ACF in foreign-born
     r3 = r2; p3 = p2;
-    r3.ACF = -log(1-0.25) * [0 1 1 1];
+    r3.ACF = -log(1-0.99) * [0 1 1 1];
     M3 = make_model(p3, r3, i, s, gps, prm0.contmat);
 
     % ACF in domestic and foreign-born
     r4 = r3; p4 = p3;
-    r4.ACF = -log(1-0.25) * [1 1 1 1];
+    r4.ACF = -log(1-0.99) * [1 1 1 1];
     M4 = make_model(p4, r4, i, s, gps, prm0.contmat);
 
     % Pre-entry TPT
@@ -77,95 +70,29 @@ for ii = 1:size(xs,1)
 
     for mi = 1:length(models)
 
-        geq = @(t,in) goveqs_scaleupb(t, in, i, s, M0, models{mi}, rin_vec, [2027 2035], agg, prm0, sel, r0, p0, false);
-        [t, soln] = ode15s(geq, 2014:2041, init, opts);
+        geq = @(t,in) goveqs_scaleupb(t, in, i, s, M0, models{mi}, rin_vec, [2026 2030], agg, prm0, sel, r0, p0, false);
+        [t, soln] = ode15s(geq, 2021:2041, init, opts);
 
         sdiff = diff(soln, [], 1);
         pops = sum(soln(:,1:i.nstates),2);
 
         incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5./pops(1:end-1);
         mrtsto(:, ii, mi) = sdiff(:, i.aux.mort) * 1e5./pops(1:end-1);
-        prvsto(:, ii, mi) = sum(soln(:,s.allI),2) * 1e5./pops;
-
-        if mi == 6
-            incsource(ii,:) = sdiff(end,i.aux.incsources);
-        end
     end
 
 end
 fprintf('\n');
+save intvn_resb;
 
-% years = 2014:2040;
-% prctile(incsto(years>=2014 & years<=2024,:,1),[2.5,50,97.5],2)
-% return;
-if saving 
-    save intvn_resb;
-end
-
-years = 2015:2041;
+years = 2022:2041;
 central_estimate = mean(incsto, 2);             
 lowerbound = prctile(incsto, 2.5, 2);          
 upperbound = prctile(incsto, 97.5, 2);        
 
-inds = find(years>=2014 & years<2025);
-
-md = squeeze(central_estimate(inds, 1, 1))
-
-vec1 = lowerbound(inds,1,1);
-vec2 = upperbound(inds,1,1);
-
-% [vec1, md, vec2]
-% 
-% return
-
-% Extract prevalence estimates for Sharon, see email on 30 June 2025
-prv_pct = prctile(prvsto,[2.5,50,97.5],2);
-prv_tbl = [prv_pct(:,:,1), prv_pct(:,:,2), prv_pct(:,:,3), prv_pct(:,:,4), prv_pct(:,:,5), prv_pct(:,:,6)]';
-
-incd_pct = prctile(incsto,[2.5,50,97.5],2);
-incd_tbl = [incd_pct(:,:,1), incd_pct(:,:,2), incd_pct(:,:,3), incd_pct(:,:,4), incd_pct(:,:,5), incd_pct(:,:,6)]';
-
-% Population numbers for Sharon
-popn = [2022	57112542;
-2023	57910211;
-2024	58568219;
-2025	59145411;
-2026	59638662;
-2027	60045068;
-2028	60362009;
-2029	60673451;
-2030	60978896;
-2031	61277976;
-2032	61570538;
-2033	61856818;
-2034	62137307;
-2035	62412168];
-
-prevyrs = 2014:2021;
-pop_old = [prevyrs; interp1(popn(:,1), popn(:,2), prevyrs, 'linear', 'extrap')]';
-
-newyrs  = 2036:2040;
-pop_new = [newyrs; interp1(popn(:,1), popn(:,2), newyrs, 'linear', 'extrap')]';
-
-popn = [pop_old; popn; pop_new];
-% figure; plot(popn(:,1), popn(:,2))
-
-incd_nums = incd_tbl/1e5.*popn(:,2)'/1e3;
-if saving
-    writematrix(prv_tbl,   'prev_tbl.xlsx');
-    writematrix(incd_tbl,  'incd_tbl.xlsx');
-    writematrix(incd_nums, 'incd_nums.xlsx');
-end
-
-
-return;
-
-
-
-
 
 ff = figure('Position', [577, 190, 1029, 732]); 
 hold on;
+
 
 colors = [
     0, 0, 1;    % M0

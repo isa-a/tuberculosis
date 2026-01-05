@@ -1,7 +1,7 @@
-clear all; load intvn_resb;
+clear all; load intvn_resb2;
 
 % Whether to show from 2015, or from 2022
-show_extended = 0;
+show_extended = 1;
 
 years = 2015:2041;
 
@@ -25,30 +25,23 @@ end
 xlabel('Year', 'FontWeight', 'bold', 'FontSize', 12);
 ylabel('Rate per 100,000 population', 'FontWeight', 'bold', 'FontSize', 12);
 set(gca, 'fontsize', fs);
-ylim([0 10]);
+
 if show_extended
     xlim([years(1) years(end)]);
 else
     xlim([2022 2040]);
 end
-yl = ylim; yl(1) = 0; ylim(yl);
+%yl = ylim; yl(1) = 0; ylim(yl);
+ylim([0 10]);
 
-% if show_extended
-%     years = [2015:2025];
-%     incs1 = [5734,5621,5066,4610,4704,4124,4407,4375,4855,0, 0] * 0.001538;
-%     incs1(end-1)   = 9.5;
-%     incs1(end)   = 8;
-%     plot(years, incs1, '.-', 'MarkerSize',20, 'Color', 0.5*[1 1 1], 'LineWidth',1);
-% end
 
 if show_extended
     years = [2015:2025];
     incs1 = [5734,5621,5066,4610,4704,4124,4407,4375,4855,0, 0] * 0.001538;
-    incs1(end-1)   = 5490*0.001538;
-    incs1(end)   = 5596 * 0.001538;
+    incs1(end-1)   = 9.5;
+    incs1(end)   = 8;
     plot(years, incs1, '.-', 'MarkerSize',20, 'Color', 0.5*[1 1 1], 'LineWidth',1);
 end
-
 
 legend(lg,'Baseline','Improved Tx outcomes', ' + Enhanced TPT, recent migrants','+ Accelerated case-finding (foreign-born)','+ Accelerated case-finding (UK-born)','+ Pre-entry migrant screening, TBI','location','SouthWest');
 set(ff,'Position',[344   297   712   563]);
@@ -86,10 +79,9 @@ end
 yl = ylim; yl(1) = 0; ylim(yl);
 
 if show_extended
-    years = [2015:2025];
-    incs1 = [5734,5621,5066,4610,4704,4124,4407,4375,4855,0, 0] * 0.001538;
-    incs1(end-1)   = 5490*0.001538;
-    incs1(end)   = 5596 * 0.001538;
+    years = [2015:2024];
+    incs1 = [5734,5621,5066,4610,4704,4124,4407,4375,4855,0] * 0.001538;
+    incs1(end)   = 9.5;
     plot(years, incs1, '.-', 'MarkerSize',20, 'Color', 0.5*[1 1 1], 'LineWidth',1);
 end
 

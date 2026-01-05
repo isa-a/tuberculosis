@@ -1,7 +1,7 @@
 % v2: Simulating using initial conditions starting from 2014, to ensure
 % doing same simulations as in slidefig
 
-clear all; load tmp0.mat; load Model_setup.mat;
+clear all; load tmp1.mat; load Model_setup.mat;
 
 % rin_vec  = [rin_vec, rin_vec(end)*5/9];
 saving = 1;
@@ -77,7 +77,7 @@ for ii = 1:size(xs,1)
 
     for mi = 1:length(models)
 
-        geq = @(t,in) goveqs_scaleupb(t, in, i, s, M0, models{mi}, rin_vec, [2027 2035], agg, prm0, sel, r0, p0, false);
+        geq = @(t,in) goveqs_scaleupb(t, in, i, s, M0, models{mi}, rin_vec, [2026 2030], agg, prm0, sel, r0, p0, false);
         [t, soln] = ode15s(geq, 2014:2041, init, opts);
 
         sdiff = diff(soln, [], 1);
@@ -99,7 +99,7 @@ fprintf('\n');
 % prctile(incsto(years>=2014 & years<=2024,:,1),[2.5,50,97.5],2)
 % return;
 if saving 
-    save intvn_resb;
+    save intvn_resb2;
 end
 
 years = 2015:2041;

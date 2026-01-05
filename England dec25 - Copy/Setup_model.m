@@ -181,7 +181,7 @@ r.ACF          = [0 0 0 0];
 r.ACF2         = [0 0 0 0];
 
 p.migrect_popn = 0.168;                                                    % Proportion of population that's migrant recent
-r.migr         = 1/10;                                                     % Average duration of stay for migrants
+r.migr         = 1/5;                                                     % Average duration of stay for migrants
 
 % p.LTBI_in_migrad = 0.17;
 % p.LTBI_in_migrch = 0.03;
@@ -198,8 +198,8 @@ r.migr         = 1/10;                                                     % Ave
 % pop      = [66.6e6, 66.7e6, 67e6, 67.6e6, 68.2e6, 69.2e6, 69.4e6];
 
 years    = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
-% vals     = [286, 210, 406, 734, 899, 829, 670]*1e3;
 vals     = [286, 210, 406, 734, 904, 509, 474]*1e3;
+% vals     = [286, 210, 406, 734, 899, 829, 670]*1e3;
 pop      = [66.6e6, 66.7e6, 67e6, 67.6e6, 68.2e6, 69.2e6, 69.4e6];
 
 %new data
@@ -248,7 +248,7 @@ xi.nx = lim;
 % Set their boundaries
 bds = [];
 bds(xi.beta,:)                   = [0 40];
-bds(xi.LTBIdec,:)                = [0 0.15];
+bds(xi.LTBIdec,:)                = [0.1 0.2];
 bds(xi.gamma,:)                  = [0, 1; 1e-4, 10];                       % Rate of treatment uptake, in 2015 and 2020
 % bds(xi.p_relrate_gamma_chvad,:)  = [0 2];                                  % Relative rate of treatment uptake, children vs adults
 bds(xi.r_migrout,:)              = [0 1];
@@ -329,11 +329,9 @@ prm.contmat      = prm.contmat_born;
 % data.ch_notifs      = [310 360 420]/4.5e6*1e5;                             % notifications in the country   
 
 % data.incd2010       = [13.6 14.6 15.6];                                    % With broader uncertainty intervals
-% data.incd2010       = [10.8 11.8 12.8];                                    % With broader uncertainty intervals
-data.incd2010       = [15.6 16.6 17.6]; 
+data.incd2010       = [10.8 11.8 12.8];                                    % With broader uncertainty intervals
 % data.incd2020       = [6 7 8];  
-% data.incd2020       = [5.3 6.3 7.3];  
-data.incd2020       = [7.3 8.36 9.3]; 
+data.incd2020       = [5.3 6.3 7.3];  
 %data.incdRR2020     = [0.11 0.15 0.18];                                    % Incidence of RR-TB
 data.mort           = [0.28 0.3 0.32];                                     % TB mortality, 2020
 data.p_migrTB       = [0.708 0.728 0.748];                                 % Proportion contribution of migrants to overall incidence
