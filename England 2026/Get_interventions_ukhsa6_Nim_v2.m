@@ -1,7 +1,7 @@
 % v2: Simulating using initial conditions starting from 2014, to ensure
 % doing same simulations as in slidefig
 
-clear all; load tmp2026.mat; load Model_setup.mat;
+clear all; load tmp26.mat; load Model_setup.mat;
 
 % rin_vec  = [rin_vec, rin_vec(end)*5/9];
 saving = 1;

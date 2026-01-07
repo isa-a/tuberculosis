@@ -1,4 +1,4 @@
-clear all; load intvn_res2026;
+clear all; load intvn_res26v2;
 
 % Whether to show from 2015, or from 2022
 show_extended = 1;
@@ -13,7 +13,7 @@ lw = 1.5; tp = 0.1; fs = 14;
 
 cols = linspecer(size(incsto,3));
 cols(1, :) = [0, 0, 0.5];
-for mi = 1:6
+for mi = 1:2
     md   = inc_pct(2,:,mi);
     hilo = inc_pct([1,3],:,mi);
 
@@ -43,7 +43,7 @@ yl = ylim; yl(1) = 0; ylim(yl);
 
 if show_extended
     years = [2015:2025];
-    incs1 = [10.46, 10.17, 9.11, 8.24, 8.36, 7.32, 7.77, 7.65, 8.34, 9.37, 9.9] / 0.875;
+    incs1 = [10.46, 10.17, 9.11, 8.24, 8.36, 7.32, 7.77, 7.65, 8.34, 9.37, 0] / 0.875;
     incs1(end)   = 9.43 / 0.875;
     plot(years, incs1, '.-', 'MarkerSize',20, 'Color', 0.5*[1 1 1], 'LineWidth',1);
 end

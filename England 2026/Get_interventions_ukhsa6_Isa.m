@@ -1,7 +1,7 @@
 % v2: Simulating using initial conditions starting from 2014, to ensure
 % doing same simulations as in slidefig
 
-clear all; load tmp2026.mat; load Model_setup.mat;
+clear all; load tmp26.mat; load Model_setup.mat;
 
 % rin_vec  = [rin_vec, rin_vec(end)*5/9];
 saving = 1;
@@ -40,37 +40,38 @@ for ii = 1:size(xs,1)
 
     % Enhanced TPT, recent migrants
     r1 = r0; p1 = p0;
-    r1.TPT = -log(1-0.25) * [0 1 0 0];
+    % r1.TPT = -log(1-0.25) * [0 1 0 0];
+    p1.LTBIinmigr = 0.104;
     M1 = make_model(p1, r1, i, s, gps, prm0.contmat);
 
-    % Improved Tx outcomes
-    r2 = r1; p2 = p1;
+    % % Improved Tx outcomes
+    % r2 = r1; p2 = p1;
+    % 
+    % % Find new treatment outcomes
+    % vec = [r1.Tx, r1.ltfu, r1.muTx]; props = vec/sum(vec);
+    % 
+    % props(end) = 0.01; props(2) = props(2)/2; props(1) = 1 - sum(props(2:3));
+    % newrates = r1.Tx*props/props(1);
+    % r2.ltfu = newrates(2);
+    % r2.muTx = newrates(3);
+    % M2 = make_model(p2, r2, i, s, gps, prm0.contmat);
+    % 
+    % % ACF in foreign-born
+    % r3 = r2; p3 = p2;
+    % r3.ACF = -log(1-0.25) * [0 1 1 1];
+    % M3 = make_model(p3, r3, i, s, gps, prm0.contmat);
+    % 
+    % % ACF in domestic and foreign-born
+    % r4 = r3; p4 = p3;
+    % r4.ACF = -log(1-0.25) * [1 1 1 1];
+    % M4 = make_model(p4, r4, i, s, gps, prm0.contmat);
+    % 
+    % % Pre-entry TPT
+    % r5 = r4; p5 = p4;
+    % p5.migrTPT = 0.6;
+    % M5 = make_model(p5, r5, i, s, gps, prm0.contmat);
 
-    % Find new treatment outcomes
-    vec = [r1.Tx, r1.ltfu, r1.muTx]; props = vec/sum(vec);
-
-    props(end) = 0.01; props(2) = props(2)/2; props(1) = 1 - sum(props(2:3));
-    newrates = r1.Tx*props/props(1);
-    r2.ltfu = newrates(2);
-    r2.muTx = newrates(3);
-    M2 = make_model(p2, r2, i, s, gps, prm0.contmat);
-
-    % ACF in foreign-born
-    r3 = r2; p3 = p2;
-    r3.ACF = -log(1-0.25) * [0 1 1 1];
-    M3 = make_model(p3, r3, i, s, gps, prm0.contmat);
-
-    % ACF in domestic and foreign-born
-    r4 = r3; p4 = p3;
-    r4.ACF = -log(1-0.25) * [1 1 1 1];
-    M4 = make_model(p4, r4, i, s, gps, prm0.contmat);
-
-    % Pre-entry TPT
-    r5 = r4; p5 = p4;
-    p5.migrTPT = 0.6;
-    M5 = make_model(p5, r5, i, s, gps, prm0.contmat);
-
-    models = {M0, M1, M2, M3, M4, M5};
+    models = {M0, M1};
     % prev_soln = init;
 
     M0_end_soln = [];
@@ -95,13 +96,14 @@ for ii = 1:size(xs,1)
 end
 fprintf('\n');
 
+
 % years = 2014:2040;
 % prctile(incsto(years>=2014 & years<=2024,:,1),[2.5,50,97.5],2)
 % return;
 if saving 
-    save intvn_res2026;
+    save intvn_res26v2;
 end
-
+return;
 years = 2015:2041;
 central_estimate = mean(incsto, 2);             
 lowerbound = prctile(incsto, 2.5, 2);          
