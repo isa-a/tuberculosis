@@ -171,7 +171,7 @@ p.imm          = 0.8;                                                      % Red
 
 p.ch_in_migr   = 0.07;                                                      % GUESS: check with countries
 
-p.LTBIinmigr   = 0.06;                                                      %ltbi inmigr 6pct
+p.LTBIinmigr   = 0.09;                                                      %ltbi inmigr 6pct
 
 % --- Interventions 
 p.migrTPT      = 0;                                                        % Proportion of migrants initiated on TPT on entry
@@ -344,7 +344,7 @@ data.mort           = [0.28 0.3 0.32];                                     % TB 
 data.p_migrTB       = [0.708 0.728 0.748];                                 % Proportion contribution of migrants to overall incidence
 data.p_migrpopn     = [0.138 0.168 0.198];                                 % Proportion of population that is migrants
 % data.p_LTBI_inmigr  = [0.1 0.15 0.2];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
-data.p_LTBI_inmigr  = [0.05 0.06 0.07];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
+% data.p_LTBI_inmigr  = [0.05 0.06 0.07];                                     % Proportion of migrants with LTBI: from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8904125/
 data.p_vulnpopn     = [2 3.48 5.5]/100;                                         % Proportion of UK population being vulnerable
 data.p_vulnTB       = [6 9.05 12]/100;                                        % Proportion contribution to overall incidence
 data.nTPT2019       = 1.3*[0.9 1 1.1];                                     % Number of TPT initiations in 2019, per 10^5 population
@@ -361,7 +361,7 @@ f1b = get_distribution_fns(data.incd2020,   'lognorm', show);
 f2  = get_distribution_fns(data.mort,       'lognorm', show);
 f3  = get_distribution_fns(data.p_migrTB,   'beta',    show);
 f4  = get_distribution_fns(data.p_migrpopn, 'beta',    show);
-f5  = get_distribution_fns(data.p_LTBI_inmigr, 'beta',    show);
+% f5  = get_distribution_fns(data.p_LTBI_inmigr, 'beta',    show);
 f6  = get_distribution_fns(data.p_vulnpopn, 'beta',    show);
 f7  = get_distribution_fns(data.p_vulnTB,   'beta',    show);
 f8  = get_distribution_fns(data.incd_ch2020,'lognorm', show);
@@ -379,8 +379,8 @@ f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
 %                                                                                                      f8(incd_ch2020) + ...
 %                                                                                                      f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
 
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI_inmigr, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                     f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI_inmigr) + f13(p_incd_recentinf);
+lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
+                                                                                                     f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f13(p_incd_recentinf);
 
 
 

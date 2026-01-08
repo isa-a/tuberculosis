@@ -41,20 +41,13 @@ for ii = 1:size(xs,1)
     % Enhanced TPT, recent migrants
     r1 = r0; p1 = p0;
     % r1.TPT = -log(1-0.25) * [0 1 0 0];
-    p1.LTBIinmigr = 0.104;
+    p1.LTBIinmigr = 0.11682;
     M1 = make_model(p1, r1, i, s, gps, prm0.contmat);
 
-    % % Improved Tx outcomes
-    % r2 = r1; p2 = p1;
-    % 
-    % % Find new treatment outcomes
-    % vec = [r1.Tx, r1.ltfu, r1.muTx]; props = vec/sum(vec);
-    % 
-    % props(end) = 0.01; props(2) = props(2)/2; props(1) = 1 - sum(props(2:3));
-    % newrates = r1.Tx*props/props(1);
-    % r2.ltfu = newrates(2);
-    % r2.muTx = newrates(3);
-    % M2 = make_model(p2, r2, i, s, gps, prm0.contmat);
+    % Improved Tx outcomes
+    r2 = r1; p2 = p1;
+    p2.LTBIinmigr = 0.10472;
+    M2 = make_model(p2, r2, i, s, gps, prm0.contmat);
     % 
     % % ACF in foreign-born
     % r3 = r2; p3 = p2;
@@ -71,29 +64,37 @@ for ii = 1:size(xs,1)
     % p5.migrTPT = 0.6;
     % M5 = make_model(p5, r5, i, s, gps, prm0.contmat);
 
-    models = {M0, M1};
+    models = {M0, M1, M2};
     % prev_soln = init;
+    
+    % M1 = M0; 
+    % M2 = M0;
 
-    M0_end_soln = [];
+    % M0_end_soln = [];
 
-    for mi = 1:length(models)
 
-        geq = @(t,in) goveqs_scaleupb(t, in, i, s, M0, models{mi}, rin_vec, [2027 2035], agg, prm0, sel, r0, p0, false);
-        [t, soln] = ode15s(geq, 2014:2041, init, opts);
 
-        sdiff = diff(soln, [], 1);
-        pops = sum(soln(:,1:i.nstates),2);
+    geq = @(t,in) goveqs_scaleupb(t, in, i, s, M0, M1, rin_vec, [2018 2023], agg, prm0, sel, r0, p0, false);
+    [t1, soln1] = ode15s(geq, 2010:2023, init, opts);
 
-        incsto(:, ii, mi) = sdiff(:, i.aux.inc(1)) * 1e5./pops(1:end-1);
-        mrtsto(:, ii, mi) = sdiff(:, i.aux.mort) * 1e5./pops(1:end-1);
-        prvsto(:, ii, mi) = sum(soln(:,s.allI),2) * 1e5./pops;
+    in2 = soln1(end,:);
 
-        if mi == 6
-            incsource(ii,:) = sdiff(end,i.aux.incsources);
-        end
-    end
+    geq = @(t,in) goveqs_scaleupb(t, in, i, s, M1, M2, rin_vec, [2023 2025], agg, prm0, sel, r0, p0, false);
+    [t2, soln2] = ode15s(geq, 2023:2041, in2, opts);
+
+    soln = [soln1; soln2(2:end,:)];
+
+    sdiff = diff(soln, [], 1);
+    pops = sum(soln(:,1:i.nstates),2);
+
+    incsto(:, ii) = sdiff(:, i.aux.inc(1)) * 1e5./pops(1:end-1);
+    mrtsto(:, ii) = sdiff(:, i.aux.mort) * 1e5./pops(1:end-1);
+    prvsto(:, ii) = sum(soln(:,s.allI),2) * 1e5./pops;
+
 
 end
+
+
 fprintf('\n');
 
 
@@ -101,7 +102,7 @@ fprintf('\n');
 % prctile(incsto(years>=2014 & years<=2024,:,1),[2.5,50,97.5],2)
 % return;
 if saving 
-    save intvn_res26v2;
+    save 15pct;
 end
 return;
 years = 2015:2041;

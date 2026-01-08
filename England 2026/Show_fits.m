@@ -1,6 +1,6 @@
 
 ix0 = size(xsto,1)/2;
-nx  = 200;
+nx  = 20;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
@@ -16,7 +16,7 @@ sim_pct = prctile(sims,[2.5,50,97.5],1);
 % aux.p_incd_recentinf
 
 % Collate data
-alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_LTBI_inmigr; data.p_incd_recentinf];
+alldat = [data.incd2010; data.incd2020; data.mort; data.p_migrTB; data.p_migrpopn; data.p_incd_recentinf];
 den = alldat(:,2)';
 
 sim_plt = sim_pct./den;
