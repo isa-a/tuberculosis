@@ -67,15 +67,15 @@ for ii = 1:size(xs,1)
     models = {M0, M1, M2};
     % prev_soln = init;
     
-    % M1 = M0; 
-    % M2 = M0;
+    M1 = M0; 
+    M2 = M0;
 
     % M0_end_soln = [];
 
 
 
     geq = @(t,in) goveqs_scaleupb(t, in, i, s, M0, M1, rin_vec, [2018 2023], agg, prm0, sel, r0, p0, false);
-    [t1, soln1] = ode15s(geq, 2010:2023, init, opts);
+    [t1, soln1] = ode15s(geq, 2014:2023, init, opts);
 
     in2 = soln1(end,:);
 
@@ -102,9 +102,9 @@ fprintf('\n');
 % prctile(incsto(years>=2014 & years<=2024,:,1),[2.5,50,97.5],2)
 % return;
 if saving 
-    save 15pct;
+    save 9pct;
 end
-return;
+
 years = 2015:2041;
 central_estimate = mean(incsto, 2);             
 lowerbound = prctile(incsto, 2.5, 2);          
@@ -122,11 +122,18 @@ vec2 = upperbound(inds,1,1);
 % return
 
 % Extract prevalence estimates for Sharon, see email on 30 June 2025
+% prv_pct = prctile(prvsto,[2.5,50,97.5],2);
+% prv_tbl = [prv_pct(:,:,1), prv_pct(:,:,2), prv_pct(:,:,3), prv_pct(:,:,4), prv_pct(:,:,5), prv_pct(:,:,6)]';
+% 
+% incd_pct = prctile(incsto,[2.5,50,97.5],2);
+% incd_tbl = [incd_pct(:,:,1), incd_pct(:,:,2), incd_pct(:,:,3), incd_pct(:,:,4), incd_pct(:,:,5), incd_pct(:,:,6)]';
+
 prv_pct = prctile(prvsto,[2.5,50,97.5],2);
-prv_tbl = [prv_pct(:,:,1), prv_pct(:,:,2), prv_pct(:,:,3), prv_pct(:,:,4), prv_pct(:,:,5), prv_pct(:,:,6)]';
+prv_tbl = [prv_pct(:,:,1)]';
 
 incd_pct = prctile(incsto,[2.5,50,97.5],2);
-incd_tbl = [incd_pct(:,:,1), incd_pct(:,:,2), incd_pct(:,:,3), incd_pct(:,:,4), incd_pct(:,:,5), incd_pct(:,:,6)]';
+incd_tbl = [incd_pct(:,:,1)]';
+
 
 % Population numbers for Sharon
 popn = [2022	57112542;

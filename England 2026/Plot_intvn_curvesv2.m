@@ -1,9 +1,9 @@
-clear all; load 15pct;
+clear all; load 9pct;
 
 % Whether to show from 2015, or from 2022
 show_extended = 1;
 
-years = 2011:2041;
+years = 2015:2041;
 
 inc_pct = permute(prctile(incsto, [2.5, 50, 97.5], 2), [2,1,3]);           % Dims: 1.Lo/Md/Hi, 2.Year, 3.Scenario
 mrt_pct = permute(prctile(mrtsto, [2.5, 50, 97.5], 2), [2,1,3]);           % Dims: 1.Lo/Md/Hi, 2.Year, 3.Scenario
@@ -29,7 +29,7 @@ set(gca, 'fontsize', fs);
 if show_extended
     xlim([years(1) years(end)]);
 else
-    xlim([2011 2040]);
+    xlim([2015 2040]);
 end
 yl = ylim; yl(1) = 0; ylim(yl);
 
@@ -42,8 +42,9 @@ yl = ylim; yl(1) = 0; ylim(yl);
 % end
 
 if show_extended
-    years = [2011:2025];
-    incs1 = [15.59, 15.11, 13.48, 11.91,10.46, 10.17, 9.11, 8.24, 8.36, 7.32, 7.77, 7.65, 8.34, 9.37, 0] / 0.875;
+    years = [2015:2025];
+    % incs1 = [15.59, 15.11, 13.48, 11.91,10.46, 10.17, 9.11, 8.24, 8.36, 7.32, 7.77, 7.65, 8.34, 9.37, 0] / 0.875;
+        incs1 = [10.46, 10.17, 9.11, 8.24, 8.36, 7.32, 7.77, 7.65, 8.34, 9.37, 0] / 0.875;
     incs1(end)   = 9.43 / 0.875;
     plot(years, incs1, '.-', 'MarkerSize',20, 'Color', 0.5*[1 1 1], 'LineWidth',1);
 end
