@@ -1,6 +1,6 @@
 
 ix0 = size(xsto,1)/2;
-nx  = 20;
+nx  = 200;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
@@ -34,7 +34,7 @@ xx = (1:length(md)) + 0.1;
 plot(xx, md, 'b.', 'markersize',ms);
 errorbar(xx, md, hilo(1,:), hilo(2,:), 'Color', 'b', 'linestyle', 'None');
 %set(gca,'XTick',1:size(alldat,1),'XTickLabel',fieldnames(data));
-set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'p_LTBI', 'proportion recent'});
+set(gca, 'fontsize', 20, 'XTick', 1:size(alldat,1), 'XTickLabel', {'incd2010', 'incd2020', 'mort', 'p_migrTB', 'p_migrpopn', 'proportion recent'});
 yl = ylim; yl(1) = 0; ylim(yl);
 
 
@@ -42,7 +42,7 @@ yl = ylim; yl(1) = 0; ylim(yl);
 figure; hold on;
 plot(2010:2021, aux.incdt,'Color',0.5*[1 1 1]);
 yl = ylim; yl(1) = 0; ylim(yl);
-xlim([2010, 2021])
+xlim([2010, 2025])
 
 % Plot posterior densities
 figure;

@@ -1,4 +1,4 @@
-clear all; load intvn_res2026;
+clear all; load intvn_res2026_04;
 
 % Whether to show from 2015, or from 2022
 show_extended = 1;
@@ -58,7 +58,7 @@ end
 %     plot(years, incs1, '.-', 'MarkerSize',20, 'Color', 0.5*[1 1 1], 'LineWidth',1);
 % end
 
-
+%legend(lg,'Baseline','+ Enhanced TPT, recent migrants','+ Improved Tx outcomes','+ Accelerated case-finding (foreign-born)','+ Accelerated case-finding (UK-born)','+ Pre-entry migrant screening, TBI','location','SouthWest');
 legend(lg,'Baseline','Improved Tx outcomes', ' + Enhanced TPT, recent migrants','+ Accelerated case-finding (foreign-born)','+ Accelerated case-finding (UK-born)','+ Pre-entry migrant screening, TBI','location','SouthWest');
 set(ff,'Position',[344   297   712   563]);
 
