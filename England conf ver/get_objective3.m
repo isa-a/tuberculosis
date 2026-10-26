@@ -89,12 +89,15 @@ else
     p_LTBI_inmigr = sum(sfin(intersect(s.migr_rect,[s.Lf, s.Ls])))/sum(sfin(s.migr_rect));
     p_migrpopn    = sum(sfin(s.migr))/pops(end);
 
+<<<<<<< HEAD
     % Share of recent migrants who leave, and their average time before leaving
     rate_become_longterm = 1/5;
     average_exit_rate    = mean(r.outvec);
     share_who_leave      = average_exit_rate/(average_exit_rate + rate_become_longterm);
     years_before_leaving = 1/(average_exit_rate + rate_become_longterm);
 
+=======
+>>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
     % % Proportion of population being vulnerable
     % p_vulnpopn = sum(sfin(s.vuln))/sum(sfin(1:i.nstates));
     % 
@@ -122,8 +125,12 @@ else
     if incd(end,1) > 0.1
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_LTBI_inmigr, p_vulnpopn, p_vulnTB, incd_ch2020, p_chpopn, p_adpopn, ch_notifs);
         % keyboard;
+<<<<<<< HEAD
         % out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn,p_incd_recentinf);
         out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn,p_incd_recentinf, share_who_leave, years_before_leaving);
+=======
+        out  = calfn.fn(incd2010, incd2020, mort, p_migrTB, p_migrpopn,p_incd_recentinf);
+>>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
         aux.init       = soln1(end-1,:);
         aux.soln0      = soln0;
         aux.soln       = soln1;
@@ -145,8 +152,11 @@ else
         % aux.adpopn     = p_adpopn;
 %         aux.ch_notifs  = ch_notifs;
         aux.p_incd_recentinf = p_incd_recentinf;
+<<<<<<< HEAD
         aux.share_who_leave      = share_who_leave;
         aux.years_before_leaving = years_before_leaving;
+=======
+>>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
         aux.sim        = [incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_incd_recentinf];
     else
         out = -Inf;

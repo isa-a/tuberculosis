@@ -22,9 +22,12 @@ x0 = fminsearch(nobj,xord(1,:),options);
 x1 = fminsearch(nobj,x0,options);
 x2 = fminsearch(nobj,x1,options);
 x3 = fminsearch(nobj,x2,options);
+<<<<<<< HEAD
 x4 = fminsearch(nobj,x3,options);
 x5 = fminsearch(nobj,x4,options);
 
+=======
+>>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
 
 return;
 % x1 = fminsearch(nobj,x0,options);

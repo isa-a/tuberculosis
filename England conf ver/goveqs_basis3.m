@@ -98,6 +98,7 @@ end
 
 out(1:i.nstates) = out(1:i.nstates) + r_in*M.migrentries;
 
+<<<<<<< HEAD
 % migrants leaving at exit rate for current year
 if equil
     r_out = r.outvec(1);
@@ -107,6 +108,8 @@ end
 
 % out(s.migr) = out(s.migr) - r_out*invec(s.migr);
 out(s.migr_rect) = out(s.migr_rect) - r_out*invec(s.migr_rect);
+=======
+>>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
 
 
 % if t < 2015

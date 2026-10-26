@@ -5,9 +5,14 @@ function [p, r, prm] = allocate_parameters(x,p,r,xi,scaling, prm)
 r.beta           = x(xi.beta)/10;
 
 r.migrout        = x(xi.r_migrout)/10;
+<<<<<<< HEAD
 r.outvec         = r.migrout*r.outvec/mean(r.outvec);
 
 % p.LTBIdec        = x(xi.LTBIdec);
+=======
+
+p.LTBIdec        = x(xi.LTBIdec);
+>>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
 % p.betadec        = 0;
 
 % r.gamma_2015     = x(xi.gamma(1))*[x(xi.p_relrate_gamma_chvad), 1];
