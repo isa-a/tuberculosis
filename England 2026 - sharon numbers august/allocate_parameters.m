@@ -6,7 +6,8 @@ r.beta           = x(xi.beta)/10;
 
 r.migrout        = x(xi.r_migrout)/10;
 
-p.LTBIdec        = x(xi.LTBIdec);
+% p.LTBIdec        = x(xi.LTBIdec);
+p.betadec        = x(xi.betadec);
 % p.betadec        = 0;
 
 % r.gamma_2015     = x(xi.gamma(1))*[x(xi.p_relrate_gamma_chvad), 1];

@@ -200,7 +200,7 @@ r.migr         = 1/10;                                                     % Ave
 % pop      = [66.6e6, 66.7e6, 67e6, 67.6e6, 68.2e6, 69.2e6, 69.4e6];
 
 years    = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
-vals     = [277, 205, 399, 727, 892, 492, 402, 274]*1e3;
+vals     = [277, 205, 399, 727, 892, 492, 402, 273]*1e3;
 % vals     = [286, 210, 406, 734, 899, 829, 670]*1e3;
 % vals     = [286, 210, 406, 734, 904, 509, 474]*1e3;
 % vals     = [277, 205, 399, 727, 892, 492, 402, 274]*1e3;
@@ -243,8 +243,13 @@ rin_vec  = vals./pop;
 % lgths =      [1,        1,      2,            1,                 1,          1,                   1,    1,           1];
 
 
-names = {'beta','LTBIdec','gamma','r_migrout','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
+% names = {'beta','LTBIdec','gamma','r_migrout','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
+% lgths =  [1,        1,      2,            1,        1,                   1,      1,         1];
+
+
+names = {'beta','betadec','gamma','r_migrout','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
 lgths =  [1,        1,      2,            1,        1,                   1,      1,         1];
+
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -257,7 +262,8 @@ xi.nx = lim;
 % Set their boundaries
 bds = [];
 bds(xi.beta,:)                   = [0 40];
-bds(xi.LTBIdec,:)                = [0 0.15];
+% bds(xi.LTBIdec,:)                = [0 0.15];
+bds(xi.betadec,:)                = [0 0.15];
 bds(xi.gamma,:)                  = [0, 1; 1e-4, 10];                       % Rate of treatment uptake, in 2015 and 2020
 % bds(xi.p_relrate_gamma_chvad,:)  = [0 2];                                  % Relative rate of treatment uptake, children vs adults
 bds(xi.r_migrout,:)              = [0 1];
@@ -278,7 +284,7 @@ scaling = ones(1,xi.nx);
 % scaling(xi.r_vuln_sc)   = 500;
 % scaling(xi.r_ageing_sc) = 10;
 scaling(xi.r_migrout) = 10;
-scaling(xi.LTBIdec) = 10;
+scaling(xi.betadec) = 10;
 scaling(xi.muTB) = 10;
 prm.scaling             = scaling;
 

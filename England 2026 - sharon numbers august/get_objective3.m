@@ -27,7 +27,7 @@ else
     
     % Equlibrium model, without RR-TB
     p0 = p; r0 = r; 
-    p0.LTBIdec = 0;
+    p0.betadec = 0;
     p0.prev_in_migr = 0.003;
     r0.gamma   = r.gamma_2015;
     %p0.relbeta = 0; r0.RR_acqu = 0;
@@ -53,6 +53,13 @@ else
     r2.gamma = r.gamma_2015;
     M2 = make_model(p2, r2, i, s, gps, prm.contmat);
 
+    % Scaleup of migration out rate to 1/5
+    p3 = p; r3 = r;
+    r3.gamma   = r.gamma_2015;
+    p3.prev_in_migr = 0;
+    r3.migrout = 1/5;
+    M3 = make_model(p3, r3, i, s, gps, prm.contmat);
+
     % --- Now simulate them all
 
     geq0 = @(t,in) goveqs_basis3(t, in, i, s, M0, rin_vec, agg, sel, r0, p0, true);
@@ -63,7 +70,7 @@ else
     %[t0b, soln0b] = ode15s(geq0b, [1970:2010], soln0(end,:), odeset('NonNegative',1:i.nstates));
 
     % Increased TPT and case-finding
-    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, rin_vec, [2015 2020; 2010 2011], i, s, p2, r2, prm, sel, agg, false);
+    geq1 = @(t,in) goveqs_scaleup2D(t, in, M0, M1, M2, M3, rin_vec, [2015 2020; 2010 2011; 2010 2019], i, s, p3, r3, prm, sel, agg, false);
     [t1, soln1] = ode15s(geq1, [2010:2022], soln0(end,:), odeset('NonNegative', 1:i.nstates));
     
 %     allsol = [soln0; soln1(2:end,:)];

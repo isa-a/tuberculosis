@@ -99,7 +99,7 @@ fprintf('\n');
 % prctile(incsto(years>=2014 & years<=2024,:,1),[2.5,50,97.5],2)
 % return;
 if saving 
-    save intvn_resaug2;
+    save intvn_resaug273_3;
 end
 
 years = 2015:2041;
@@ -109,7 +109,7 @@ upperbound = prctile(incsto, 97.5, 2);
 
 inds = find(years>=2014 & years<2025);
 
-md = squeeze(central_estimate(inds, 1, 1))
+md = squeeze(central_estimate(inds, 1, 1));
 
 vec1 = lowerbound(inds,1,1);
 vec2 = upperbound(inds,1,1);
@@ -152,9 +152,9 @@ popn = [pop_old; popn; pop_new];
 
 incd_nums = incd_tbl/1e5.*popn(:,2)'/1e3;
 if saving
-    writematrix(prv_tbl,   'prev_tbl1.xlsx');
-    writematrix(incd_tbl,  'incd_tbl1.xlsx');
-    writematrix(incd_nums, 'incd_nums1.xlsx');
+    writematrix(prv_tbl,   'prev_tbl4.xlsx');
+    writematrix(incd_tbl,  'incd_tbl4.xlsx');
+    writematrix(incd_nums, 'incd_nums4.xlsx');
 end
 
 

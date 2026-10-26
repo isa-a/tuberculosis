@@ -15,7 +15,7 @@ if midpt
     xs = x3;
 else
     ix0 = size(xsto,1)/2;
-    nx  = 20;
+    nx  = 200;
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
