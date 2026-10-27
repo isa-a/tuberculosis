@@ -15,11 +15,10 @@ if midpt
     xs = x3;
 else
     ix0 = size(xsto,1)/2;
-<<<<<<< HEAD
+
     nx  = 20;
-=======
-    nx  = 200;
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
+
     dx  = round(ix0/nx);
     xs  = xsto(ix0:dx:end,:);
 end
@@ -113,11 +112,11 @@ upperbound = prctile(incsto, 97.5, 2);
 
 inds = find(years>=2014 & years<2025);
 
-<<<<<<< HEAD
+
 md = squeeze(central_estimate(inds, 1, 1));
-=======
+
 md = squeeze(central_estimate(inds, 1, 1))
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
 
 vec1 = lowerbound(inds,1,1);
 vec2 = upperbound(inds,1,1);

@@ -391,11 +391,11 @@ M.denvec = sparse(m);
 m = zeros(i.nstates,2);
 % m(s.ch,1)         = 0;
 m(s.ad,1)         = 1/83;
-<<<<<<< HEAD
+
 % m(s.migr,1)       = m(s.migr,1) + r.migrout;
-=======
+
 m(s.migr,1)       = m(s.migr,1) + r.migrout;
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
 %m(:,1)            = 1/83;
 % m(s.vuln,1)       = 1/55;
 m(s.infectious,2) = r.muTB;

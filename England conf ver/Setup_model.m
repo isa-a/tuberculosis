@@ -183,14 +183,14 @@ r.ACF          = [0 0 0 0];
 r.ACF2         = [0 0 0 0];
 
 p.migrect_popn = 0.168;                                                    % Proportion of population that's migrant recent
-<<<<<<< HEAD
+
 %r.migr         = 1/10;                                                     % Average duration of stay for migrants
 
 r.meanstay   = [2.64 2.28 2.16 2.18 2.13 2.08 2.10 2.19 2.17];
 r.outvec     = 1./r.meanstay;
-=======
+
 r.migr         = 1/10;                                                     % Average duration of stay for migrants
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
 
 % p.LTBI_in_migrad = 0.17;
 % p.LTBI_in_migrch = 0.03;
@@ -246,22 +246,22 @@ rin_vec  = vals./pop;
 % lgths =      [1,        1,      2,            1,                 1,          1,                   1,    1,           1];
 
 
-<<<<<<< HEAD
+
 % names = {'beta','LTBIdec','gamma','r_migrout','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
 % lgths =  [1,        1,      2,            1,        1,                   1,      1,         1];
 
-names = {'beta','gamma','r_migrout','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
-lgths =  [1,         2,            1,        1,                   1,      1,         1];
+% names = {'beta','gamma','r_migrout','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
+% lgths =  [1,         2,            1,        1,                   1,      1,         1];
 
 
 % names = {'beta','LTBIdec','gamma','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
 % lgths =  [1,        1,      2,          1,                  1,      1,         1];
 
 
-=======
+
 names = {'beta','LTBIdec','gamma','r_migrout','p_relrate', 'p_relrate_factor', 'muTB', 'migrmix'};      
 lgths =  [1,        1,      2,            1,        1,                   1,      1,         1];
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
 
 lim = 0; xi = [];
 for ii = 1:length(names)
@@ -277,12 +277,10 @@ bds(xi.beta,:)                   = [0 40];
 bds(xi.LTBIdec,:)                = [0 0.15];
 bds(xi.gamma,:)                  = [0, 1; 1e-4, 10];                       % Rate of treatment uptake, in 2015 and 2020
 % bds(xi.p_relrate_gamma_chvad,:)  = [0 2];                                  % Relative rate of treatment uptake, children vs adults
-<<<<<<< HEAD
+
 % bds(xi.r_migrout,:)              = [0 10];
-bds(xi.r_migrout,:)              = [1.9 2.1];
-=======
 bds(xi.r_migrout,:)              = [0 1];
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
 % bds(xi.p_LTBI_in_migrad,:)       = [0.1 0.6];                              % Prevalence of LTBI in adult migrants, used to construct migrant 'birth' terms
 % bds(xi.p_relLTBI_inmigr_advch,:) = [3 7];                                  % Relative prev of LTBI in migrants, ad vs ch: estimated using simple ARTI calculation
 % bds(xi.r_vuln_sc,:)              = [0 1];                                  % Rate of acquisition of vulnerability
@@ -379,11 +377,10 @@ data.p_chpopn       = [0.1102 0.1902 0.2502];                              % pro
 data.p_adpopn       = [0.6154 0.8154 0.93];                                % proportion of country thats adults
 data.ch_notifs      = [101 141 181]/55.98e6*1e5;                           % notifications in the country
 data.p_incd_recentinf = [20 25 30]/100;                                    
-<<<<<<< HEAD
+
 data.p_leave          = [0.672 0.7165 0.761];
 data.stay_leavers     = [1.88 2.21 2.55];
-=======
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
 
 show = 0;
 f1a = get_distribution_fns(data.incd2010,   'lognorm', show);
@@ -400,11 +397,10 @@ f10  = get_distribution_fns(data.p_chpopn,  'beta',    show);
 f11  = get_distribution_fns(data.p_adpopn,  'beta',    show);
 f12  = get_distribution_fns(data.ch_notifs, 'lognorm', show);
 f13  = get_distribution_fns(data.p_incd_recentinf, 'beta', show);
-<<<<<<< HEAD
+
 f14  = get_distribution_fns(data.p_leave,      'beta',    show);
 f15  = get_distribution_fns(data.stay_leavers, 'lognorm', show);
-=======
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
 
 % lhd.fn = @(incd, mort, p_migrTB, p_migrpopn, p_LTBI) f1(incd) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI);
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_LTBI, nTPT2019) f1a(incd2010) + f1b(incd2020) + f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f5(p_LTBI) + f6(nTPT2019);
@@ -415,18 +411,15 @@ f15  = get_distribution_fns(data.stay_leavers, 'lognorm', show);
 %                                                                                                      f8(incd_ch2020) + ...
 %                                                                                                      f10(p_chpopn) + f11(p_adpopn) + f12(ch_notifs);
 
-<<<<<<< HEAD
 % lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
 %                                                                                                      f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f13(p_incd_recentinf);
 
 lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_incd_recentinf, p_leave, stay_leavers) f1a(incd2010) + f1b(incd2020) + ...
                                                                                                      f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f13(p_incd_recentinf) + ...
                                                                                                      f14(p_leave) + f15(stay_leavers);
-=======
-lhd.fn = @(incd2010, incd2020, mort, p_migrTB, p_migrpopn, p_incd_recentinf) f1a(incd2010) + f1b(incd2020) + ...
-                                                                                                     f2(mort) + f3(p_migrTB) + f4(p_migrpopn) + f13(p_incd_recentinf);
 
 
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
+
+
 
 save Model_setup;

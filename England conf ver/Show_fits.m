@@ -1,11 +1,11 @@
 
 ix0 = size(xsto,1)/2;
-nx  = 200;
+nx  = 20;
 dx  = round(ix0/nx);
 xs  = xsto(ix0:dx:end,:);
 
 %xs(ii,:)
-<<<<<<< HEAD
+
 
 % for ii = 1:size(x3,1)
 %     [out, aux, msg] = obj(x3);
@@ -16,8 +16,6 @@ xs  = xsto(ix0:dx:end,:);
 % sim_pct = prctile(sims,[2.5,50,97.5],1);
 
 
-=======
->>>>>>> 4daf58c29d1317d70fc1e16418c3a49817165328
 for ii = 1:size(xs,1)
     [out, aux, msg] = obj(xs(ii,:));
     sims(ii,:) = aux.sim;
